@@ -1,10 +1,11 @@
-import type { Kind, Risk } from "./services";
+import { isCatalogKind, type Kind, type Risk } from "./services";
 
 /**
  * Risk suggestion from the provider's own words (service name, description, category) and the service kind.
  * Each rule adds or removes points when one of its words appears; longer phrases are matched first and then
  * removed from the text, so "no refill" counts once as "no refill" and not again as "refill".
  * Score ≤ −2 = low · −1 to +1 = medium · ≥ +2 = high. Blocked words (fake reviews, account sales…) = never sold.
+ * Exception: for catalog kinds `account` / `sms` (YTSeller), "account sale" phrases are allowed — that is the product.
  * Staff edit the rules in Admin → Services & risk, and can override and lock any level.
  */
 export type RiskRule = { words: string[]; points: number };
@@ -31,9 +32,13 @@ export const DEFAULT_BLOCKED = ["google reviews", "google custom reviews", "trus
 
 const norm = (s: string) => ` ${s.toLowerCase().replace(/[^a-z0-9/+:%-]+/g, " ").replace(/\s+/g, " ").trim()} `;
 
+/** Phrases that block SMM "account sale" junk but must not block YTSeller account/SMS catalog. */
+const ACCOUNT_SALE_BLOCKED = new Set(["account sale", "accounts for sale"]);
+
 export function analyzeRisk(input: { name: string; desc?: string | null; category?: string | null; kind?: Kind | null }, rules: RiskRule[] = DEFAULT_RISK_RULES, blocked: string[] = DEFAULT_BLOCKED): RiskResult {
   const plain = norm([input.category, input.name, input.desc].filter(Boolean).join(" "));
-  const hit = blocked.map((b) => b.trim().toLowerCase()).find((b) => b && plain.includes(norm(b)));
+  const list = isCatalogKind(input.kind) ? blocked.filter((b) => !ACCOUNT_SALE_BLOCKED.has(b.trim().toLowerCase())) : blocked;
+  const hit = list.map((b) => b.trim().toLowerCase()).find((b) => b && plain.includes(norm(b)));
   if (hit) return { level: "blocked", score: 0, why: [`blocked: ${hit}`] };
 
   // Speed written as "10-50K/Day" or "50-500/Day": 10K+ a day counts as fast, under 1K as slow.
@@ -56,7 +61,7 @@ export function analyzeRisk(input: { name: string; desc?: string | null; categor
     if (counted.has(key)) continue;
     counted.add(key);
     score += points;
-    why.push(`${points > 0 ? "+" : "−"}${Math.abs(points)} ${w}`);
+    why.push(`${points > 0 ? "+" : "\u2212"}${Math.abs(points)} ${w}`);
   }
   return { level: score <= -2 ? "low" : score >= 2 ? "high" : "med", score, why: why.length ? why : ["no clues found"] };
 }
@@ -69,8 +74,8 @@ export function rulesToText(rules: RiskRule[]) {
 export function rulesFromText(text: string): RiskRule[] {
   return text
     .split("\n")
-    .map((l) => /^\s*([+\-−]?\d+)\s+(.+)$/.exec(l))
+    .map((l) => /^\s*([+\-\u2212]?\d+)\s+(.+)$/.exec(l))
     .filter((m): m is RegExpExecArray => !!m)
-    .map((m) => ({ points: Number(m[1].replace("−", "-")), words: m[2].split(",").map((w) => w.trim()).filter(Boolean) }))
+    .map((m) => ({ points: Number(m[1].replace("\u2212", "-")), words: m[2].split(",").map((w) => w.trim()).filter(Boolean) }))
     .filter((r) => r.words.length && Number.isFinite(r.points) && r.points !== 0);
 }
