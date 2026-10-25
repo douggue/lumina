@@ -13,7 +13,7 @@
     "db:seed": "tsx prisma/seed.ts",
     "setup:admin": "tsx scripts/create-admin.ts",
     "test": "vitest run",
-    "postinstall": "prisma generate",
+    "postinstall": "node scripts/emit-public-assets.mjs && prisma generate",
     "vercel-build": "node scripts/vercel-build.mjs"
   },
   "prisma": {
