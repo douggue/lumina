@@ -11,6 +11,7 @@ import { audit } from "@/lib/audit";
 import { t } from "@/lib/text";
 import { StatusBadge } from "@/components/StatusBadge";
 import { CopyButton } from "@/components/CopyButton";
+import { YtDeliveryTools } from "@/components/YtDeliveryTools";
 import { NatcashOrderForm, MoncashRetryButton } from "@/components/OrderPayment";
 import { WhatsAppIcon } from "@/components/Icons";
 import { ReviewRequest } from "@/components/ReviewRequest";
@@ -104,12 +105,35 @@ export default async function OrderPage({ params }: { params: Promise<{ locale: 
                 <StatusBadge status={item.status} label={to(`itemStatus.${item.status}`)} />
               </div>
             </div>
-            {item.codes.length > 0 && (() => {
+            {(() => {
               const tags = item.variant.product.tags;
               const isSms = tags.includes("kind:sms");
               const isAccount = tags.includes("kind:account");
+              if (item.codes.length === 0 && !isSms && !isAccount) return null;
               const title = isSms ? to("yourSms") : isAccount ? to("yourAccount") : to("yourCodes");
+              const ytLabels = {
+                refreshCodes: to("refreshCodes"),
+                refreshOk: to("refreshOk"),
+                refreshNone: to("refreshNone"),
+                gen2fa: to("gen2fa"),
+                pasteSecret: to("pasteSecret"),
+                codeExpires: to("codeExpires"),
+                copy: to("copy"),
+                copied: to("copied"),
+                errors: {
+                  no_secret: to("ytError.no_secret"),
+                  bad_secret: to("ytError.bad_secret"),
+                  not_ytseller: to("ytError.not_ytseller"),
+                  generic: to("ytError.generic"),
+                  missing: to("ytError.missing"),
+                  no_code: to("ytError.no_code"),
+                  no_provider_id: to("ytError.no_provider_id"),
+                  status: to("ytError.status"),
+                },
+              };
               return (
+              <>
+              {item.codes.length > 0 && (
               <div className="rounded-xl border border-border bg-surface-2 p-4">
                 <p className="mb-2 text-sm font-semibold text-text">{title}</p>
                 <ul className="space-y-2">
@@ -145,6 +169,16 @@ export default async function OrderPage({ params }: { params: Promise<{ locale: 
                   })}
                 </ul>
               </div>
+              )}
+              {(isSms || isAccount) && (
+                <YtDeliveryTools
+                  orderId={order.id}
+                  mode={isSms ? "sms" : "account"}
+                  codeItemIds={item.codes.map((c) => ({ id: c.id }))}
+                  labels={ytLabels}
+                />
+              )}
+              </>
               );
             })()}
             {item.supplierOrders[0] && (() => {

@@ -267,7 +267,23 @@
     "yourSms": "Vos numéros SMS",
     "yourAccount": "Comptes livrés",
     "accountUser": "Identifiant",
-    "accountPass": "Mot de passe"
+    "accountPass": "Mot de passe",
+    "refreshCodes": "Actualiser les codes",
+    "refreshOk": "{added} nouvelle(s) ligne(s) ajoutée(s)",
+    "refreshNone": "Aucun nouveau code pour le moment",
+    "gen2fa": "Générer le code 2FA",
+    "pasteSecret": "Coller le secret 2FA (Base32)",
+    "codeExpires": "Expire dans {seconds}s",
+    "ytError": {
+      "no_secret": "Pas de secret 2FA. Collez-le ci-dessous.",
+      "bad_secret": "Secret invalide.",
+      "not_ytseller": "Cette commande ne prend pas en charge l'actualisation.",
+      "generic": "Une erreur s'est produite. Réessayez.",
+      "missing": "Commande introuvable.",
+      "no_code": "Aucun code livré pour le moment.",
+      "no_provider_id": "Commande fournisseur pas encore prête.",
+      "status": "Le statut de la commande ne permet pas cela."
+    }
   },
   "account": {
     "dashboard": "Tableau de bord",

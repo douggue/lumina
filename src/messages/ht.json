@@ -267,7 +267,23 @@
     "yourSms": "Nimewo SMS ou yo",
     "yourAccount": "Kont livre yo",
     "accountUser": "Itilizatè",
-    "accountPass": "Modpas"
+    "accountPass": "Modpas",
+    "refreshCodes": "Rafrechi kòd yo",
+    "refreshOk": "{added} nouvo liy ajoute",
+    "refreshNone": "Pa gen nouvo kòd pou kounye a",
+    "gen2fa": "Jenerye kòd 2FA",
+    "pasteSecret": "Kole sekrè 2FA a (Base32)",
+    "codeExpires": "Ekspire nan {seconds}s",
+    "ytError": {
+      "no_secret": "Pa gen sekrè 2FA. Kole li anba a.",
+      "bad_secret": "Sekrè a pa valid.",
+      "not_ytseller": "Kòmand sa a pa sipòte rafrechisman.",
+      "generic": "Yon erè rive. Eseye ankò.",
+      "missing": "Kòmand pa jwenn.",
+      "no_code": "Pa gen kòd livre ankò.",
+      "no_provider_id": "Kòmand founisè a pa pare.",
+      "status": "Estati kòmand lan pa pèmèt sa."
+    }
   },
   "account": {
     "dashboard": "Tablo bò",
