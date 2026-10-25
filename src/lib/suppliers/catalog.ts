@@ -10,6 +10,8 @@ import { packPrice, type PackConfig } from "../pack-math";
 import { VIP_LEVELS } from "../vip";
 import { smmBalance, smmServices } from "./smm";
 import { isSmm, serviceIdFor } from "./smm-orders";
+import { ytBalance, ytProducts } from "./ytseller";
+import { isYtseller } from "./ytseller-orders";
 
 /**
  * Provider catalogs and the choices sold on the site:
@@ -21,35 +23,66 @@ import { isSmm, serviceIdFor } from "./smm-orders";
  */
 
 const SMM = ["smm_panel", "smm_mock"];
+const CATALOG = [...SMM, "ytseller"];
 
 export async function syncProviderServices(supplierId: string) {
   const s = await prisma.supplier.findUniqueOrThrow({ where: { id: supplierId } });
-  if (!isSmm(s.preset)) throw new Error("Only SMM panels have a service list");
-  const list = await smmServices(s);
+  if (!isSmm(s.preset) && !isYtseller(s.preset)) throw new Error("Only SMM panels and YTSeller have a syncable catalog");
   const now = new Date();
-  // Real panels list thousands of services: add new ones in bulk, update only what changed.
   const existing = new Map((await prisma.providerService.findMany({ where: { supplierId } })).map((x) => [x.serviceId, x]));
   const fresh: Prisma.ProviderServiceCreateManyInput[] = [];
   const changed: Prisma.PrismaPromise<unknown>[] = [];
-  for (const x of list) {
-    const data = { name: x.name.slice(0, 500), category: x.category.slice(0, 200), type: x.type.slice(0, 60), rate: x.rate, min: x.min, max: x.max, refill: x.refill, cancel: x.cancel, dripfeed: x.dripfeed, desc: x.desc?.slice(0, 2000) ?? null };
-    const old = existing.get(x.service);
-    if (!old) fresh.push({ supplierId, serviceId: x.service, ...data, seenAt: now });
-    else if (old.removedAt || old.name !== data.name || old.category !== data.category || old.type !== data.type || Number(old.rate) !== data.rate || old.min !== data.min || old.max !== data.max || old.refill !== data.refill || old.cancel !== data.cancel || old.dripfeed !== data.dripfeed || old.desc !== data.desc)
-      changed.push(prisma.providerService.update({ where: { id: old.id }, data: { ...data, removedAt: null, ...(Number(old.rate) !== data.rate ? { prevRate: old.rate, rateChangedAt: now } : {}) } }));
+  let ids: string[] = [];
+
+  if (isYtseller(s.preset)) {
+    const list = await ytProducts(s);
+    ids = list.map((x) => x.id);
+    for (const x of list) {
+      const requireNote = x.require.length ? `require:${x.require.join(",")}` : "";
+      const kindNote = x.kind === "sms" ? "kind:sms" : "kind:account";
+      const desc = [kindNote, requireNote, x.delivery].filter(Boolean).join(" | ").slice(0, 2000) || null;
+      const data = {
+        name: x.name.slice(0, 500),
+        category: x.category.slice(0, 200),
+        type: x.delivery.slice(0, 60),
+        rate: x.price,
+        min: 1,
+        max: Math.max(0, x.stock),
+        refill: false,
+        cancel: false,
+        dripfeed: false,
+        desc,
+      };
+      const old = existing.get(x.id);
+      if (!old) fresh.push({ supplierId, serviceId: x.id, ...data, seenAt: now });
+      else if (old.removedAt || old.name !== data.name || old.category !== data.category || old.type !== data.type || Number(old.rate) !== data.rate || old.min !== data.min || old.max !== data.max || old.desc !== data.desc)
+        changed.push(prisma.providerService.update({ where: { id: old.id }, data: { ...data, removedAt: null, ...(Number(old.rate) !== data.rate ? { prevRate: old.rate, rateChangedAt: now } : {}) } }));
+    }
+    await ytBalance(s).catch(() => null);
+  } else {
+    const list = await smmServices(s);
+    ids = list.map((x) => x.service);
+    for (const x of list) {
+      const data = { name: x.name.slice(0, 500), category: x.category.slice(0, 200), type: x.type.slice(0, 60), rate: x.rate, min: x.min, max: x.max, refill: x.refill, cancel: x.cancel, dripfeed: x.dripfeed, desc: x.desc?.slice(0, 2000) ?? null };
+      const old = existing.get(x.service);
+      if (!old) fresh.push({ supplierId, serviceId: x.service, ...data, seenAt: now });
+      else if (old.removedAt || old.name !== data.name || old.category !== data.category || old.type !== data.type || Number(old.rate) !== data.rate || old.min !== data.min || old.max !== data.max || old.refill !== data.refill || old.cancel !== data.cancel || old.dripfeed !== data.dripfeed || old.desc !== data.desc)
+        changed.push(prisma.providerService.update({ where: { id: old.id }, data: { ...data, removedAt: null, ...(Number(old.rate) !== data.rate ? { prevRate: old.rate, rateChangedAt: now } : {}) } }));
+    }
+    await smmBalance(s).catch(() => null);
   }
+
   if (fresh.length) await prisma.providerService.createMany({ data: fresh, skipDuplicates: true });
   for (let i = 0; i < changed.length; i += 200) await prisma.$transaction(changed.slice(i, i + 200));
-  await prisma.providerService.updateMany({ where: { supplierId, serviceId: { in: list.map((x) => x.service) } }, data: { seenAt: now } });
+  if (ids.length) await prisma.providerService.updateMany({ where: { supplierId, serviceId: { in: ids } }, data: { seenAt: now } });
   const added = fresh.length;
   const removed = await prisma.providerService.updateMany({ where: { supplierId, removedAt: null, seenAt: { lt: now } }, data: { removedAt: now } });
-  await smmBalance(s).catch(() => null);
-  return { total: list.length, added, updated: changed.length, removed: removed.count };
+  return { total: ids.length, added, updated: changed.length, removed: removed.count };
 }
 
 /** Daily: refresh every SMM provider, then re-check risk (unlocked choices) and profit. */
 export async function syncAllProviders() {
-  const suppliers = await prisma.supplier.findMany({ where: { isEnabled: true, preset: { in: SMM } } });
+  const suppliers = await prisma.supplier.findMany({ where: { isEnabled: true, preset: { in: CATALOG } } });
   const out: Record<string, unknown> = {};
   for (const s of suppliers) out[s.name] = await syncProviderServices(s.id).catch((e) => ({ error: e instanceof Error ? e.message : "failed" }));
   await applyRisk();

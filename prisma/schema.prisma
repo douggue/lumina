@@ -964,26 +964,53 @@ enum TrialStatus {
   REJECTED
 }
 
-/// Free trial requests (one per account, phone number, social profile link and browser). Staff approve them in Admin → Free trials.
+/// Free trial requests (one per account, phone number, social profile/account and browser). Staff approve them in Admin → Free trials.
 model TrialRequest {
-  id        String      @id @default(cuid())
-  userId    String      @unique
-  user      User        @relation(fields: [userId], references: [id])
+  id               String      @id @default(cuid())
+  userId           String      @unique
+  user             User        @relation(fields: [userId], references: [id])
   /// Offer key from the trialOffers setting
-  offer     String
-  /// Link as cleaned by the link check; unique so the same profile/video never gets two trials
-  link      String      @unique
-  phone     String      @unique
-  deviceId  String?
-  ip        String?
-  status    TrialStatus @default(PENDING)
-  orderId   String?
-  note      String?
-  createdAt DateTime    @default(now())
-  decidedAt DateTime?
+  offer            String
+  /// Link as cleaned by the link check; unique so the same exact URL never gets two trials
+  link             String      @unique
+  /// Canonical social account after short-link resolve (e.g. tiktok:@name); unique so another video of the same account is refused
+  socialAccountKey String?  @unique
+  phone            String      @unique
+  /// Set when the customer verified the phone (WhatsApp inbound code)
+  phoneVerifiedAt  DateTime?
+  deviceId         String?
+  ip               String?
+  /// vpn | proxy | datacenter | ok | unknown
+  networkSignal    String?
+  /// Combined anti-cheat score at request time (higher = riskier)
+  riskScore        Int         @default(0)
+  /// auto | review | refuse — decision band from thresholds
+  riskBand         String?
+  status           TrialStatus @default(PENDING)
+  orderId          String?
+  note             String?
+  createdAt        DateTime    @default(now())
+  decidedAt        DateTime?
 
   @@index([status, createdAt])
   @@index([ip, createdAt])
+  @@index([deviceId])
+}
+
+/// WhatsApp inbound phone verification for free trial (customer sends a code to our WA Business number).
+model PhoneVerification {
+  id         String    @id @default(cuid())
+  /// E.164 / normalized phone
+  phone      String
+  userId     String?
+  /// Short code the customer must send via WhatsApp
+  code       String
+  verifiedAt DateTime?
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+
+  @@index([phone, code])
+  @@index([userId, createdAt])
 }
 
 /// A provider's service list (SMM panel "services"), refreshed by "Sync services" and the daily check.

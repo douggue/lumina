@@ -11,6 +11,8 @@ import { checkSupplierOrder, closeSupplierLine, finishOrders, retrySupplierLine 
 import { mockSupplierAllowed } from "@/lib/suppliers/mock";
 import { smmBalance, smmStatuses } from "@/lib/suppliers/smm";
 import { isSmm } from "@/lib/suppliers/smm-orders";
+import { ytBalance, ytStatus } from "@/lib/suppliers/ytseller";
+import { isYtseller } from "@/lib/suppliers/ytseller-orders";
 import type { SupplierConfig } from "@/lib/suppliers/types";
 
 type R = { ok: true; message?: string } | { ok: false; error: string };
@@ -108,6 +110,19 @@ export async function testSupplier(id: string, what: "balance" | "token" | "stat
         return p ? { ok: true, message: `Status: ${p.status}${p.startCount != null ? ` · start ${p.startCount}` : ""}${p.remains != null ? ` · remains ${p.remains}` : ""}${p.error ? ` · ${p.error}` : ""}` } : { ok: false, error: "No answer for this order" };
       }
       return { ok: false, error: "SMM panels use a key, there is no login to test" };
+    }
+    if (isYtseller(sup.preset)) {
+      if (what === "balance") {
+        const b = await ytBalance(sup);
+        return b ? { ok: true, message: `Balance: ${b.balance} ${b.currency}` } : { ok: false, error: "No balance in the reply. Check the API address and key, then see the request log." };
+      }
+      if (what === "status") {
+        const so = await prisma.supplierOrder.findFirst({ where: { supplierId: id, OR: [{ ref: ref.trim() }, { supplierOrderId: ref.trim() }] } });
+        const oid = so?.supplierOrderId ?? ref.trim();
+        const p = await ytStatus(sup, oid, so?.id ?? null);
+        return p.status || !p.error ? { ok: true, message: `Status: ${p.status || "—"}${p.charge != null ? ` · charge ${p.charge}` : ""}${p.error ? ` · ${p.error}` : ""}` } : { ok: false, error: p.error ?? "No answer for this order" };
+      }
+      return { ok: false, error: "YTSeller uses a key, there is no login to test" };
     }
     if (what === "status") {
       const so = ref.trim() ? await prisma.supplierOrder.findFirst({ where: { supplierId: id, ref: ref.trim() } }) : null;
