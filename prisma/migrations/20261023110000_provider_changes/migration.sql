@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "ProviderService" ADD COLUMN     "firstSeenAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN     "prevRate" DECIMAL(18,6),
+ADD COLUMN     "rateChangedAt" TIMESTAMP(3);
