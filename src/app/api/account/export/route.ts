@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/session";
 import { audit } from "@/lib/audit";
 
-/** Customer data export (privacy). Gift-card codes are deliberately left out. */
+/** Customer data export (privacy). Delivered account codes are deliberately left out. */
 export async function GET() {
   const u = await getUser();
   if (!u) return new NextResponse("Sign in first", { status: 401 });

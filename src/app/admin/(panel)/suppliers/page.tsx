@@ -40,11 +40,13 @@ export default async function SuppliersPage() {
 
       <form action={createSupplier} className="card mt-6 grid max-w-2xl gap-3 border-dashed p-5 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
         <p className="font-semibold sm:col-span-3">Add a supplier</p>
-        <label><span className="label">Name</span><input name="name" required maxLength={80} placeholder="MooGold" className="input" /></label>
+        <label><span className="label">Name</span><input name="name" required maxLength={80} placeholder="PerfectPanel" className="input" /></label>
         <label>
           <span className="label">Type</span>
           <select name="preset" className="input">
             {Object.entries(PRESETS)
+              // SMM panel: hide Haiti Gaming gift-card / game / mobile top-up leftovers
+              .filter(([k]) => !["moogold", "reloadly_giftcards", "bamboo", "dtone", "digiflazz"].includes(k))
               .filter(([k]) => k !== "mock" || mockSupplierAllowed())
               .map(([k, p]) => <option key={k} value={k}>{p.label}</option>)}
           </select>
