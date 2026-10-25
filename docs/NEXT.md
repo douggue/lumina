@@ -122,6 +122,12 @@ Status: **noted only**. Nothing here is built. The owner decides the order befor
     - Links and on/off for each set in the admin; icons hidden when no link is set.
     - Opens in the app (WhatsApp, Telegram) on phones.
 
+
+## In progress on `preview/foundations` (Backend)
+- YTSeller preset + sync/order/result path (`ytseller` / `ytseller-orders`); login/SMS lines encrypted as CodeItems.
+- Trial: socialAccountKey, WhatsApp inbound webhook + PhoneVerification, VPN signal, risk score settings. See `docs/api-ytseller-trial.md`.
+- Not on `main` until Lead ships.
+
 ## Waiting on preview (not on `main` yet)
 - One Private Blob store for every upload (public images served through `/media/…`).
 - `docs/DEPLOY.md` updated: Private Blob, the 5-minute order check with cron-job.org, SMM steps.

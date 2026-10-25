@@ -7,6 +7,7 @@ import { saveSupplier, supplierOrderAction, testSupplier } from "@/actions/suppl
 import { secretsOf } from "@/lib/suppliers/engine";
 import { PRESETS } from "@/lib/suppliers/presets";
 import { isSmm } from "@/lib/suppliers/smm-orders";
+import { isYtseller } from "@/lib/suppliers/ytseller-orders";
 import type { SupplierConfig } from "@/lib/suppliers/types";
 import { ActionButton, ActionForm } from "@/components/admin/ActionButton";
 import { PageTitle, Table } from "@/components/admin/ui";
@@ -30,7 +31,7 @@ export default async function SupplierPage({ params }: { params: Promise<{ id: s
   const s = await prisma.supplier.findUnique({ where: { id } });
   if (!s) notFound();
   const cfg = s.config as unknown as SupplierConfig;
-  const smm = isSmm(s.preset);
+  const smm = isSmm(s.preset) || isYtseller(s.preset);
   const saved = secretsOf(s);
   const preset = PRESETS[s.preset];
   const [orders, logs, variants] = await Promise.all([
