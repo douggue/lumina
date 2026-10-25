@@ -8,7 +8,7 @@ import { cleanInfo, type ServiceInfo } from "./service-info";
 
 export type ServiceType = "default" | "comments" | "commentLikes" | "live" | "liveComments";
 export type Risk = "low" | "med" | "high";
-export type Kind = "followers" | "likes" | "views" | "comments" | "live";
+export type Kind = "followers" | "likes" | "views" | "comments" | "live" | "account" | "sms";
 
 export type ServiceMeta = {
   type: ServiceType;
@@ -65,10 +65,39 @@ export function parseMeta(v: unknown): ServiceMeta | null {
 /** Service kind of a product, from its "kind:…" tag. */
 export function productKind(tags: string[]): Kind | null {
   const tag = tags.find((t) => t.startsWith("kind:"))?.slice(5);
-  return tag && ["followers", "likes", "views", "comments", "live"].includes(tag) ? (tag as Kind) : null;
+  return tag && ["followers", "likes", "views", "comments", "live", "account", "sms"].includes(tag) ? (tag as Kind) : null;
 }
 
-export const KIND_ORDER: Kind[] = ["followers", "likes", "views", "comments", "live"];
+export const KIND_ORDER: Kind[] = ["followers", "likes", "views", "comments", "live", "account", "sms"];
+
+/** True for YTSeller account / SMS catalog kinds (no social link). */
+export function isCatalogKind(kind: Kind | null | undefined): kind is "account" | "sms" {
+  return kind === "account" || kind === "sms";
+}
+
+/** Provider require keys from notes like `require:email,country` in ProviderService.desc. */
+export function parseProviderRequire(desc?: string | null): string[] {
+  if (!desc) return [];
+  const m = /(?:^|[|·\s])require:([^\s|·]+)/i.exec(desc);
+  if (!m) return [];
+  return [...new Set(m[1].split(",").map((s) => s.trim()).filter(Boolean))];
+}
+
+/** Instant vs 24h from provider delivery / type text in desc notes. */
+export function parseProviderDelivery(desc?: string | null, type?: string | null): "instant" | "24h" | string {
+  const text = `${type ?? ""} ${desc ?? ""}`;
+  if (/\b(?:within\s*)?24\s*h(?:ours?)?\b/i.test(text) || /\b24h\b/i.test(text)) return "24h";
+  if (/\binstant\b/i.test(text)) return "instant";
+  const t = (type ?? "").trim();
+  return t || "instant";
+}
+
+/** SMS always; account when provider notes mention no warranty. */
+export function productNeedsNoWarranty(kind: Kind | null | undefined, desc?: string | null): boolean {
+  if (kind === "sms") return true;
+  if (kind === "account" && /no[\s_-]?warranty/i.test(desc ?? "")) return true;
+  return false;
+}
 
 /** Platforms the site knows how to check links for (category slugs). */
 export const PLATFORMS: Record<string, { name: string; letter: string; color: string }> = {
@@ -92,6 +121,7 @@ const RULES: Record<string, LinkRule> = {
 
 /** What kind of link a service needs: a profile (followers, live) or a video/post (likes, views, comments). */
 export function wantsPost(kind: Kind | null, type: ServiceType) {
+  if (kind === "account" || kind === "sms") return false;
   if (type === "live" || type === "liveComments") return false;
   if (type === "comments" || type === "commentLikes") return true;
   return kind === "likes" || kind === "views";

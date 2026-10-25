@@ -14,7 +14,7 @@ import { amountInRange, isExchangeProduct, quoteAmount } from "./amount";
 import { hasOpenSupplierOrder, queueSupplierLines, sendQueued } from "./suppliers/orders";
 import { vipStatus, withDiscount } from "./vip";
 import { resolveShortLink } from "./link-resolve";
-import { checkLink, isShortLink, DRIP_INTERVAL_MIN, DRIP_RUNS, LIVE_DURATIONS, parseComments, parseMeta, productKind, servicePrice, wantsPost } from "./services";
+import { checkLink, isCatalogKind, isShortLink, DRIP_INTERVAL_MIN, DRIP_RUNS, LIVE_DURATIONS, parseComments, parseMeta, parseProviderRequire, productKind, productNeedsNoWarranty, servicePrice, wantsPost } from "./services";
 
 export type FieldDef = {
   key: string;
@@ -160,7 +160,7 @@ export async function createOrder(input: {
 export type ServiceOrderInput = {
   userId: string;
   variantId: string;
-  link: string;
+  link?: string;
   quantity: number;
   comments?: string;
   username?: string;
@@ -169,6 +169,10 @@ export type ServiceOrderInput = {
   acceptRisk?: boolean;
   /** The customer ticked "my account is public" */
   publicOk?: boolean;
+  /** Extra provider fields (YTSeller require:… keys) */
+  fields?: Record<string, string>;
+  /** SMS / no-warranty consent */
+  noWarrantyAccepted?: boolean;
 };
 
 /**
@@ -186,51 +190,77 @@ export async function createServiceOrder(input: ServiceOrderInput) {
   if ((await getSettings()).serviceStatus?.[v.product.category.slug] === "pause") throw new OrderError("unavailable");
   const kind = productKind(v.product.tags);
   const slug = v.product.category.slug;
-  const post = wantsPost(kind, meta.type);
-  let link = checkLink(input.link, slug, post, meta.postType);
-  if (!link.ok) throw new OrderError("invalid_link");
-  // Short share links: open them to see if they really point to a video or a profile, and keep the full address.
-  if (isShortLink(link.url, slug)) {
-    const full = await resolveShortLink(link.url);
-    if (full) {
-      link = checkLink(full, slug, post, meta.postType);
-      if (!link.ok) throw new OrderError(`link_${link.error}`);
-    }
-  }
-  if (!input.publicOk) throw new OrderError("not_public");
-  // One order at a time per link and service: providers count from one start number, so two at once get mixed up.
-  const running = await prisma.orderItem.count({
-    where: { variant: { productId: v.productId }, fieldValues: { path: ["link"], equals: link.url }, order: { status: { in: ["PAID", "PROCESSING"] } } },
-  });
-  if (running) throw new OrderError("same_link");
+  const catalog = isCatalogKind(kind);
 
-  const fieldValues: Record<string, string> = { link: link.url, publicConfirmedAt: new Date().toISOString() };
+  const fieldValues: Record<string, string> = {};
   let quantity = input.quantity;
-  if (meta.type === "comments" || meta.type === "liveComments") {
-    const lines = parseComments(input.comments ?? "");
-    quantity = lines.length;
-    fieldValues.comments = lines.join("\n");
-  }
-  if (!Number.isInteger(quantity) || quantity < meta.min || quantity > meta.max) throw new OrderError("invalid_quantity");
-  if (meta.type === "commentLikes") {
-    const name = (input.username ?? "").trim().replace(/^@/, "");
-    if (!/^[A-Za-z0-9._]{1,40}$/.test(name)) throw new OrderError("missing_field");
-    fieldValues.username = name;
-  }
   let duration = 30;
-  if (meta.type === "live") {
-    duration = input.durationMin ?? 30;
-    if (!(LIVE_DURATIONS as readonly number[]).includes(duration)) throw new OrderError("invalid_quantity");
-    fieldValues.durationMin = String(duration);
+
+  if (catalog) {
+    // Account / SMS: no social link, no public-ok, no same-link check.
+    if (!Number.isInteger(quantity) || quantity < meta.min || quantity > meta.max) throw new OrderError("invalid_quantity");
+    const require = parseProviderRequire(meta.desc);
+    const incoming = input.fields ?? {};
+    for (const key of require) {
+      const val = (incoming[key] ?? "").trim().slice(0, 200);
+      if (!val) throw new OrderError("missing_field");
+      fieldValues[key] = val;
+    }
+    if (productNeedsNoWarranty(kind, meta.desc)) {
+      if (!input.noWarrantyAccepted) throw new OrderError("no_warranty");
+      fieldValues.noWarrantyAcceptedAt = new Date().toISOString();
+    }
+    if (meta.risk === "high") {
+      if (!input.acceptRisk) throw new OrderError("risk_not_accepted");
+      fieldValues.riskAcceptedAt = new Date().toISOString();
+    }
+    fieldValues.quantity = String(quantity);
+  } else {
+    const post = wantsPost(kind, meta.type);
+    let link = checkLink(input.link ?? "", slug, post, meta.postType);
+    if (!link.ok) throw new OrderError("invalid_link");
+    // Short share links: open them to see if they really point to a video or a profile, and keep the full address.
+    if (isShortLink(link.url, slug)) {
+      const full = await resolveShortLink(link.url);
+      if (full) {
+        link = checkLink(full, slug, post, meta.postType);
+        if (!link.ok) throw new OrderError(`link_${link.error}`);
+      }
+    }
+    if (!input.publicOk) throw new OrderError("not_public");
+    // One order at a time per link and service: providers count from one start number, so two at once get mixed up.
+    const running = await prisma.orderItem.count({
+      where: { variant: { productId: v.productId }, fieldValues: { path: ["link"], equals: link.url }, order: { status: { in: ["PAID", "PROCESSING"] } } },
+    });
+    if (running) throw new OrderError("same_link");
+
+    fieldValues.link = link.url;
+    fieldValues.publicConfirmedAt = new Date().toISOString();
+    if (meta.type === "comments" || meta.type === "liveComments") {
+      const lines = parseComments(input.comments ?? "");
+      quantity = lines.length;
+      fieldValues.comments = lines.join("\n");
+    }
+    if (!Number.isInteger(quantity) || quantity < meta.min || quantity > meta.max) throw new OrderError("invalid_quantity");
+    if (meta.type === "commentLikes") {
+      const name = (input.username ?? "").trim().replace(/^@/, "");
+      if (!/^[A-Za-z0-9._]{1,40}$/.test(name)) throw new OrderError("missing_field");
+      fieldValues.username = name;
+    }
+    if (meta.type === "live") {
+      duration = input.durationMin ?? 30;
+      if (!(LIVE_DURATIONS as readonly number[]).includes(duration)) throw new OrderError("invalid_quantity");
+      fieldValues.durationMin = String(duration);
+    }
+    if (input.drip && meta.drip) {
+      fieldValues.drip = `${DRIP_RUNS}x${Math.ceil(quantity / DRIP_RUNS)}/${DRIP_INTERVAL_MIN}min`;
+    }
+    if (meta.risk === "high") {
+      if (!input.acceptRisk) throw new OrderError("risk_not_accepted");
+      fieldValues.riskAcceptedAt = new Date().toISOString();
+    }
+    fieldValues.quantity = String(quantity);
   }
-  if (input.drip && meta.drip) {
-    fieldValues.drip = `${DRIP_RUNS}x${Math.ceil(quantity / DRIP_RUNS)}/${DRIP_INTERVAL_MIN}min`;
-  }
-  if (meta.risk === "high") {
-    if (!input.acceptRisk) throw new OrderError("risk_not_accepted");
-    fieldValues.riskAcceptedAt = new Date().toISOString();
-  }
-  fieldValues.quantity = String(quantity);
 
   // VIP discount by total spent (src/lib/vip.ts)
   const vip = await vipStatus(input.userId);

@@ -25,6 +25,8 @@ export const KIND_NAMES: Record<Kind, ReturnType<typeof L>> = {
   views: L("Vi", "Vues"),
   comments: L("Kòmantè", "Commentaires"),
   live: L("Live", "Live"),
+  account: L("Kont", "Compte"),
+  sms: L("SMS", "SMS"),
 };
 
 type Tier = [name: ReturnType<typeof L>, type: ServiceType, ratePer1000: number, avg: ReturnType<typeof L>, risk: Risk, refillDays: number, min: number, max: number, drip: boolean, desc: string];

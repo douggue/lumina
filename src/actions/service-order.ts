@@ -9,7 +9,7 @@ import { createPackOrder } from "@/lib/packs";
 
 const input = z.object({
   variantId: z.string().min(1).max(64),
-  link: z.string().max(500),
+  link: z.string().max(500).optional().default(""),
   quantity: z.number().int().min(0).max(10_000_000),
   comments: z.string().max(100_000).optional(),
   username: z.string().max(60).optional(),
@@ -17,6 +17,10 @@ const input = z.object({
   drip: z.boolean().optional(),
   acceptRisk: z.boolean().optional(),
   publicOk: z.boolean().optional(),
+  /** Extra provider fields (YTSeller require:… keys) */
+  fields: z.record(z.string().max(200)).optional(),
+  /** SMS / no-warranty consent */
+  noWarrantyAccepted: z.boolean().optional(),
 });
 
 export type ServiceOrderResult = { ok: true; orderId: string } | { ok: false; error: string };
