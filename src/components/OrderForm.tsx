@@ -33,7 +33,7 @@ export type OrderCatalog = {
   services: { kind: Kind; tiers: OrderTier[] }[];
 }[];
 
-const RISK_COLOR: Record<Risk, string> = { low: "#16A34A", med: "#D97706", high: "#DC2626" };
+const RISK_COLOR: Record<Risk, string> = { low: "bg-success", med: "bg-warning", high: "bg-danger" };
 const num = (n: number) => n.toLocaleString("en-US");
 
 /** Rounded chip: dark when selected (mockup "pill"). */
@@ -203,11 +203,11 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
             const per = x.meta.type === "comments" || x.meta.type === "liveComments" ? t("perComment") : x.meta.type === "live" ? t("per1000live") : t("per1000");
             const price = x.meta.type === "comments" || x.meta.type === "liveComments" ? `${(x.rate / 100 / 1000).toFixed(2)} HTG` : fmt(x.rate);
             return (
-              <div key={x.id} className={`flex items-stretch rounded-[14px] border-2 bg-surface ${on ? "border-text shadow-[0_0_0_3px_#E2E8F0] dark:shadow-none" : "border-border"} ${x.soldOut ? "opacity-50" : ""}`}>
+              <div key={x.id} className={`flex items-stretch rounded-[14px] border-2 bg-surface ${on ? "border-text shadow-[0_0_0_3px_var(--border)] dark:shadow-none" : "border-border"} ${x.soldOut ? "opacity-50" : ""}`}>
                 <button type="button" aria-pressed={on} disabled={x.soldOut} onClick={() => pickTier(i)} className="flex min-w-0 flex-1 flex-col gap-1.5 py-3 pl-3.5 text-left">
                   <span className="flex items-center gap-2">
                     <span className="text-[15px] font-extrabold">{x.name}</span>
-                    <span aria-hidden className="h-[9px] w-[9px] rounded-full" style={{ background: RISK_COLOR[x.meta.risk] }} />
+                    <span aria-hidden className={`h-[9px] w-[9px] rounded-full ${RISK_COLOR[x.meta.risk]}`} />
                     <span className="text-xs text-muted">{t(`risk_${x.meta.risk}`)}</span>
                   </span>
                   <span className="text-xs text-muted">
@@ -312,12 +312,12 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
                     className="rounded-xl border border-border bg-surface px-3.5 py-3 text-base leading-normal" />
                   {commentList.length === 1 && commentList[0].includes(",") && (
                     <button type="button" onClick={() => setComments(commentList[0].split(",").map((s) => s.trim()).filter(Boolean).join("\n"))}
-                      className="min-h-11 rounded-xl border border-[#F59E0B] bg-[#FFFBEB] text-[13px] font-bold text-[#92400E]">{t("splitCommas")}</button>
+                      className="min-h-11 rounded-xl border border-warning bg-warning-soft text-[13px] font-bold text-warning">{t("splitCommas")}</button>
                   )}
                   <div className="flex flex-wrap gap-1.5">
                     {t("presets").split("|").map((p) => (
                       <button key={p} type="button" onClick={() => setComments((c) => (c.trim() ? `${c.replace(/\s+$/, "")}\n` : "") + p)}
-                        className="min-h-[38px] rounded-full border border-dashed border-[#94A3B8] bg-surface px-3 text-[13px] font-semibold">+ {p}</button>
+                        className="min-h-[38px] rounded-full border border-dashed border-border bg-surface px-3 text-[13px] font-semibold">+ {p}</button>
                     ))}
                   </div>
                 </>
@@ -332,8 +332,8 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
               )}
 
               {liveAny && (
-                <div className="flex gap-2.5 rounded-xl bg-[#FFEDD5] p-3 text-[13px] leading-normal text-[#7C2D12]">
-                  <span className="flex h-[22px] flex-none items-center rounded-md bg-[#DC2626] px-2 text-[11px] font-extrabold text-white">LIVE</span>
+                <div className="flex gap-2.5 rounded-xl bg-warning-soft p-3 text-[13px] leading-normal text-warning">
+                  <span className="flex h-[22px] flex-none items-center rounded-md bg-danger px-2 text-[11px] font-extrabold text-white">LIVE</span>
                   <span>{t("liveWarn")}</span>
                 </div>
               )}
@@ -378,8 +378,8 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
         )}
 
         {isCatalog && tier.noWarranty && (
-          <label className="flex cursor-pointer items-start gap-2.5 rounded-2xl border-2 border-[#FCA5A5] bg-[#FEF2F2] p-3.5 text-[13px] leading-normal text-[#7F1D1D]">
-            <input type="checkbox" checked={noWarrantyOk} onChange={() => setNoWarrantyOk((v) => !v)} className="m-0 h-[22px] w-[22px] flex-none accent-[#DC2626]" />
+          <label className="flex cursor-pointer items-start gap-2.5 rounded-2xl border-2 border-danger bg-danger-soft p-3.5 text-[13px] leading-normal text-danger">
+            <input type="checkbox" checked={noWarrantyOk} onChange={() => setNoWarrantyOk((v) => !v)} className="m-0 h-[22px] w-[22px] flex-none accent-danger" />
             <span>
               <b className="block">{t("noWarrantyTitle")}</b>
               {t("noWarrantyBody")}
@@ -388,8 +388,8 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
         )}
 
         {isHigh && (
-          <label className="flex cursor-pointer items-start gap-2.5 rounded-2xl border-2 border-[#FCA5A5] bg-[#FEF2F2] p-3.5 text-[13px] leading-normal text-[#7F1D1D]">
-            <input type="checkbox" checked={accepted} onChange={() => setAccepted((a) => !a)} className="m-0 h-[22px] w-[22px] flex-none accent-[#DC2626]" />
+          <label className="flex cursor-pointer items-start gap-2.5 rounded-2xl border-2 border-danger bg-danger-soft p-3.5 text-[13px] leading-normal text-danger">
+            <input type="checkbox" checked={accepted} onChange={() => setAccepted((a) => !a)} className="m-0 h-[22px] w-[22px] flex-none accent-danger" />
             <span>{t.rich("riskAccept", { b: (c) => <b>{c}</b> })}</span>
           </label>
         )}
@@ -482,7 +482,7 @@ function ServiceDetails({ id, tab, setTab, meta, post, live, locale, updates }: 
         <div className="flex flex-col gap-3 p-3.5 text-[13px] leading-normal">
           <p className="font-bold">{t("readStatusTitle")}</p>
           <ul className="flex flex-col gap-1.5">
-            {([["pending", "#B45309"], ["running", "#1E40AF"], ["done", "#166534"], ["partial", "#B45309"], ["canceled", "#B91C1C"]] as const).map(([k, c]) => (
+            {([["pending", "var(--warning)"], ["running", "var(--primary)"], ["done", "var(--success)"], ["partial", "var(--warning)"], ["canceled", "var(--danger)"]] as const).map(([k, c]) => (
               <li key={k}><b style={{ color: c }}>{t(`readS_${k}`)}</b> {t(`readS_${k}_text`)}</li>
             ))}
           </ul>
