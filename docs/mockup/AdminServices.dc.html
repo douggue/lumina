@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HaitiViral – Services risk analysis</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#00209F}a:hover{color:#001670}
+</style>
+</helmet>
+<div style="box-sizing: border-box; min-height: 1150px; background: #F5F6FB; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0F172A; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <aside style="flex: 1 1 220px; max-width: 100%; background: #0F172A; color: #E2E8F0; padding: 20px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
+    <div style="display: flex; align-items: center; gap: 8px; padding: 0 8px">
+      <div style="width: 30px; height: 30px; border-radius: 8px; background: #00209F; display: flex; align-items: center; justify-content: center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="15 7 21 7 21 13"></polyline></svg>
+      </div>
+      <div style="font-size: 17px; font-weight: 800; color: #FFFFFF">Haiti<span style="color: #FF6B7D">Viral</span> <span style="font-size: 11px; font-weight: 700; color: #94A3B8">ADMIN</span></div>
+    </div>
+    <nav aria-label="Admin" style="display: flex; flex-direction: column; gap: 2px">
+      <sc-for list="{{nav}}" as="n" hint-placeholder-count="8">
+        <a href="{{n.href}}" style="{{n.style}}">{{n.label}}</a>
+      </sc-for>
+    </nav>
+  </aside>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 28px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px">
+      <div>
+        <h1 style="margin: 0; font-size: 24px; font-weight: 800">Services · risk analysis</h1>
+        <div style="font-size: 13px; color: #5B6478; margin-top: 4px">Levels are suggested from the provider's own words. You have the final say.</div>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap">
+        <button type="button" style="min-height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid #CBD2E1; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; color: #0F172A">Sync from providers</button>
+        <button type="button" style="min-height: 40px; padding: 0 14px; border-radius: 10px; border: none; background: #00209F; font: inherit; font-size: 13px; font-weight: 700; color: #FFFFFF">Re-analyze all</button>
+      </div>
+    </div>
+
+    <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px">
+      <sc-for list="{{counts}}" as="c" hint-placeholder-count="4">
+        <div style="background: #FFFFFF; border: 1px solid #E5E7EF; border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
+          <span style="{{c.badge}}">{{c.label}}</span>
+          <div style="font-size: 24px; font-weight: 800">{{c.value}}</div>
+        </div>
+      </sc-for>
+    </section>
+    <div style="font-size: 12px; color: #5B6478; margin-top: -10px">Counts from a real test: 3,921 services of one provider, analyzed on 2026-10-21.</div>
+
+    <section style="background: #FFFFFF; border: 1px solid #E5E7EF; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 700">Services</h2>
+      <div style="overflow-x: auto">
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 900px">
+          <thead>
+            <tr style="text-align: left; color: #5B6478; font-size: 12px">
+              <th style="padding: 8px 6px; font-weight: 700">Provider service (name as given by provider)</th>
+              <th style="padding: 8px 6px; font-weight: 700">Suggested</th>
+              <th style="padding: 8px 6px; font-weight: 700">Why</th>
+              <th style="padding: 8px 6px; font-weight: 700">Your level</th>
+              <th style="padding: 8px 6px; font-weight: 700">Lock</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{rows}}" as="r" hint-placeholder-count="7">
+              <tr style="border-top: 1px solid #EEF0F5; vertical-align: top">
+                <td style="padding: 12px 6px; max-width: 280px">
+                  <div style="font-weight: 700; font-size: 14px">{{r.name}}</div>
+                  <div style="color: #5B6478; margin-top: 3px">{{r.desc}}</div>
+                </td>
+                <td style="padding: 12px 6px; white-space: nowrap">
+                  <span style="{{r.suggestedBadge}}">{{r.suggestedLabel}}</span>
+                  <div style="color: #5B6478; margin-top: 6px">score {{r.score}}</div>
+                </td>
+                <td style="padding: 12px 6px">
+                  <div style="display: flex; gap: 5px; flex-wrap: wrap; max-width: 260px">
+                    <sc-for list="{{r.why}}" as="w" hint-placeholder-count="2">
+                      <span style="{{w.style}}">{{w.text}}</span>
+                    </sc-for>
+                  </div>
+                </td>
+                <td style="padding: 12px 6px">
+                  <label style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)" for="{{r.selectId}}">Your level for {{r.name}}</label>
+                  <select id="{{r.selectId}}" value="{{r.level}}" onChange="{{r.setLevel}}" style="{{r.selectStyle}}">
+                    <option value="auto">Use suggestion</option>
+                    <option value="low">Low risk</option>
+                    <option value="med">Medium risk</option>
+                    <option value="high">High risk</option>
+                    <option value="blocked">Blocked (never sell)</option>
+                  </select>
+                  <sc-if value="{{r.overridden}}" hint-placeholder-val="{{ false }}">
+                    <div style="font-size: 11px; color: #1E40AF; font-weight: 700; margin-top: 5px">Changed by you</div>
+                  </sc-if>
+                </td>
+                <td style="padding: 12px 6px">
+                  <button type="button" onClick="{{r.toggleLock}}" aria-pressed="{{r.lockedText}}" aria-label="Lock level for {{r.name}}" style="{{r.lockStyle}}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="{{r.lockPath}}"></path></svg>
+                    {{r.lockLabel}}
+                  </button>
+                </td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-wrap: wrap; gap: 16px">
+      <div style="flex: 2 1 420px; min-width: 0; background: #FFFFFF; border: 1px solid #E5E7EF; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap">
+          <h2 style="margin: 0; font-size: 16px; font-weight: 700">Clue rules (editable)</h2>
+          <button type="button" style="min-height: 36px; padding: 0 12px; border-radius: 10px; border: 1px dashed #94A3B8; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; color: #0F172A">+ Add rule</button>
+        </div>
+        <div style="font-size: 12px; color: #5B6478">Score ≤ −2 = Low · −1 to +1 = Medium · ≥ +2 = High</div>
+        <div style="display: flex; flex-direction: column">
+          <sc-for list="{{rules}}" as="u" hint-placeholder-count="8">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 0; border-top: 1px solid #EEF0F5">
+              <div style="font-size: 13px; font-family: ui-monospace, Menlo, monospace; color: #0F172A">{{u.words}}</div>
+              <div style="display: flex; align-items: center; gap: 8px">
+                <span style="{{u.style}}">{{u.points}}</span>
+                <button type="button" style="min-height: 32px; padding: 0 10px; border-radius: 8px; border: 1px solid #CBD2E1; background: #FFFFFF; font: inherit; font-size: 12px; font-weight: 700; color: #334155">Edit</button>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="flex: 1 1 280px; min-width: 0; background: #FFFFFF; border: 1px solid #E5E7EF; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Learned from real orders</h2>
+        <div style="padding: 10px 12px; border-radius: 10px; background: #FEF3C7; color: #78350F; display: flex; flex-direction: column; gap: 3px">
+          <div style="font-size: 13px; font-weight: 700">Instagram Followers (30 Day Refill)</div>
+          <div style="font-size: 12px; line-height: 1.45">18% of orders needed a refill this month. Suggest: Medium → High.</div>
+          <div style="display: flex; gap: 6px; margin-top: 6px">
+            <button type="button" style="min-height: 34px; padding: 0 10px; border-radius: 8px; border: none; background: #92400E; color: #FFFFFF; font: inherit; font-size: 12px; font-weight: 700">Accept</button>
+            <button type="button" style="min-height: 34px; padding: 0 10px; border-radius: 8px; border: 1px solid #D6B98C; background: transparent; color: #78350F; font: inherit; font-size: 12px; font-weight: 700">Ignore</button>
+          </div>
+        </div>
+        <h2 style="margin: 8px 0 0; font-size: 16px; font-weight: 700">Blocked categories</h2>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap">
+          <span style="font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 999px; background: #E2E8F0; color: #0F172A">Google reviews</span>
+          <span style="font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 999px; background: #E2E8F0; color: #0F172A">Trustpilot reviews</span>
+          <span style="font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 999px; background: #E2E8F0; color: #0F172A">App store reviews</span>
+          <span style="font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 999px; background: #E2E8F0; color: #0F172A">Account sales</span>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1150}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { level: { igf30: 'high' }, locked: { igf30: true } };
+  }
+  renderVals() {
+    const st = this.state;
+    const pill = (bg, fg) => 'display: inline-block; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: ' + bg + '; color: ' + fg + '; white-space: nowrap';
+    const B = {
+      low: ['Low', pill('#DCFCE7', '#166534')],
+      med: ['Medium', pill('#FEF3C7', '#92400E')],
+      high: ['High', pill('#FEE2E2', '#991B1B')],
+      blocked: ['Blocked', pill('#0F172A', '#FFFFFF')]
+    };
+    const chip = (t) => ({ text: t, style: 'font-size: 11px; font-weight: 700; padding: 3px 7px; border-radius: 6px; font-family: ui-monospace, Menlo, monospace; ' + (t.charAt(0) === '+' ? 'background: #FEE2E2; color: #991B1B' : t.charAt(0) === '−' ? 'background: #DCFCE7; color: #166534' : 'background: #F1F5F9; color: #475569') });
+    const data = [
+      { id: 'ttcom', name: 'TikTok English Comment, Like, Add to Favorites, and Save', desc: 'Real User Guarantee / Speed: 50-500/Day', s: 'low', score: '−4', why: ['−2 real', '−1 guarantee', '−1 slow speed'] },
+      { id: 'iglikes', name: 'Instagram Real Likes + Reach + Impressions', desc: '30 Day Refill / 150-200K/Day', s: 'low', score: '−3', why: ['+1 very fast', '−2 real', '−2 refill'] },
+      { id: 'igf30', name: 'Instagram Followers', desc: '30 Day Refill / Speed: 10-50K/Day', s: 'med', score: '−1', why: ['+1 very fast', '−2 refill'] },
+      { id: 'ytlive', name: 'YouTube Live Stream Views', desc: '60 Minutes / 100% Concurrent', s: 'med', score: '0', why: ['no clues found'] },
+      { id: 'ttviews', name: 'TikTok Video Views', desc: 'No Refill / Speed: 50-500K/Day', s: 'med', score: '+1', why: ['+2 no refill', '+1 very fast', '−2 kind: views'] },
+      { id: 'igfnr', name: 'Instagram Followers', desc: 'No Refill / Speed: 500-2K/Day', s: 'high', score: '+3', why: ['+2 no refill', '+1 kind: followers'] },
+      { id: 'greviews', name: 'Google Custom Reviews', desc: 'Canada / 30 Day Refill', s: 'blocked', score: '—', why: ['blocked category: fake reviews'] }
+    ];
+    const rows = data.map((d) => {
+      const lv = st.level[d.id] || 'auto';
+      const eff = lv === 'auto' ? d.s : lv;
+      const locked = !!st.locked[d.id];
+      return {
+        name: d.name, desc: d.desc, score: d.score,
+        suggestedLabel: B[d.s][0], suggestedBadge: B[d.s][1],
+        why: d.why.map(chip),
+        selectId: 'lv-' + d.id,
+        level: lv,
+        overridden: lv !== 'auto',
+        selectStyle: 'min-height: 38px; padding: 0 8px; border-radius: 8px; font: inherit; font-size: 13px; font-weight: 700; background: #FFFFFF; color: #0F172A; border: 2px solid ' + (eff === 'low' ? '#16A34A' : eff === 'med' ? '#D97706' : eff === 'high' ? '#DC2626' : '#0F172A'),
+        setLevel: (e) => this.setState({ level: { ...st.level, [d.id]: e.target.value } }),
+        toggleLock: () => this.setState({ locked: { ...st.locked, [d.id]: !locked } }),
+        lockedText: locked ? 'true' : 'false',
+        lockLabel: locked ? 'Locked' : 'Lock',
+        lockPath: locked ? 'M8 11V7a4 4 0 0 1 8 0v4' : 'M8 11V7a4 4 0 0 1 7.5-2',
+        lockStyle: 'display: flex; align-items: center; gap: 6px; min-height: 38px; padding: 0 10px; border-radius: 8px; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; ' + (locked ? 'background: #0F172A; color: #FFFFFF; border: 1px solid #0F172A' : 'background: #FFFFFF; color: #334155; border: 1px solid #CBD2E1')
+      };
+    });
+    const rule = (words, points) => ({ words, points, style: 'min-width: 34px; text-align: center; font-size: 12px; font-weight: 800; padding: 4px 8px; border-radius: 6px; font-family: ui-monospace, Menlo, monospace; ' + (points.charAt(0) === '+' ? 'background: #FEE2E2; color: #991B1B' : 'background: #DCFCE7; color: #166534') });
+    const navItem = (label, href, on) => ({ label, href, style: 'display: block; padding: 10px 12px; border-radius: 10px; font-size: 14px; text-decoration: none; ' + (on ? 'background: #1E293B; color: #FFFFFF; font-weight: 700' : 'color: #CBD5E1; font-weight: 500') });
+    return {
+      nav: [navItem('Dashboard', 'Admin.dc.html', false), navItem('Orders', '#', false), navItem('Services', 'AdminServices.dc.html', true), navItem('Pricing', 'AdminPricing.dc.html', false), navItem('Providers', '#', false), navItem('Customers', '#', false), navItem('Payments', '#', false), navItem('Referrals', '#', false), navItem('Settings', '#', false)],
+      counts: [
+        { label: 'Low', value: '1,828', badge: B.low[1] },
+        { label: 'Medium', value: '1,911', badge: B.med[1] },
+        { label: 'High', value: '182', badge: B.high[1] },
+        { label: 'Blocked', value: '—', badge: B.blocked[1] }
+      ],
+      rows,
+      rules: [
+        rule('bot, fake', '+3'),
+        rule('kind: followers, subscribers, members', '+1'),
+        rule('kind: views, impressions, live viewers', '−2'),
+        rule('no refill, no guarantee', '+2'),
+        rule('not working, unstable, test', '+2'),
+        rule('drop (not "non/low drop")', '+1'),
+        rule('instant, super fast, 10K+/day', '+1'),
+        rule('cheap, LQ, mixed', '+1'),
+        rule('real, active, organic', '−2'),
+        rule('refill, R30, lifetime', '−2'),
+        rule('non drop, low drop', '−1'),
+        rule('HQ, premium, VIP', '−1'),
+        rule('slow speed (50-500/day)', '−1')
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

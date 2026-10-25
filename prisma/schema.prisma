@@ -1,0 +1,1085 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url       = env("DATABASE_URL")
+  // Direct (non-pooled) connection for migrations; on Neon/Supabase use the pooled URL above for the app.
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+// ─────────────────────────────── Auth (Better Auth) ───────────────────────────────
+
+enum Role {
+  CUSTOMER
+  SUPER_ADMIN
+  STORE_MANAGER
+  FINANCE_MANAGER
+  CONTENT_EDITOR
+  SUPPORT_AGENT
+  FULFILLMENT
+  /// Permissions come from customRole
+  CUSTOM
+}
+
+enum AccountStatus {
+  ACTIVE
+  RESTRICTED
+  SUSPENDED
+  CLOSED
+}
+
+enum Currency {
+  HTG
+  USD
+}
+
+model User {
+  id               String        @id
+  name             String
+  email            String        @unique
+  emailVerified    Boolean       @default(false)
+  image            String?
+  phone            String?
+  role             Role          @default(CUSTOMER)
+  status           AccountStatus @default(ACTIVE)
+  locale           String        @default("ht")
+  displayCurrency  Currency      @default(HTG)
+  twoFactorEnabled Boolean?      @default(false)
+  customRoleId     String?
+  customRole       CustomRole?   @relation(fields: [customRoleId], references: [id])
+  referralCode     String?       @unique
+  /// { email: boolean, whatsapp: boolean, marketing: boolean }
+  notifyPrefs      Json          @default("{\"email\":true,\"whatsapp\":true,\"marketing\":false}")
+  /// Cart saved to the account so it follows the customer across devices
+  savedCart        Json          @default("[]")
+  /// City picked by the customer (shown as "Jean P. · Santo Domingo" in the recent sales popup)
+  city             String?
+  /// Customer may hide their first name from the recent sales popup (Account → Privacy)
+  showInFeed       Boolean       @default(true)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  sessions       Session[]
+  accounts       Account[]
+  twoFactors     TwoFactor[]
+  orders         Order[]
+  ledgerAccounts LedgerAccount[]
+  paymentIntents PaymentIntent[]  @relation("PaymentCustomer")
+  reviewed       PaymentIntent[]  @relation("PaymentReviewer")
+  quotes         ExchangeQuote[]
+  notifications  Notification[]
+  pushSubs       PushSubscription[]
+  savedPlayerIds SavedPlayerId[]
+  riskFlags      RiskFlag[]
+  auditEvents    AuditEvent[]
+  tickets        SupportTicket[]   @relation("TicketCustomer")
+  ticketMessages SupportMessage[]
+  referralsMade  Referral[]        @relation("Referrer")
+  referredBy     Referral?         @relation("Referred")
+  reviews        Review[]
+
+  @@map("user")
+  trialRequest  TrialRequest?
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model TwoFactor {
+  id                      String    @id
+  secret                  String
+  backupCodes             String
+  userId                  String
+  verified                Boolean?  @default(true)
+  failedVerificationCount Int?      @default(0)
+  lockedUntil             DateTime?
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([secret])
+  @@map("twoFactor")
+}
+
+model RateLimit {
+  id          String @id
+  key         String @unique
+  count       Int
+  lastRequest BigInt
+
+  @@map("rateLimit")
+}
+
+// ─────────────────────────────── Catalog ───────────────────────────────
+
+/// Localized text is stored as JSON: { "ht": "...", "fr": "...", "en": "...", "es": "..." }
+model Category {
+  id          String     @id @default(cuid())
+  slug        String     @unique
+  name        Json
+  description Json?
+  icon        String?
+  /// Small square picture in the white tile (replaces the emoji icon)
+  image       String?
+  /// Big background picture filling the category card
+  cover       String?
+  sortOrder   Int        @default(0)
+  isVisible   Boolean    @default(true)
+  parentId    String?
+  parent      Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryTree")
+  products    Product[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+enum FulfillmentType {
+  CODE_INVENTORY
+  MANUAL
+  SUPPLIER_API
+}
+
+model Product {
+  id               String           @id @default(cuid())
+  slug             String           @unique
+  categoryId       String
+  category         Category         @relation(fields: [categoryId], references: [id])
+  name             Json
+  description      Json
+  deliveryEstimate Json?
+  image            String?
+  /// Additional product photos (URLs), shown as a gallery on the product page
+  gallery          Json             @default("[]")
+  accent           String?
+  isPublished      Boolean          @default(false)
+  isFeatured       Boolean          @default(false)
+  fulfillmentType  FulfillmentType  @default(MANUAL)
+  /// Array of custom field definitions: [{ key, label: {ht,fr,en,es}, type, required, placeholder? }]
+  fields           Json             @default("[]")
+  seoTitle         Json?
+  seoDescription   Json?
+  sortOrder        Int              @default(0)
+  /// Filter tags such as platform:android, region:us (shown as store filters)
+  tags             String[]         @default([])
+  /// Show the recent sales popup on this product's page (Admin → Trust)
+  salesPopup       Boolean          @default(false)
+  variants         ProductVariant[]
+  saleFeed         SaleFeedItem[]
+  reviews          Review[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@index([categoryId, isPublished])
+}
+
+model ProductVariant {
+  id           String      @id @default(cuid())
+  productId    String
+  product      Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name         Json
+  /// Price in HTG centimes (integer minor units)
+  priceHtg     Int
+  salePriceHtg Int?
+  sortOrder    Int         @default(0)
+  isActive     Boolean     @default(true)
+  /// Marked "out of stock" by staff: stays visible (red dot, struck through) but can't be bought
+  soldOut      Boolean     @default(false)
+  /// "Stock is low" message: off | auto (codes left under the limit) | on (manual, until lowStockUntil)
+  lowStock     String      @default("off")
+  lowStockUntil DateTime?
+  sku          String?     @unique
+  /// Delivery through a supplier API (products with fulfillment type SUPPLIER_API)
+  supplierId   String?
+  supplier     Supplier?   @relation(fields: [supplierId], references: [id])
+  /// The supplier's product / denomination code for this option
+  supplierSku  String?
+  /// Backup provider, used only when the main one clearly refuses an order
+  backupSupplierId  String?
+  backupSupplier    Supplier?   @relation("BackupSupplier", fields: [backupSupplierId], references: [id])
+  backupSupplierSku String?
+  /// Social media service choice (Bon mache / Pi bon kalite / Rapid): priceHtg is the price per 1,000 and this holds
+  /// { type, min, max, avg {ht,fr}, risk, refillDays, drip, desc } (see src/lib/services.ts)
+  service      Json?
+  codes        CodeItem[]
+  orderItems   OrderItem[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+enum CodeStatus {
+  AVAILABLE
+  ASSIGNED
+  VOID
+}
+
+model CodeItem {
+  id            String         @id @default(cuid())
+  variantId     String
+  variant       ProductVariant @relation(fields: [variantId], references: [id])
+  codeEncrypted String
+  /// HMAC of the code; prevents importing the same code twice
+  codeHash      String         @unique
+  batchLabel    String?
+  costHtg       Int?
+  status        CodeStatus     @default(AVAILABLE)
+  orderItemId   String?
+  orderItem     OrderItem?     @relation(fields: [orderItemId], references: [id])
+  createdAt     DateTime       @default(now())
+  assignedAt    DateTime?
+
+  @@index([variantId, status])
+  @@index([orderItemId])
+}
+
+model SavedPlayerId {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  label     String?
+  values    Json
+  createdAt DateTime @default(now())
+
+  @@index([userId, productId])
+}
+
+// ─────────────────────────────── Orders ───────────────────────────────
+
+enum OrderStatus {
+  AWAITING_PAYMENT
+  PAYMENT_REVIEW
+  PAID
+  PROCESSING
+  FULFILLED
+  FAILED
+  CANCELED
+  REFUNDED
+}
+
+enum PaymentMethodKind {
+  WALLET
+  MONCASH
+  NATCASH
+  MANUAL
+}
+
+model Order {
+  id            String            @id @default(cuid())
+  number        Int               @unique @default(autoincrement())
+  userId        String
+  user          User              @relation(fields: [userId], references: [id])
+  status        OrderStatus       @default(AWAITING_PAYMENT)
+  currency      Currency
+  /// Totals in minor units of `currency`
+  subtotal      Int
+  total         Int
+  /// HTG per 1 USD at the time of the order, when charged in USD
+  rateUsed      Decimal?          @db.Decimal(18, 8)
+  paymentMethod PaymentMethodKind
+  manualMethodId String?
+  recipientNote String?
+  accessToken   String            @unique
+  /// Private gift page link (/gift/<token>) the buyer sends to the person receiving the codes
+  giftToken     String?           @unique
+  items         OrderItem[]
+  events        OrderEvent[]
+  payments      PaymentIntent[]
+  review        Review?
+  riskFlags     RiskFlag[]
+  paidAt        DateTime?
+  fulfilledAt   DateTime?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([status])
+}
+
+enum ItemStatus {
+  PENDING
+  DELIVERED
+  FAILED
+}
+
+model OrderItem {
+  id           String         @id @default(cuid())
+  orderId      String
+  order        Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variantId    String
+  variant      ProductVariant @relation(fields: [variantId], references: [id])
+  productName  Json
+  variantName  Json
+  quantity     Int
+  unitPrice    Int
+  fieldValues  Json           @default("{}")
+  status       ItemStatus     @default(PENDING)
+  deliveryNote String?
+  codes        CodeItem[]
+  supplierOrders SupplierOrder[]
+}
+
+/// Append-only order history
+model OrderEvent {
+  id        String      @id @default(cuid())
+  orderId   String
+  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status    OrderStatus
+  note      String?
+  actorId   String?
+  createdAt DateTime    @default(now())
+
+  @@index([orderId, createdAt])
+}
+
+// ─────────────────────────────── Payments ───────────────────────────────
+
+enum PaymentProvider {
+  MONCASH
+  NATCASH
+  /// Other manual methods configured in Admin → Payment methods (bank transfer, other wallets…)
+  MANUAL
+}
+
+enum PaymentStatus {
+  PENDING
+  REVIEW
+  SUCCEEDED
+  FAILED
+  REJECTED
+  EXPIRED
+}
+
+/// External money coming in. Every successful intent credits the customer's wallet;
+/// when linked to an order, the order is then paid from the wallet in the same transaction.
+model PaymentIntent {
+  id           String          @id @default(cuid())
+  userId       String
+  user         User            @relation("PaymentCustomer", fields: [userId], references: [id])
+  orderId      String?
+  order        Order?          @relation(fields: [orderId], references: [id])
+  provider     PaymentProvider
+  manualMethodId String?
+  manualMethod ManualMethod? @relation(fields: [manualMethodId], references: [id])
+  amount       Int
+  currency     Currency        @default(HTG)
+  status       PaymentStatus   @default(PENDING)
+  /// Provider transaction id (MonCash) or customer-submitted reference (NatCash); unique per provider
+  providerRef  String?
+  payerPhone   String?
+  evidencePath String?
+  reviewedById String?
+  reviewedBy   User?           @relation("PaymentReviewer", fields: [reviewedById], references: [id])
+  reviewNote   String?
+  holdUntil    DateTime?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  riskFlags    RiskFlag[]
+
+  @@unique([provider, providerRef])
+  @@index([status, provider])
+  @@index([userId, createdAt])
+}
+
+// ─────────────────────────────── Ledger ───────────────────────────────
+
+enum LedgerAccountType {
+  CUSTOMER_WALLET
+  CUSTOMER_HELD
+  /// Referral earnings: the only money a customer can withdraw (MonCash / NatCash)
+  CUSTOMER_EARNINGS
+  CLEARING
+  REVENUE
+  FX
+  ADJUSTMENT
+}
+
+model LedgerAccount {
+  id            String            @id @default(cuid())
+  code          String            @unique
+  type          LedgerAccountType
+  currency      Currency
+  userId        String?
+  user          User?             @relation(fields: [userId], references: [id])
+  /// Cached balance in minor units; kept in sync inside every posting transaction
+  balance       Int               @default(0)
+  allowNegative Boolean           @default(false)
+  entries       LedgerEntry[]
+  createdAt     DateTime          @default(now())
+
+  @@index([userId])
+}
+
+enum LedgerTxType {
+  DEPOSIT
+  PURCHASE
+  REFUND
+  EXCHANGE
+  ADJUSTMENT
+  HOLD_RELEASE
+}
+
+model LedgerTransaction {
+  id             String        @id @default(cuid())
+  type           LedgerTxType
+  idempotencyKey String        @unique
+  description    String
+  createdById    String?
+  metadata       Json          @default("{}")
+  entries        LedgerEntry[]
+  createdAt      DateTime      @default(now())
+}
+
+model LedgerEntry {
+  id            String            @id @default(cuid())
+  transactionId String
+  transaction   LedgerTransaction @relation(fields: [transactionId], references: [id])
+  accountId     String
+  account       LedgerAccount     @relation(fields: [accountId], references: [id])
+  currency      Currency
+  /// Signed amount in minor units. Entries of one transaction sum to zero per currency.
+  amount        Int
+  createdAt     DateTime          @default(now())
+
+  @@index([accountId, createdAt])
+  @@index([transactionId])
+}
+
+model ExchangeQuote {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+  fromCurrency Currency
+  toCurrency   Currency
+  fromAmount   Int
+  toAmount     Int
+  rate         Decimal   @db.Decimal(18, 8)
+  feeAmount    Int
+  expiresAt    DateTime
+  usedAt       DateTime?
+  createdAt    DateTime  @default(now())
+}
+
+// ─────────────────────────────── Risk, audit, settings, notifications ───────────────────────────────
+
+enum RiskStatus {
+  OPEN
+  APPROVED
+  REJECTED
+}
+
+model RiskFlag {
+  id              String         @id @default(cuid())
+  userId          String?
+  user            User?          @relation(fields: [userId], references: [id])
+  paymentIntentId String?
+  paymentIntent   PaymentIntent? @relation(fields: [paymentIntentId], references: [id])
+  orderId         String?
+  order           Order?         @relation(fields: [orderId], references: [id])
+  reason          String
+  status          RiskStatus     @default(OPEN)
+  resolvedById    String?
+  createdAt       DateTime       @default(now())
+  resolvedAt      DateTime?
+
+  @@index([status])
+}
+
+model AuditEvent {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actor      User?    @relation(fields: [actorId], references: [id])
+  action     String
+  targetType String
+  targetId   String?
+  metadata   Json     @default("{}")
+  ip         String?
+  createdAt  DateTime @default(now())
+
+  @@index([targetType, targetId])
+  @@index([createdAt])
+}
+
+model SiteSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+/// A browser/phone that accepted push notifications (Web Push). Removed when the push service says it's gone.
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Message key in the `notifications` namespace, rendered in the reader's language
+  type      String
+  params    Json      @default("{}")
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, createdAt])
+}
+
+// ─────────────────────────────── Staff roles & sensitive actions ───────────────────────────────
+
+model CustomRole {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  permissions String[]
+  users       User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+/// Recent re-authentication (TOTP) for a session, required before high-risk admin actions.
+model StepUp {
+  sessionToken String   @id
+  userId       String
+  until        DateTime
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+/// Large wallet adjustments need a second staff member to approve (two-person rule).
+model PendingApproval {
+  id           String         @id @default(cuid())
+  kind         String
+  payload      Json
+  summary      String
+  requestedBy  String
+  decidedBy    String?
+  status       ApprovalStatus @default(PENDING)
+  createdAt    DateTime       @default(now())
+  decidedAt    DateTime?
+
+  @@index([status])
+}
+
+// ─────────────────────────────── Support ───────────────────────────────
+
+enum TicketStatus {
+  OPEN
+  WAITING_CUSTOMER
+  CLOSED
+}
+
+model SupportTicket {
+  id         String           @id @default(cuid())
+  number     Int              @unique @default(autoincrement())
+  userId     String
+  user       User             @relation("TicketCustomer", fields: [userId], references: [id])
+  orderId    String?
+  subject    String
+  status     TicketStatus     @default(OPEN)
+  assignedTo String?
+  messages   SupportMessage[]
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  @@index([status, updatedAt])
+  @@index([userId])
+}
+
+model SupportMessage {
+  id             String        @id @default(cuid())
+  ticketId       String
+  ticket         SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  authorId       String
+  author         User          @relation(fields: [authorId], references: [id])
+  fromStaff      Boolean       @default(false)
+  body           String
+  attachmentPath String?
+  createdAt      DateTime      @default(now())
+
+  @@index([ticketId, createdAt])
+}
+
+// ─────────────────────────────── Referrals ───────────────────────────────
+
+enum ReferralStatus {
+  PENDING
+  REWARDED
+  REJECTED
+}
+
+model Referral {
+  id           String         @id @default(cuid())
+  referrerId   String
+  referrer     User           @relation("Referrer", fields: [referrerId], references: [id])
+  referredId   String         @unique
+  referred     User           @relation("Referred", fields: [referredId], references: [id])
+  status       ReferralStatus @default(PENDING)
+  rewardAmount Int?
+  signupIp     String?
+  note         String?
+  createdAt    DateTime       @default(now())
+  rewardedAt   DateTime?
+
+  @@index([referrerId])
+}
+
+// ─────────────────────────────── Content & SEO ───────────────────────────────
+
+model NewsArticle {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  title       Json
+  excerpt     Json      @default("{}")
+  body        Json      @default("{}")
+  image       String?
+  isPublished Boolean   @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([isPublished, publishedAt])
+}
+
+model RedirectRule {
+  id        String   @id @default(cuid())
+  /// Path without locale, e.g. "/old-free-fire"
+  from      String   @unique
+  /// Path without locale ("/products/free-fire-diamonds") or a full https URL
+  to        String
+  permanent Boolean  @default(true)
+  hits      Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+/// Title/description overrides for fixed pages ("/", "/store", "/guides", …)
+model PageSeo {
+  path        String   @id
+  title       Json     @default("{}")
+  description Json     @default("{}")
+  updatedAt   DateTime @updatedAt
+}
+
+/// Admin overrides of interface wording (message catalog keys like "home.heroTitle")
+model TranslationOverride {
+  locale    String
+  key       String
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@id([locale, key])
+}
+
+// ─────────────────────────────── Final additions ───────────────────────────────
+
+/// Manual payment methods beyond NatCash, set up by staff (e.g. bank transfer, another mobile wallet).
+model ManualMethod {
+  id              String          @id @default(cuid())
+  code            String          @unique
+  name            Json
+  instructions    Json            @default("{}")
+  recipientName   String
+  recipientNumber String
+  logo            String?
+  /// "mobile" (NatCash-like wallet, bank…) or "crypto" (recipientNumber holds the address)
+  kind            String          @default("mobile")
+  /// Crypto only: network shown to customers, e.g. "BEP-20 (BSC)"
+  network         String?
+  /// Optional QR image customers can scan (crypto addresses get a generated QR when empty)
+  qrImage         String?
+  /// Wallet credited by deposits: HTG for mobile money, USD for USDT
+  currency        Currency        @default(HTG)
+  isEnabled       Boolean         @default(true)
+  allowDeposits   Boolean         @default(true)
+  allowOrders     Boolean         @default(true)
+  sortOrder       Int             @default(0)
+  payments        PaymentIntent[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+/// Browser seen at sign-in (long-lived anonymous cookie) for multi-account detection.
+model DeviceSeen {
+  id        String   @id @default(cuid())
+  userId    String
+  deviceId  String
+  ip        String?
+  userAgent String?
+  firstSeen DateTime @default(now())
+  lastSeen  DateTime @default(now())
+
+  @@unique([userId, deviceId])
+  @@index([deviceId])
+  @@index([ip])
+}
+
+model MediaAsset {
+  id         String   @id @default(cuid())
+  url        String   @unique
+  folder     String
+  uploadedBy String?
+  alt        String?
+  createdAt  DateTime @default(now())
+
+  @@index([folder, createdAt])
+}
+
+/// Custom content pages built from blocks (text, image, button, FAQ)
+model Page {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  title        Json
+  description  Json     @default("{}")
+  blocks       Json     @default("[]")
+  isPublished  Boolean  @default(false)
+  showInFooter Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model EmailLog {
+  id        String   @id @default(cuid())
+  to        String
+  subject   String
+  status    String
+  error     String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model NewsletterSubscriber {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  locale         String    @default("ht")
+  token          String    @unique
+  consentAt      DateTime  @default(now())
+  unsubscribedAt DateTime?
+}
+
+/// A sale shown in the recent sales popup that was made outside the site (WhatsApp…). Site orders are read from Order directly.
+model SaleFeedItem {
+  id        String   @id @default(cuid())
+  /// "Jean P." (first name + last initial only)
+  name      String
+  city      String
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  soldAt    DateTime @default(now())
+  createdBy String?
+  createdAt DateTime @default(now())
+
+  @@index([soldAt])
+}
+
+/// Customer review: asked after delivery (source "order") or typed in by staff from a real comment (source "admin").
+model Review {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  orderId   String?  @unique
+  order     Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  rating    Int
+  quote     String
+  /// "Jean-Philippe M."
+  name      String
+  city      String?
+  locale    String   @default("ht")
+  source    String   @default("order")
+  /// pending | approved | hidden
+  status    String   @default("pending")
+  /// Shown in the homepage reviews section
+  onHome    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([status, onHome])
+}
+
+// ─────────────────────────────── Suppliers (universal API connector) ───────────────────────────────
+
+/// A product supplier reached through its API. How to talk to it (requests, signatures, how to read replies)
+/// lives in `config`, starting from a preset (src/lib/suppliers/presets.ts), editable in Admin → Suppliers.
+model Supplier {
+  id             String          @id @default(cuid())
+  name           String
+  preset         String
+  baseUrl        String
+  /// Operations (token, order, status, balance, codes) and reply mappings, see src/lib/suppliers/types.ts
+  config         Json
+  /// AES-GCM encrypted JSON of the API keys/secrets (never shown again after saving)
+  secrets        String?
+  isEnabled      Boolean         @default(true)
+  /// Secret part of the callback URL the supplier calls when an order changes
+  callbackToken  String          @unique
+  /// Cached login token for suppliers that need one (encrypted)
+  tokenEncrypted String?
+  tokenExpiresAt DateTime?
+  balance        Decimal?        @db.Decimal(18, 4)
+  balanceCurrency String?
+  balanceAt      DateTime?
+  /// Admin dashboard warns when the balance drops under this
+  lowBalance     Decimal?        @db.Decimal(18, 4)
+  variants       ProductVariant[]
+  backupFor      ProductVariant[] @relation("BackupSupplier")
+  services       ProviderService[]
+  orders         SupplierOrder[]
+  logs           SupplierLog[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+enum SupplierOrderStatus {
+  /// Created, not sent yet
+  QUEUED
+  /// Request in flight
+  SENDING
+  /// Supplier accepted it and is working on it
+  PENDING
+  /// We don't know if the supplier got it (timeout, error page…): checked with "status", never re-sent blindly
+  UNKNOWN
+  SUCCESS
+  /// Supplier said it failed for good: staff retries, delivers by hand or refunds
+  FAILED
+  /// Staff closed it (delivered by hand, refunded…)
+  CLOSED
+}
+
+/// One supplier order per order line. `ref` is our reference, the same on every status check, so the
+/// supplier can never deliver it twice.
+model SupplierOrder {
+  id              String              @id @default(cuid())
+  supplierId      String
+  supplier        Supplier            @relation(fields: [supplierId], references: [id])
+  orderItemId     String
+  orderItem       OrderItem           @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  ref             String              @unique
+  supplierOrderId String?
+  status          SupplierOrderStatus @default(QUEUED)
+  message         String?
+  checks          Int                 @default(0)
+  /// Provider service id used for this attempt (null = the option's supplierSku); set for backup-provider attempts
+  sku             String?
+  /// SMM panels: progress reported by the provider
+  startCount      Int?
+  remains         Int?
+  /// Amount (HTG centimes) given back for the part not delivered (partial orders)
+  refundedPartial Int?
+  refillId        String?
+  refillStatus    String?
+  refillAt        DateTime?
+  cancelAt        DateTime?
+  /// What the provider charges for this order (its currency, usually USD): estimated when sent, then the provider's own figure
+  costUsd         Decimal?  @db.Decimal(18, 6)
+  /// Same in HTG centimes, at the exchange rate of the day
+  costHtg         Int?
+  nextCheckAt     DateTime?
+  lockedUntil     DateTime?
+  logs            SupplierLog[]
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@index([status, nextCheckAt])
+  @@index([orderItemId])
+}
+
+/// Every request to a supplier and its reply, secrets removed, kept for troubleshooting.
+model SupplierLog {
+  id              String         @id @default(cuid())
+  supplierId      String
+  supplier        Supplier       @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  supplierOrderId String?
+  supplierOrder   SupplierOrder? @relation(fields: [supplierOrderId], references: [id], onDelete: SetNull)
+  op              String
+  request         String
+  response        String
+  httpStatus      Int?
+  ms              Int
+  outcome         String
+  createdAt       DateTime       @default(now())
+
+  @@index([supplierId, createdAt])
+}
+
+enum TrialStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+/// Free trial requests (one per account, phone number, social profile link and browser). Staff approve them in Admin → Free trials.
+model TrialRequest {
+  id        String      @id @default(cuid())
+  userId    String      @unique
+  user      User        @relation(fields: [userId], references: [id])
+  /// Offer key from the trialOffers setting
+  offer     String
+  /// Link as cleaned by the link check; unique so the same profile/video never gets two trials
+  link      String      @unique
+  phone     String      @unique
+  deviceId  String?
+  ip        String?
+  status    TrialStatus @default(PENDING)
+  orderId   String?
+  note      String?
+  createdAt DateTime    @default(now())
+  decidedAt DateTime?
+
+  @@index([status, createdAt])
+  @@index([ip, createdAt])
+}
+
+/// A provider's service list (SMM panel "services"), refreshed by "Sync services" and the daily check.
+model ProviderService {
+  id         String    @id @default(cuid())
+  supplierId String
+  supplier   Supplier  @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  serviceId  String
+  name       String
+  category   String
+  type       String
+  /// Provider price per 1,000, in the provider's currency (usually USD)
+  rate       Decimal   @db.Decimal(18, 6)
+  min        Int
+  max        Int
+  refill     Boolean   @default(false)
+  cancel     Boolean   @default(false)
+  dripfeed   Boolean   @default(false)
+  desc       String?
+  seenAt     DateTime  @default(now())
+  /// First time a sync saw it ("new services" alert)
+  firstSeenAt DateTime @default(now())
+  /// Price before the last change, and when it changed ("price changed" alert)
+  prevRate    Decimal? @db.Decimal(18, 6)
+  rateChangedAt DateTime?
+  /// Set when the provider no longer lists it
+  removedAt  DateTime?
+
+  @@unique([supplierId, serviceId])
+  @@index([supplierId, category])
+}
+
+/// "Nouvèl sèvis" tab on the order screen: new services, price changes, pauses (written automatically) and staff notes.
+model ServiceUpdate {
+  id        String   @id @default(cuid())
+  /// new | price_up | price_down | paused | resumed | note
+  kind      String
+  /// Shown text per language ({ ht, fr })
+  text      Json
+  productId String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+enum CommissionStatus {
+  /// Waiting: the order must stay completed for the hold days
+  PENDING
+  /// In the referrer's earnings balance
+  AVAILABLE
+  /// Order refunded, or the accounts look like the same person
+  CANCELED
+}
+
+/// Referral program: a % of each completed order of a direct friend, by the referrer's tier at that time.
+model ReferralCommission {
+  id          String           @id @default(cuid())
+  referrerId  String
+  referredId  String
+  orderId     String           @unique
+  orderTotal  Int
+  /// Commission % and tier name when the order completed
+  pct         Int
+  tier        String
+  amount      Int
+  status      CommissionStatus @default(PENDING)
+  availableAt DateTime
+  createdAt   DateTime         @default(now())
+
+  @@index([referrerId, status])
+  @@index([status, availableAt])
+}
+
+enum PayoutStatus {
+  REQUESTED
+  SENT
+  REJECTED
+}
+
+/// Withdrawal of referral earnings to MonCash or NatCash, sent by staff.
+model Payout {
+  id          String       @id @default(cuid())
+  userId      String
+  amount      Int
+  /// MONCASH | NATCASH
+  method      String
+  phone       String
+  name        String
+  status      PayoutStatus @default(REQUESTED)
+  /// Transaction reference staff copy from MonCash/NatCash when sent
+  reference   String?
+  note        String?
+  decidedById String?
+  createdAt   DateTime     @default(now())
+  decidedAt   DateTime?
+
+  @@index([status, createdAt])
+  @@index([userId])
+}

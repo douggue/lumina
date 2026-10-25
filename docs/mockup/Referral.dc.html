@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="ht">
+<head>
+<meta charset="utf-8">
+<title>HaitiViral – Envite zanmi</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#00209F}a:hover{color:#001670}
+</style>
+</helmet>
+<div style="width: 390px; height: 1560px; box-sizing: border-box; background: #F5F6FB; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0F172A; display: flex; flex-direction: column; position: relative; overflow: hidden">
+
+  <header style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #FFFFFF; border-bottom: 1px solid #E5E7EF">
+    <a href="Main.dc.html" aria-label="Retounen" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #0F172A; border-radius: 12px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </a>
+    <h1 style="margin: 0; font-size: 18px; font-weight: 800; flex: 1">Envite zanmi</h1>
+    <a href="ReferralVisitor.dc.html" style="font-size: 13px; font-weight: 700; padding: 10px 6px; text-decoration: none">Kijan sa mache?</a>
+  </header>
+
+  <main style="flex: 1; padding: 18px 20px; display: flex; flex-direction: column; gap: 16px">
+
+    <section style="background: #0F172A; color: #FFFFFF; border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <div style="width: 40px; height: 40px; border-radius: 12px; background: #CBD5E1; color: #0F172A; display: flex; align-items: center; justify-content: center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="6"></circle><polyline points="8.2 13.5 7 22 12 19 17 22 15.8 13.5"></polyline></svg>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: #94A3B8; font-weight: 600">Nivo ou</div>
+            <div style="font-size: 20px; font-weight: 800">Ajan · 7%</div>
+          </div>
+        </div>
+        <div style="font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 999px; background: #1E293B; color: #CBD5E1">30 dènye jou</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <div style="display: flex; justify-content: space-between; font-size: 13px; color: #CBD5E1"><span>13 / 20 zanmi aktif</span><span>Pwochen: Lò · 10%</span></div>
+        <div style="height: 10px; border-radius: 999px; background: #1E293B; overflow: hidden"><div style="width: 65%; height: 100%; border-radius: 999px; background: #FBBF24"></div></div>
+        <div style="font-size: 13px; line-height: 1.45; color: #E2E8F0">Ou bezwen <b style="color: #FBBF24">7 zanmi aktif</b> ankò, oswa <b style="color: #FBBF24">17,600 HTG</b> kòmand zanmi ankò, pou w monte Lò.</div>
+      </div>
+      <button type="button" onClick="{{toggleTiers}}" style="align-self: flex-start; min-height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid #334155; background: transparent; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer">{{tiersLabel}}</button>
+      <sc-if value="{{showTiers}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <sc-for list="{{tiers}}" as="t" hint-placeholder-count="4">
+            <div style="{{t.style}}">
+              <span style="font-weight: 800">{{t.name}}</span>
+              <span style="font-size: 12px; color: #94A3B8; flex: 1; text-align: right">{{t.need}}</span>
+              <span style="font-weight: 800; min-width: 40px; text-align: right">{{t.pct}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </section>
+
+    <section style="background: #FFFFFF; border: 1px solid #E5E7EF; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px">
+        <div style="display: flex; flex-direction: column; gap: 3px">
+          <div style="font-size: 13px; color: #5B6478; font-weight: 600">Ou ka retire</div>
+          <div style="font-size: 30px; font-weight: 800; color: #166534; letter-spacing: -0.5px">{{available}}</div>
+          <div style="font-size: 12px; color: #5B6478">+ 485 HTG ap tann (kòmand zanmi poko fini)</div>
+        </div>
+        <div style="display: flex; gap: 6px">
+          <span style="font-size: 11px; font-weight: 800; padding: 5px 8px; border-radius: 8px; background: #FDECEE; color: #B4122E">MonCash</span>
+          <span style="font-size: 11px; font-weight: 800; padding: 5px 8px; border-radius: 8px; background: #E6F0FF; color: #1D4ED8">NatCash</span>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px">
+        <button type="button" onClick="{{openWithdraw}}" style="min-height: 50px; border-radius: 14px; border: none; background: #00209F; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer">Retire lajan</button>
+        <button type="button" onClick="{{toWallet}}" style="min-height: 50px; border-radius: 14px; border: 1px solid #CBD2E1; background: #FFFFFF; color: #0F172A; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer">Mete nan bous</button>
+      </div>
+      <sc-if value="{{walletDone}}" hint-placeholder-val="{{ false }}">
+        <div style="font-size: 13px; padding: 10px 12px; border-radius: 10px; background: #DCFCE7; color: #166534; font-weight: 600">500 HTG ale nan bous ou. Ou ka itilize l touswit pou kòmande.</div>
+      </sc-if>
+      <div style="font-size: 12px; color: #5B6478">Minimòm retrè: 500 HTG · Voye nan 24 è (jou travay)</div>
+    </section>
+
+    <section style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+      <sc-for list="{{stats}}" as="s" hint-placeholder-count="3">
+        <div style="background: #FFFFFF; border: 1px solid #E5E7EF; border-radius: 14px; padding: 12px 8px; display: flex; flex-direction: column; gap: 4px; align-items: center; text-align: center">
+          <div style="font-size: 18px; font-weight: 800; color: {{s.color}}">{{s.value}}</div>
+          <div style="font-size: 11px; font-weight: 600; color: #5B6478">{{s.label}}</div>
+        </div>
+      </sc-for>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 10px">
+      <label for="reflink" style="font-size: 14px; font-weight: 700">Lyen pèsonèl ou</label>
+      <div style="display: flex; gap: 8px">
+        <input id="reflink" type="text" readonly="" value="haitiviral.com/r/MIKA7Q" style="flex: 1; min-width: 0; height: 48px; box-sizing: border-box; padding: 0 12px; border: 1px solid #CBD2E1; border-radius: 12px; font: inherit; font-size: 15px; font-weight: 600; background: #FFFFFF; color: #0F172A">
+        <button type="button" onClick="{{copy}}" style="{{copyStyle}}">{{copyLabel}}</button>
+      </div>
+      <div style="background: #FFFFFF; border: 1px dashed #CBD2E1; border-radius: 12px; padding: 12px; font-size: 13px; line-height: 1.5; color: #334155">Mwen itilize HaitiViral pou m jwenn abòne ak like sou TikTok, Instagram, YouTube. Peye ak MonCash oswa NatCash. Eseye l gratis: haitiviral.com/r/MIKA7Q</div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+        <button type="button" style="min-height: 48px; border-radius: 12px; border: none; background: #15803D; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.4A8.5 8.5 0 1 1 21 11.5z"></path></svg>WhatsApp</button>
+        <button type="button" style="min-height: 48px; border-radius: 12px; border: none; background: #1D4ED8; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>Facebook</button>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <div role="tablist" aria-label="Lis" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; background: #E9ECF4; border-radius: 12px">
+        <button type="button" role="tab" aria-selected="{{tabFriendsOn}}" onClick="{{showFriends}}" style="{{tabFriendsStyle}}">Zanmi yo</button>
+        <button type="button" role="tab" aria-selected="{{tabPayOn}}" onClick="{{showPayouts}}" style="{{tabPayStyle}}">Retrè yo</button>
+      </div>
+      <sc-for list="{{rows}}" as="f" hint-placeholder-count="4">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #E5E7EF; gap: 10px">
+          <div style="display: flex; gap: 10px; align-items: center; min-width: 0">
+            <div style="{{f.avatarStyle}}">{{f.initial}}</div>
+            <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+              <div style="font-size: 14px; font-weight: 600">{{f.name}}</div>
+              <div style="font-size: 12px; color: #5B6478">{{f.meta}}</div>
+            </div>
+          </div>
+          <div style="{{f.style}}">{{f.value}}</div>
+        </div>
+      </sc-for>
+    </section>
+
+    <div style="font-size: 12px; line-height: 1.5; color: #5B6478">Komisyon an konte sèlman lè kòmand zanmi w lan fini; li disponib 3 jou apre. Kòmand ki ranbouse, esè gratis ak kont ki se menm moun nan pa bay komisyon. Se kòb ou touche sèlman ki ka retire, pa kòb ou depoze.</div>
+  </main>
+
+  <sc-if value="{{sheetOpen}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; inset: 0; background: rgba(15, 23, 42, 0.55); display: flex; flex-direction: column; justify-content: flex-end">
+      <div role="dialog" aria-modal="true" aria-label="Retire lajan" style="background: #FFFFFF; border-radius: 22px 22px 0 0; padding: 18px 20px 24px; display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <h2 style="margin: 0; font-size: 18px; font-weight: 800">Retire lajan</h2>
+          <button type="button" onClick="{{closeWithdraw}}" aria-label="Fèmen" style="width: 44px; height: 44px; border-radius: 12px; border: none; background: #F1F5F9; color: #0F172A; cursor: pointer; display: flex; align-items: center; justify-content: center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg>
+          </button>
+        </div>
+        <sc-if value="{{sent}}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 10px; align-items: center; text-align: center; padding: 10px 0 6px">
+            <div style="width: 56px; height: 56px; border-radius: 50%; background: #DCFCE7; color: #166534; display: flex; align-items: center; justify-content: center">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="5 12 10 17 19 7"></polyline></svg>
+            </div>
+            <div style="font-size: 17px; font-weight: 800">Demann lan voye!</div>
+            <div style="font-size: 14px; line-height: 1.5; color: #5B6478">{{sentText}}</div>
+            <button type="button" onClick="{{closeWithdraw}}" style="width: 100%; min-height: 50px; border-radius: 14px; border: none; background: #0F172A; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer">OK</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{notSent}}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; flex-direction: column; gap: 14px">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px">
+              <button type="button" aria-pressed="{{mcOn}}" onClick="{{pickMc}}" style="{{mcStyle}}">MonCash</button>
+              <button type="button" aria-pressed="{{ncOn}}" onClick="{{pickNc}}" style="{{ncStyle}}">NatCash</button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <label for="wamt" style="font-size: 13px; font-weight: 700">Konbyen (HTG)</label>
+              <input id="wamt" type="text" inputmode="numeric" value="2,640" style="height: 50px; box-sizing: border-box; padding: 0 12px; border: 1px solid #CBD2E1; border-radius: 12px; font: inherit; font-size: 18px; font-weight: 800">
+              <div style="font-size: 12px; color: #5B6478">Ou ka retire ant 500 HTG ak 2,640 HTG</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <label for="wphone" style="font-size: 13px; font-weight: 700">Nimewo {{method}}</label>
+              <input id="wphone" type="tel" value="+509 3712 4580" style="height: 50px; box-sizing: border-box; padding: 0 12px; border: 1px solid #CBD2E1; border-radius: 12px; font: inherit; font-size: 16px; font-weight: 600">
+              <div style="font-size: 12px; color: #5B6478">Non sou kont lan dwe menm ak non ou sou HaitiViral: Mika Joseph</div>
+            </div>
+            <button type="button" onClick="{{send}}" style="min-height: 52px; border-radius: 14px; border: none; background: #00209F; color: #FFFFFF; font: inherit; font-size: 16px; font-weight: 800; cursor: pointer">Voye demann lan</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1560}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { copied: false, tab: 'friends', sheet: false, sent: false, method: 'MonCash', tiers: false, wallet: false };
+  }
+  renderVals() {
+    const st = this.state;
+    const tab = (on) => 'min-height: 40px; border-radius: 9px; border: none; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; ' + (on ? 'background: #FFFFFF; color: #0F172A; box-shadow: 0 1px 3px rgba(15,23,42,0.12)' : 'background: transparent; color: #5B6478');
+    const pick = (on, bg, fg) => 'min-height: 52px; border-radius: 14px; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; ' + (on ? 'border: 2px solid ' + fg + '; background: ' + bg + '; color: ' + fg : 'border: 1px solid #CBD2E1; background: #FFFFFF; color: #334155');
+    const avatar = (bg, fg) => 'flex: none; width: 36px; height: 36px; border-radius: 50%; background: ' + bg + '; color: ' + fg + '; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center';
+    const val = (c) => 'flex: none; font-size: 14px; font-weight: 700; color: ' + c;
+    const tierRow = (on) => 'display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 10px; font-size: 14px; ' + (on ? 'background: #1E293B; color: #FBBF24' : 'color: #E2E8F0');
+    const friends = [
+      { initial: 'S', name: 'studio509', meta: 'Aktif · 14 kòmand', value: '+ 1,120 HTG', avatarStyle: avatar('#E0E6FF', '#00209F'), style: val('#166534') },
+      { initial: 'J', name: 'jean.p', meta: 'Aktif · dènye kòmand jodi a', value: '+ 84 HTG', avatarStyle: avatar('#E0E6FF', '#00209F'), style: val('#166534') },
+      { initial: 'R', name: 'roselaure', meta: 'Enskri · poko kòmande', value: '0 HTG', avatarStyle: avatar('#F1F5F9', '#475569'), style: val('#5B6478') },
+      { initial: 'K', name: 'k.dorval', meta: 'Bloke · menm aparèy ak ou', value: '—', avatarStyle: avatar('#FEE2E2', '#991B1B'), style: val('#991B1B') }
+    ];
+    const payouts = [
+      { initial: 'M', name: '1,500 HTG · MonCash', meta: '12 okt · +509 3712 •••• ', value: 'Voye', avatarStyle: avatar('#FDECEE', '#B4122E'), style: val('#166534') },
+      { initial: 'N', name: '800 HTG · NatCash', meta: '28 sept · +509 4410 ••••', value: 'Voye', avatarStyle: avatar('#E6F0FF', '#1D4ED8'), style: val('#166534') },
+      { initial: 'B', name: '500 HTG · nan bous', meta: '15 sept · itilize pou kòmande', value: 'Fèt', avatarStyle: avatar('#F1F5F9', '#475569'), style: val('#5B6478') }
+    ];
+    const mc = st.method === 'MonCash';
+    return {
+      available: st.wallet ? '2,140 HTG' : '2,640 HTG',
+      toWallet: () => this.setState({ wallet: true }),
+      walletDone: st.wallet,
+      showTiers: st.tiers,
+      tiersLabel: st.tiers ? 'Kache nivo yo' : 'Wè tout nivo yo',
+      toggleTiers: () => this.setState({ tiers: !st.tiers }),
+      tiers: [
+        { name: 'Bwonz', need: 'Depi w enskri', pct: '5%', style: tierRow(false) },
+        { name: 'Ajan', need: '5 zanmi aktif oswa 10,000 HTG', pct: '7%', style: tierRow(true) },
+        { name: 'Lò', need: '20 zanmi aktif oswa 50,000 HTG', pct: '10%', style: tierRow(false) },
+        { name: 'Dyaman', need: '50 zanmi aktif oswa 150,000 HTG', pct: '12%', style: tierRow(false) }
+      ],
+      copy: () => this.setState({ copied: true }),
+      copyLabel: st.copied ? 'Kopye!' : 'Kopye',
+      copyStyle: 'flex: none; min-width: 80px; height: 48px; border-radius: 12px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; ' + (st.copied ? 'background: #DCFCE7; color: #166534; border: 1px solid #86EFAC' : 'background: #0F172A; color: #FFFFFF; border: 1px solid #0F172A'),
+      stats: [
+        { value: '21', label: 'Envite', color: '#0F172A' },
+        { value: '13', label: 'Aktif (30 jou)', color: '#00209F' },
+        { value: '5,440 HTG', label: 'Total touche', color: '#166534' }
+      ],
+      tabFriendsOn: String(st.tab === 'friends'),
+      tabPayOn: String(st.tab === 'payouts'),
+      tabFriendsStyle: tab(st.tab === 'friends'),
+      tabPayStyle: tab(st.tab === 'payouts'),
+      showFriends: () => this.setState({ tab: 'friends' }),
+      showPayouts: () => this.setState({ tab: 'payouts' }),
+      rows: st.tab === 'friends' ? friends : payouts,
+      sheetOpen: st.sheet,
+      openWithdraw: () => this.setState({ sheet: true, sent: false }),
+      closeWithdraw: () => this.setState({ sheet: false, sent: false }),
+      sent: st.sent,
+      notSent: !st.sent,
+      send: () => this.setState({ sent: true }),
+      sentText: '2,640 HTG ap vin sou ' + st.method + ' ou (+509 3712 4580) nan 24 è. N ap voye yon notifikasyon lè l fin voye.',
+      method: st.method,
+      mcOn: String(mc),
+      ncOn: String(!mc),
+      pickMc: () => this.setState({ method: 'MonCash' }),
+      pickNc: () => this.setState({ method: 'NatCash' }),
+      mcStyle: pick(mc, '#FDECEE', '#B4122E'),
+      ncStyle: pick(!mc, '#E6F0FF', '#1D4ED8')
+    };
+  }
+}
+</script>
+</body>
+</html>

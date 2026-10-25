@@ -1,0 +1,486 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Brand palette: light ground, navy accent, Haitian red for the brand word. Admin → Appearance overrides these per store (theme-css.ts). */
+:root {
+  --hv-css: 1; /* checked by cssGuardScript: proves the stylesheet loaded */
+  --bg: #f5f6fb;
+  --surface: #ffffff;
+  --surface-2: #eef0f6;
+  --text: #0f172a;
+  --muted: #5b6478;
+  --border: #e3e6ef;
+  --primary: #0f172a;
+  --primary-hover: #1e293b;
+  --primary-soft: #eef1ff;
+  --navy: #111a2e;
+  --midnight: #0a0f1c;
+  --steel: #7b8aa8;
+  --cyan: #00209f;
+  --success: #15803d;
+  --success-soft: #dcfce7;
+  --warning: #92400e;
+  --warning-soft: #fef3c7;
+  --danger: #b91c1c;
+  --danger-soft: #fee2e2;
+  --glow: rgba(15, 23, 42, 0);
+  --glow-strength: 0;
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #0a0f1c;
+  --surface: #111a2e;
+  --surface-2: #182339;
+  --text: #eef2fb;
+  --muted: #94a3c0;
+  --border: #233049;
+  --primary: #5470f0;
+  --primary-hover: #7a8ff5;
+  --primary-soft: #1b2650;
+  --cyan: #8ea2ff;
+  --success: #4ade80;
+  --success-soft: #0f3326;
+  --warning: #fbbf24;
+  --warning-soft: #3a2a0c;
+  --danger: #ff6b78;
+  --danger-soft: #3d1419;
+  --glow: rgba(142, 162, 255, 0);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-soft: var(--primary-soft);
+  --color-navy: var(--navy);
+  --color-midnight: var(--midnight);
+  --color-steel: var(--steel);
+  --color-cyan: var(--cyan);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-display-face), var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --radius-card: 1rem;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@utility container-page {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
+  }
+
+@utility card {
+    @apply rounded-2xl border border-border bg-surface;
+  }
+
+@utility btn {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+@utility btn-primary {
+    @apply btn bg-primary text-white hover:bg-primary-hover;
+  }
+
+@utility btn-secondary {
+    @apply btn border border-border bg-surface text-text hover:bg-surface-2;
+  }
+
+@utility btn-ghost {
+    @apply btn text-text hover:bg-surface-2;
+  }
+
+@utility btn-danger {
+    @apply btn bg-danger text-white hover:opacity-90;
+  }
+
+@utility input {
+    @apply min-h-11 w-full rounded-xl border border-border bg-surface px-3.5 text-base text-text placeholder:text-muted focus:border-primary focus:outline-none sm:text-sm;
+  }
+
+@utility label {
+    @apply mb-1.5 block text-sm font-medium text-text;
+  }
+
+@utility badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
+
+/* ── Look: display font, glow, hero ── */
+[data-font="bold"] .display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.display {
+  text-wrap: balance;
+}
+.glow-btn {
+  box-shadow: 0 14px 34px -14px var(--glow);
+}
+.glow-card {
+  box-shadow: 0 0 0 1px var(--border), 0 24px 48px -28px var(--glow);
+}
+/* The hero is always dark, in both modes, like the wallet card */
+.hero-dark {
+  color: #eef3ff;
+  background:
+    radial-gradient(900px 420px at 80% 8%, rgb(47 116 255 / calc(var(--glow-strength) * 0.6)), transparent 60%),
+    linear-gradient(180deg, color-mix(in srgb, var(--midnight) 70%, #13306e), var(--midnight));
+}
+.hero-grid {
+  display: none;
+}
+[data-grid="on"] .hero-grid {
+  display: block;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgb(70 216 255 / 0.07) 1px, transparent 1px), linear-gradient(90deg, rgb(70 216 255 / 0.07) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(180deg, #000 30%, transparent);
+}
+.marquee {
+  overflow: hidden;
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  /* Always moves (the band is the point): slower for visitors who ask for reduced motion, stopped only when the
+     store turns animations off or in data-saver mode. Touch or hover pauses it. */
+  animation: marquee 22s linear infinite;
+}
+/* Colorful band: a slowly moving gradient (blue → purple → pink → orange) behind the scrolling words. */
+.marquee-color {
+  background: linear-gradient(90deg, #1467f5, #7c3aed, #e0338a, #f59e0b, #7c3aed, #1467f5);
+  background-size: 300% 100%;
+  animation: marquee-hue 14s linear infinite;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.25), 0 10px 30px -12px rgba(124, 58, 237, 0.7);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+@keyframes marquee-hue {
+  to { background-position: 300% 0; }
+}
+[data-motion="off"] .marquee-color {
+  animation: none;
+}
+.marquee:hover .marquee-track,
+.marquee:active .marquee-track {
+  animation-play-state: paused;
+}
+[data-motion="off"] .marquee-track {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation-duration: 60s;
+  }
+}
+
+/* ── Motion styles (Admin → Appearance): calm · lively · neon · off ──
+   Everything here is skipped for visitors who ask their device for reduced motion, and in data-saver mode. */
+@media (prefers-reduced-motion: no-preference) {
+  .lift {
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+
+  /* Calm: soft fades and small lifts */
+  [data-motion="calm"] .animate-rise {
+    animation: rise-calm 0.45s ease-out both;
+  }
+  [data-motion="calm"] .lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px -18px var(--glow);
+    border-color: var(--primary);
+  }
+
+  /* Lively: springy entrances, buttons that squish, counters that pop */
+  [data-motion="lively"] .animate-rise,
+  [data-motion="neon"] .animate-rise {
+    animation: rise-spring 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  [data-motion="lively"] .lift {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s, border-color 0.3s;
+  }
+  [data-motion="lively"] .lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 36px -18px var(--glow);
+    border-color: var(--primary);
+  }
+  [data-motion="lively"] .lift:active,
+  [data-motion="neon"] .lift:active {
+    transform: scale(0.97);
+    transition-duration: 0.1s;
+  }
+  [data-motion="lively"] .btn:active,
+  [data-motion="neon"] .btn:active {
+    transform: scale(0.96);
+  }
+  [data-motion="lively"] .pop,
+  [data-motion="neon"] .pop {
+    animation: pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Neon: glowing edges, a shining headline, a pulsing main button */
+  [data-motion="neon"] .lift:hover {
+    transform: translateY(-3px);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 1px var(--primary), 0 0 28px -6px var(--glow);
+  }
+  [data-motion="neon"] .neon-text {
+    background: linear-gradient(90deg, currentColor 30%, #46d8ff 45%, #ffffff 50%, #46d8ff 55%, currentColor 70%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shine 5s linear infinite;
+  }
+  [data-motion="neon"] .neon-pulse {
+    animation: glow-pulse 2.6s ease-in-out infinite;
+  }
+
+  .stagger > :nth-child(2) { animation-delay: 70ms; }
+  .stagger > :nth-child(3) { animation-delay: 140ms; }
+  .stagger > :nth-child(4) { animation-delay: 210ms; }
+  .stagger > :nth-child(5) { animation-delay: 280ms; }
+  .stagger > :nth-child(n + 6) { animation-delay: 340ms; }
+}
+
+@keyframes rise-calm {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes rise-spring {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes pop {
+  40% { transform: scale(1.4); }
+}
+@keyframes shine {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 12px var(--glow); }
+  50% { box-shadow: 0 0 0 4px rgb(61 130 255 / 0.18), 0 0 26px rgb(70 216 255 / 0.6); }
+}
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+
+/* Data saver (toggle in the footer, or the browser's Save-Data signal): no decorative images, no motion. */
+.data-saver .ds-hide {
+  display: none !important;
+}
+.data-saver *,
+.data-saver *::before,
+.data-saver *::after {
+  animation: none !important;
+  transition: none !important;
+}
+.data-saver .blur-3xl {
+  display: none;
+}
+
+/* Admin on phones: grid columns may shrink below their content, and tables turn into labeled cards. */
+.admin-main .grid > * {
+  min-width: 0;
+}
+@media (max-width: 639px) {
+  .rtable table,
+  .rtable tbody {
+    display: block;
+  }
+  .rtable thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .rtable tr {
+    display: grid;
+    gap: 2px;
+    padding: 12px 14px;
+  }
+  .rtable td {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 12px;
+    row-gap: 2px;
+    align-items: center;
+    justify-items: end;
+    padding: 4px 0 !important;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+  .rtable td > * {
+    grid-column: 2;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .rtable td[data-label]::before {
+    content: attr(data-label);
+    grid-column: 1;
+    grid-row: 1 / span 6;
+    align-self: start;
+    padding-top: 2px;
+    justify-self: start;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+  .rtable td[data-label=""] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .rtable td[data-label=""] > * {
+    grid-column: 1;
+  }
+  .rtable td[data-label=""]::before {
+    content: none;
+  }
+  .rtable td:first-child {
+    font-weight: 600;
+  }
+  .rtable td:empty {
+    display: none;
+  }
+}
+
+/* Language switch: a thin progress bar and a soft dim while the new language loads,
+   then the page fades back in without replaying every entrance animation. */
+html[data-switching] main,
+html[data-switching] footer {
+  opacity: 0.55;
+  transition: opacity 0.2s ease;
+}
+html[data-switching] body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  z-index: 100;
+  background: linear-gradient(90deg, transparent, var(--primary), #7c3aed, transparent);
+  background-size: 200% 100%;
+  animation: lang-progress 0.9s linear infinite;
+}
+@keyframes lang-progress {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+html[data-switched] main,
+html[data-switched] footer {
+  animation: lang-fade-in 0.28s ease-out both;
+}
+html[data-switched] .animate-rise,
+html[data-switched] .stagger > * {
+  animation: none !important;
+}
+@keyframes lang-fade-in {
+  from { opacity: 0.55; }
+  to { opacity: 1; }
+}
+
+/* Phone keyboard open (set by BottomNav): fixed bars step aside instead of floating mid-screen on iOS. */
+html[data-kb] .kb-hide {
+  display: none !important;
+}
+
+/* Trust: "stock is low" pulse + striped bar, recent sale popup slide-in */
+.low-dot {
+  animation: low-pulse 1.6s ease-out infinite;
+}
+@keyframes low-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--warning) 55%, transparent); }
+  70% { box-shadow: 0 0 0 8px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.low-bar {
+  background: repeating-linear-gradient(45deg, #ffb547 0 7px, #ff8a3d 7px 14px);
+  background-size: 28px 100%;
+  animation: low-stripes 1s linear infinite;
+}
+@keyframes low-stripes {
+  to { background-position: 28px 0; }
+}
+.sale-pop {
+  animation: sale-in 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
+}
+.sale-pop[data-leaving] {
+  animation: sale-out 0.3s ease-in both;
+}
+@keyframes sale-in {
+  from { transform: translateY(-18px) scale(0.97); opacity: 0; }
+}
+@keyframes sale-out {
+  to { transform: translateY(-14px); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .low-dot, .low-bar, .sale-pop, .sale-pop[data-leaving] { animation: none; }
+}
+
+/* Install the app card + footer link (src/components/InstallPrompt.tsx) */
+.install-pop {
+  animation: install-in 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.1) both;
+}
+@keyframes install-in {
+  from { transform: translateY(24px); opacity: 0; }
+}
+.install-link { display: none; }
+html[data-can-install] .install-link { display: inline-flex; }
+@media (prefers-reduced-motion: reduce) {
+  .install-pop { animation: none; }
+}
+
+/*
+ * Dark theme for the customer screens built from the mockup: they use the mockup's exact light colors. In dark mode
+ * each of those colors is swapped here for its dark counterpart, in one place. Elements that already say what to do
+ * in dark (a "dark:" class) are left alone. Logos on purpose keep a white background (.keep-white).
+ */
+:where(.dark) :is(.text-\[\#0F172A\], .text-\[\#334155\], .text-\[\#475569\]):not([class*="dark:text"]) { color: var(--text); }
+:where(.dark) :is(.text-\[\#64748B\], .text-\[\#5B6478\]):not([class*="dark:text"]) { color: var(--muted); }
+:where(.dark) :is(.text-\[\#00209F\], .text-\[\#1E40AF\], .text-\[\#1E3A8A\]):not([class*="dark:text"]) { color: #93b4ff; }
+:where(.dark) :is(.text-\[\#166534\], .text-\[\#15803D\]):not([class*="dark:text"]) { color: #4ade80; }
+:where(.dark) :is(.text-\[\#991B1B\], .text-\[\#B91C1C\], .text-\[\#7F1D1D\]):not([class*="dark:text"]) { color: #ff8a95; }
+:where(.dark) :is(.text-\[\#92400E\], .text-\[\#B45309\], .text-\[\#78350F\], .text-\[\#7C2D12\]):not([class*="dark:text"]) { color: #fbbf24; }
+:where(.dark) :is(.border-\[\#CBD2E1\], .border-\[\#E5E7EF\], .border-\[\#94A3B8\], .border-\[\#EEF0F5\]):not([class*="dark:border"]) { border-color: var(--border); }
+:where(.dark) :is(.bg-\[\#CBD2E1\], .bg-\[\#CBD5E1\], .bg-\[\#EEF0F5\], .bg-\[\#E9ECF4\], .bg-\[\#F1F5F9\], .bg-\[\#F5F6FB\]):not([class*="dark:bg"]) { background-color: var(--surface-2); }
+:where(.dark) .bg-white:not(.keep-white):not([class*="dark:bg"]) { background-color: var(--surface); }
+:where(.dark) .bg-\[\#DCFCE7\]:not([class*="dark:bg"]) { background-color: var(--success-soft); }
+:where(.dark) .bg-\[\#FEE2E2\]:not([class*="dark:bg"]) { background-color: var(--danger-soft); }
+:where(.dark) :is(.bg-\[\#FEF3C7\], .bg-\[\#FFFBEB\]):not([class*="dark:bg"]) { background-color: var(--warning-soft); }
+:where(.dark) .bg-\[\#DBEAFE\]:not([class*="dark:bg"]) { background-color: #172554; }
+:where(.dark) .bg-\[\#0F172A\]:not([class*="dark:bg"]) { background-color: var(--primary); }
+:where(.dark) .divide-\[\#EEF0F5\] > :not(:last-child) { border-color: var(--border); }
+:where(.dark) .bg-\[\#FEF2F2\]:not([class*="dark:bg"]) { background-color: var(--danger-soft); }
+:where(.dark) .bg-\[\#FFEDD5\]:not([class*="dark:bg"]) { background-color: var(--warning-soft); }
+:where(.dark) .border-\[\#FCA5A5\]:not([class*="dark:border"]) { border-color: #7f2a33; }
+:where(.dark) .border-\[\#F59E0B\]:not([class*="dark:border"]) { border-color: #a16207; }
