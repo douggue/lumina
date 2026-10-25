@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ht">
+<head>
+<meta charset="utf-8">
+<title>HaitiViral – Sipò</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#00209F}a:hover{color:#001670}
+</style>
+</helmet>
+<div style="width: 390px; height: 1000px; box-sizing: border-box; background: #F5F6FB; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0F172A; display: flex; flex-direction: column; overflow: hidden">
+
+  <header style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #FFFFFF; border-bottom: 1px solid #E5E7EF">
+    <a href="Account.dc.html" aria-label="Retounen" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #0F172A; border-radius: 12px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </a>
+    <h1 style="margin: 0; font-size: 18px; font-weight: 800">Sipò</h1>
+  </header>
+
+  <main style="flex: 1; overflow: hidden; padding: 16px 20px; display: flex; flex-direction: column; gap: 16px">
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+      <a href="#" style="min-height: 54px; border-radius: 14px; background: #15803D; color: #FFFFFF; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.4A8.5 8.5 0 1 1 21 11.5z"></path></svg>WhatsApp</a>
+      <a href="#" style="min-height: 54px; border-radius: 14px; background: #FFFFFF; border: 1px solid #CBD2E1; color: #0F172A; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v12H8l-4 4z"></path></svg>Ouvri tikè</a>
+    </div>
+
+    <section style="background: #FFFFFF; border: 1px solid #E5E7EF; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+      <label for="lookup" style="font-size: 14px; font-weight: 700">Chèche yon kòmand</label>
+      <div style="display: flex; gap: 8px">
+        <input id="lookup" type="text" inputmode="numeric" placeholder="Egz: 10483" value="{{q}}" onInput="{{setQ}}" style="flex: 1; min-width: 0; height: 48px; box-sizing: border-box; padding: 0 12px; border: 1px solid #CBD2E1; border-radius: 12px; font: inherit; font-size: 16px">
+        <button type="button" onClick="{{search}}" style="flex: none; height: 48px; padding: 0 16px; border-radius: 12px; border: none; background: #0F172A; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer">Chèche</button>
+      </div>
+      <sc-if value="{{found}}" hint-placeholder-val="{{ false }}">
+        <div style="background: #EFF6FF; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px">
+          <div style="font-size: 14px; font-weight: 700">#10483 · Instagram Like · 2,000</div>
+          <div style="font-size: 13px; color: #1E40AF">Ap trete · 900 / 2,000 livre · Mwayèn sèvis la: 25 minit</div>
+          <div style="font-size: 12px; color: #334155">Pa gen pwoblèm: kòmand lan ap avanse nòmalman.</div>
+        </div>
+      </sc-if>
+    </section>
+
+    <section style="background: #FFFFFF; border: 1px solid #E5E7EF; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 8px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 700">Estati sèvis yo</h2>
+      <sc-for list="{{status}}" as="s" hint-placeholder-count="4">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0">
+          <span style="font-size: 14px; font-weight: 600">{{s.name}}</span>
+          <span style="{{s.style}}"><span style="{{s.dot}}"></span>{{s.text}}</span>
+        </div>
+      </sc-for>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 700">Kesyon yo poze souvan</h2>
+      <sc-for list="{{faq}}" as="f" hint-placeholder-count="4">
+        <div style="background: #FFFFFF; border: 1px solid #E5E7EF; border-radius: 14px">
+          <button type="button" onClick="{{f.toggle}}" aria-expanded="{{f.expanded}}" style="width: 100%; min-height: 50px; padding: 0 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; background: none; border: none; font: inherit; font-size: 14px; font-weight: 700; color: #0F172A; text-align: left; cursor: pointer">{{f.q}}<span style="font-size: 18px; color: #64748B">{{f.sign}}</span></button>
+          <sc-if value="{{f.open}}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 0 14px 14px; font-size: 13px; line-height: 1.55; color: #334155">{{f.a}}</div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { q: '10483', found: true, open: 0 };
+  }
+  renderVals() {
+    const st = this.state;
+    const S = { ok: ['Nòmal', '#166534', '#DCFCE7', '#16A34A'], slow: ['Pi dousman', '#92400E', '#FEF3C7', '#D97706'], pause: ['Sou pòz', '#991B1B', '#FEE2E2', '#DC2626'] };
+    const stat = (name, k) => ({ name, text: S[k][0], style: 'display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; color: ' + S[k][1] + '; background: ' + S[k][2], dot: 'width: 7px; height: 7px; border-radius: 50%; background: ' + S[k][3] });
+    const faqs = [
+      ['Èske kont mwen ka gen pwoblèm?', 'Platfòm yo pa renmen achte angajman. Pifò kliyan pa janm gen pwoblèm, men sa ka rive: yon pati ka tonbe oswa kont lan ka limite. Chwazi sèvis "Risk feb" pou plis sekirite. Ou itilize sèvis yo sou pwop responsablite w.'],
+      ['Kòmand mwen pa fin rive, kisa k pase?', 'Kèk sèvis pran plizyè èdtan. Gade "Mwayèn livrezon" sou kòmand lan. Si founisè a pa ka fini, rès kòb la tounen nan bous ou otomatikman.'],
+      ['Èske m bezwen bay modpas mwen?', 'Non, janm. Nou bezwen sèlman lyen piblik la.'],
+      ['Kijan pou m mete kòb?', 'Ak MonCash, NatCash oswa transfè labank (voye prèv la). MonCash ak NatCash antre touswit.']
+    ];
+    return {
+      q: st.q, setQ: (e) => this.setState({ q: e.target.value, found: false }),
+      search: () => this.setState({ found: String(st.q).trim() === '10483' }),
+      found: st.found,
+      status: [stat('TikTok', 'ok'), stat('Instagram', 'ok'), stat('YouTube', 'slow'), stat('Facebook Live', 'pause')],
+      faq: faqs.map((f, i) => ({ q: f[0], a: f[1], open: st.open === i, expanded: st.open === i ? 'true' : 'false', sign: st.open === i ? '−' : '+', toggle: () => this.setState({ open: st.open === i ? -1 : i }) }))
+    };
+  }
+}
+</script>
+</body>
+</html>

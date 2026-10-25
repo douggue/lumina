@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ht">
+<head>
+<meta charset="utf-8">
+<title>HaitiViral – Eseye gratis</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#00209F}a:hover{color:#001670}
+</style>
+</helmet>
+<div style="width: 390px; height: 1050px; box-sizing: border-box; background: #F5F6FB; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0F172A; display: flex; flex-direction: column; overflow: hidden">
+
+  <header style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #FFFFFF; border-bottom: 1px solid #E5E7EF">
+    <a href="Main.dc.html" aria-label="Retounen" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #0F172A; border-radius: 12px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </a>
+    <h1 style="margin: 0; font-size: 18px; font-weight: 800">Eseye gratis</h1>
+  </header>
+
+  <main style="flex: 1; overflow: hidden; padding: 18px 20px; display: flex; flex-direction: column; gap: 18px">
+    <sc-if value="{{notDone}}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; flex-direction: column; gap: 18px">
+        <div style="font-size: 14px; line-height: 1.55; color: #334155">Teste kalite sèvis nou yo <b>gratis</b> anvan ou mete kòb. Yon sèl esè pa moun, pa telefòn ak pa kont rezo sosyal.</div>
+
+        <section style="display: flex; flex-direction: column; gap: 10px">
+          <div style="font-size: 13px; font-weight: 700; color: #5B6478; text-transform: uppercase; letter-spacing: 0.6px">1 · Chwazi esè ou</div>
+          <sc-for list="{{offers}}" as="o" hint-placeholder-count="3">
+            <button type="button" onClick="{{o.pick}}" style="{{o.style}}">
+              <div style="width: 40px; height: 40px; border-radius: 11px; background: {{o.bg}}; color: #FFFFFF; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: center; flex: none">{{o.letter}}</div>
+              <div style="flex: 1; text-align: left; display: flex; flex-direction: column; gap: 2px">
+                <div style="font-size: 15px; font-weight: 700">{{o.name}}</div>
+                <div style="font-size: 12px; color: #5B6478">Mwayèn livrezon: {{o.avg}}</div>
+              </div>
+              <span style="font-size: 12px; font-weight: 800; padding: 5px 10px; border-radius: 999px; background: #DCFCE7; color: #166534">GRATIS</span>
+            </button>
+          </sc-for>
+        </section>
+
+        <section style="display: flex; flex-direction: column; gap: 8px">
+          <div style="font-size: 13px; font-weight: 700; color: #5B6478; text-transform: uppercase; letter-spacing: 0.6px">2 · Lyen ou</div>
+          <label for="tlink" style="font-size: 14px; font-weight: 600">{{linkLabel}}</label>
+          <input id="tlink" type="url" placeholder="{{linkHint}}" style="height: 50px; box-sizing: border-box; padding: 0 14px; border: 1px solid #CBD2E1; border-radius: 12px; font: inherit; font-size: 16px; background: #FFFFFF">
+        </section>
+
+        <section style="display: flex; flex-direction: column; gap: 8px">
+          <div style="font-size: 13px; font-weight: 700; color: #5B6478; text-transform: uppercase; letter-spacing: 0.6px">3 · Verifye telefòn ou</div>
+          <label for="phone" style="font-size: 14px; font-weight: 600">Nimewo telefòn</label>
+          <div style="display: flex; gap: 8px">
+            <div style="height: 50px; padding: 0 12px; display: flex; align-items: center; border: 1px solid #CBD2E1; border-radius: 12px; background: #F8FAFC; font-weight: 700">+509</div>
+            <input id="phone" type="tel" inputmode="numeric" placeholder="3X XX XXXX" style="flex: 1; min-width: 0; height: 50px; box-sizing: border-box; padding: 0 14px; border: 1px solid #CBD2E1; border-radius: 12px; font: inherit; font-size: 16px; background: #FFFFFF">
+          </div>
+          <sc-if value="{{codeSent}}" hint-placeholder-val="{{ false }}">
+            <label for="code" style="font-size: 14px; font-weight: 600; margin-top: 4px">Kòd 6 chif nou voye sou WhatsApp</label>
+            <input id="code" type="text" inputmode="numeric" placeholder="______" style="height: 50px; box-sizing: border-box; padding: 0 14px; border: 2px solid #0F172A; border-radius: 12px; font: inherit; font-size: 20px; letter-spacing: 6px; background: #FFFFFF">
+          </sc-if>
+          <sc-if value="{{notSent}}" hint-placeholder-val="{{ true }}">
+            <button type="button" onClick="{{sendCode}}" style="min-height: 46px; border-radius: 12px; border: 1px solid #0F172A; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; color: #0F172A; cursor: pointer">Voye kòd la sou WhatsApp</button>
+          </sc-if>
+        </section>
+
+        <button type="button" onClick="{{submit}}" style="height: 54px; border-radius: 14px; border: none; background: #0F172A; color: #FFFFFF; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer">Resevwa esè gratis la</button>
+        <div style="font-size: 12px; line-height: 1.5; color: #5B6478">Kont lan dwe PIBLIK. Esè yo voye nan kèk minit apre verifikasyon; kèk fwa nou verifye yo alamen anvan.</div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{done}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; padding: 40px 10px">
+        <div style="width: 72px; height: 72px; border-radius: 50%; background: #DCFCE7; color: #166534; display: flex; align-items: center; justify-content: center">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div style="font-size: 22px; font-weight: 800">Esè ou anrejistre!</div>
+        <div style="font-size: 14px; line-height: 1.55; color: #334155">{{doneText}} Nou ap voye yon notifikasyon lè l fini.</div>
+        <a href="Wallet.dc.html" style="margin-top: 8px; display: flex; align-items: center; justify-content: center; height: 52px; padding: 0 22px; border-radius: 14px; background: #0F172A; color: #FFFFFF; font-size: 15px; font-weight: 700; text-decoration: none">Ou renmen l? Ajoute kòb</a>
+        <a href="Orders.dc.html" style="font-size: 14px; font-weight: 700">Wè kòmand mwen yo</a>
+      </div>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1050}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { pick: 0, sent: false, done: false };
+  }
+  renderVals() {
+    const st = this.state;
+    const offers = [
+      { name: '100 vi TikTok', letter: 'TT', bg: '#111111', avg: '10 minit', label: 'Lyen videyo TikTok ou', hint: 'https://www.tiktok.com/@non/video/123...' },
+      { name: '20 like Instagram', letter: 'IG', bg: '#C13584', avg: '25 minit', label: 'Lyen piblikasyon Instagram ou', hint: 'https://www.instagram.com/p/ABC...' },
+      { name: '100 vi YouTube', letter: 'YT', bg: '#CC0000', avg: '1 èdtan', label: 'Lyen videyo YouTube ou', hint: 'https://youtube.com/watch?v=...' }
+    ];
+    const cur = offers[st.pick];
+    return {
+      offers: offers.map((o, i) => ({ ...o, pick: () => this.setState({ pick: i }),
+        style: 'display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; font: inherit; color: #0F172A; cursor: pointer; background: #FFFFFF; ' + (i === st.pick ? 'border: 2px solid #0F172A' : 'border: 2px solid #E5E7EF') })),
+      linkLabel: cur.label, linkHint: cur.hint,
+      codeSent: st.sent, notSent: !st.sent,
+      sendCode: () => this.setState({ sent: true }),
+      submit: () => this.setState({ done: true }),
+      done: st.done, notDone: !st.done,
+      doneText: cur.name + ' ap rive sou kont ou byento.'
+    };
+  }
+}
+</script>
+</body>
+</html>
