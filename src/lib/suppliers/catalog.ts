@@ -397,6 +397,8 @@ const KIND_WORDS: Record<Kind, RegExp> = {
   views: /\bviews?\b|\bplays?\b|impression|reach|watch/i,
   comments: /comment/i,
   live: /\blive\b|stream/i,
+  account: /account|login|credential|password|user\s*:\s*pass/i,
+  sms: /\bsms\b|otp|phone.?verif|virtual.?number/i,
 };
 const PLATFORM_WORDS: Record<string, string[]> = {
   tiktok: ["tiktok", "tik tok"],
