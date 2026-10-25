@@ -55,7 +55,7 @@ export default async function OrdersPage({ params, searchParams }: { params: Pro
     if (d.toDateString() === new Date(now.getTime() - 86400000).toDateString()) return t("yesterday");
     return d.toLocaleDateString(locale === "fr" ? "fr-FR" : "fr-HT", { day: "numeric", month: "short" });
   };
-  const chip = (on: boolean) => `flex-none inline-flex min-h-9 items-center rounded-full border px-3.5 text-[13px] font-bold ${on ? "border-text bg-text text-surface" : "border-[#CBD2E1] bg-surface text-text/80 dark:border-border"}`;
+  const chip = (on: boolean) => `flex-none inline-flex min-h-9 items-center rounded-full border px-3.5 text-[13px] font-bold ${on ? "border-text bg-text text-surface" : "border-border bg-surface text-text/80"}`;
 
   return (
     <>

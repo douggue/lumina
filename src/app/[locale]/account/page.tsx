@@ -70,7 +70,7 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
                 {vip.level.discount ? t("vipName", { name: txt(vip.level.name, locale), discount: vip.level.discount }) : t("vipNameNone", { name: txt(vip.level.name, locale) })}
               </span>
             </span>
-            <span className="rounded-full bg-[#E2E8F0] px-2.5 py-[5px] text-xs font-extrabold text-[#0F172A]">VIP</span>
+            <span className="rounded-full bg-surface-2 px-2.5 py-[5px] text-xs font-extrabold text-text">VIP</span>
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-[#334155]"><div className="h-full rounded-full bg-[#FBBF24]" style={{ width: `${pct}%` }} /></div>
           <p className="text-xs text-[#CBD5E1]">
