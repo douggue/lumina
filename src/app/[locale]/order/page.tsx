@@ -4,7 +4,9 @@ import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/session";
 import { getBalances } from "@/lib/ledger";
 import { t as txt } from "@/lib/text";
-import { KIND_ORDER, parseMeta, PLATFORMS, productKind } from "@/lib/services";
+import {
+  KIND_ORDER, parseMeta, parseProviderDelivery, parseProviderRequire, productKind, productNeedsNoWarranty, PLATFORMS,
+} from "@/lib/services";
 import { OrderForm, type OrderCatalog } from "@/components/OrderForm";
 import { PageBar } from "@/components/PageBar";
 import { vipStatus } from "@/lib/vip";
@@ -42,9 +44,21 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
       .filter((x) => x.meta)
       // Only what customers may see: never the provider's own text (desc), and the admin flags stay on the server.
       .map(({ v, meta }) => {
+        const require = parseProviderRequire(meta!.desc);
+        const delivery = parseProviderDelivery(meta!.desc);
+        const noWarranty = productNeedsNoWarranty(kind, meta!.desc);
         const { desc: _desc, riskLocked: _l, blocked: _b, pausedLoss: _p, ...shown } = meta!;
         const about = meta!.about ? txt(meta!.about, locale) : "";
-        return { id: v.id, name: txt(v.name, locale), rate: v.salePriceHtg ?? v.priceHtg, soldOut: v.soldOut, meta: { ...shown, avg: { [locale]: txt(meta!.avg, locale) }, about: about ? { [locale]: about } : undefined } };
+        return {
+          id: v.id,
+          name: txt(v.name, locale),
+          rate: v.salePriceHtg ?? v.priceHtg,
+          soldOut: v.soldOut,
+          require,
+          delivery,
+          noWarranty,
+          meta: { ...shown, avg: { [locale]: txt(meta!.avg, locale) }, about: about ? { [locale]: about } : undefined },
+        };
       });
     if (!tiers.length) continue;
     let platform = catalog.find((c) => c.slug === p.category.slug);

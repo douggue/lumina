@@ -775,7 +775,7 @@
     "error_invalid_link": "Tanpri verifye lyen an.",
     "error_invalid_quantity": "Tanpri verifye kantite a.",
     "error_risk_not_accepted": "Konfime ou konprann risk la.",
-    "error_missing_field": "Tanpri ranpli tout enfòmasyon yo.",
+    "error_missing_field": "Ranpli tout chan obligatwa yo.",
     "error_verify_email": "Konfime imèl ou anvan ou kòmande.",
     "error_new_account_limit": "Kont nouvo yo gen yon limit pa jou. Eseye yon pi piti kantite.",
     "error_generic": "Gen yon pwoblèm. Eseye ankò.",
@@ -838,7 +838,17 @@
     "error_not_public": "Konfime kont ou piblik anvan w kòmande.",
     "okHandle": "Nou pral itilize pwofil sa a.",
     "shortLinkHint": "Lyen kout (vm.tiktok, fb.watch…): n ap verifye li sou sèvè a lè w kòmande.",
-    "liveLinkHint": "Pou LIVE: mete lyen pwofil ou oswa lyen live la, epi kòmande sèlman lè ou deja an live."
+    "liveLinkHint": "Pou LIVE: mete lyen pwofil ou oswa lyen live la, epi kòmande sèlman lè ou deja an live.",
+    "kind_account": "Kont",
+    "kind_sms": "SMS",
+    "deliveryInstant": "Livrezon touswit",
+    "delivery24h": "Livrezon nan 24 èdtan",
+    "noWarrantyTitle": "Pa gen garanti",
+    "noWarrantyBody": "Nimewo SMS / OTP sa yo pa gen refill ni ranbousman apre livrezon. Kòd yo ka ekspire vit. Mwen konprann epi mwen aksepte achte san garanti.",
+    "requireFields": "Ranpli tout chan obligatwa yo anvan ou kòmande.",
+    "error_no_warranty": "Ou dwe aksepte ke pa gen garanti pou kontinye.",
+    "err_no_warranty": "Ou dwe aksepte ke pa gen garanti pou kontinye.",
+    "err_missing_field": "Ranpli tout chan obligatwa yo."
   },
   "ordersUi": {
     "title": "Kòmand mwen yo",

@@ -775,7 +775,7 @@
     "error_invalid_link": "Vérifiez le lien.",
     "error_invalid_quantity": "Vérifiez la quantité.",
     "error_risk_not_accepted": "Confirmez que vous comprenez le risque.",
-    "error_missing_field": "Remplissez toutes les informations.",
+    "error_missing_field": "Remplissez tous les champs obligatoires.",
     "error_verify_email": "Confirmez votre e-mail avant de commander.",
     "error_new_account_limit": "Les nouveaux comptes ont une limite par jour. Essayez une quantité plus petite.",
     "error_generic": "Un problème est survenu. Réessayez.",
@@ -838,7 +838,17 @@
     "error_not_public": "Confirmez que votre compte est public avant de commander.",
     "okHandle": "Nous utiliserons ce profil.",
     "shortLinkHint": "Lien court (vm.tiktok, fb.watch…) : nous le vérifierons sur le serveur à la commande.",
-    "liveLinkHint": "Pour le LIVE : mettez le lien de votre profil ou du live, et commandez seulement quand vous êtes déjà en direct."
+    "liveLinkHint": "Pour le LIVE : mettez le lien de votre profil ou du live, et commandez seulement quand vous êtes déjà en direct.",
+    "kind_account": "Compte",
+    "kind_sms": "SMS",
+    "deliveryInstant": "Livraison instantanée",
+    "delivery24h": "Livraison sous 24 h",
+    "noWarrantyTitle": "Sans garantie",
+    "noWarrantyBody": "Ces numéros SMS / OTP n'ont ni refill ni remboursement après livraison. Les codes peuvent expirer vite. Je comprends et j'accepte d'acheter sans garantie.",
+    "requireFields": "Remplissez tous les champs obligatoires avant de commander.",
+    "error_no_warranty": "Vous devez accepter l’absence de garantie pour continuer.",
+    "err_no_warranty": "Vous devez accepter l’absence de garantie pour continuer.",
+    "err_missing_field": "Remplissez tous les champs obligatoires."
   },
   "ordersUi": {
     "title": "Mes commandes",

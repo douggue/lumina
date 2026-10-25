@@ -6,9 +6,23 @@ import { placeServiceOrder } from "@/actions/service-order";
 import { formatMoney } from "@/lib/money";
 import { withDiscount } from "@/lib/vip-math";
 import {
-  checkLink, isShortLink, DRIP_INTERVAL_MIN, DRIP_RUNS, LIVE_DURATIONS, linkExample, parseComments, servicePrice, wantsPost,
+  checkLink, isCatalogKind, isShortLink, DRIP_INTERVAL_MIN, DRIP_RUNS, LIVE_DURATIONS, linkExample, parseComments, servicePrice, wantsPost,
   type Kind, type Risk, type ServiceMeta,
 } from "@/lib/services";
+
+export type OrderTier = {
+  id: string;
+  name: string;
+  rate: number;
+  soldOut: boolean;
+  meta: ServiceMeta;
+  /** Provider require:… keys (account/SMS). */
+  require?: string[];
+  /** "instant" | "24h" | other delivery label. */
+  delivery?: string;
+  /** Show no-warranty consent (SMS, or account with no-warranty notes). */
+  noWarranty?: boolean;
+};
 
 export type OrderCatalog = {
   slug: string;
@@ -16,7 +30,7 @@ export type OrderCatalog = {
   letter: string;
   color: string;
   image: string | null;
-  services: { kind: Kind; tiers: { id: string; name: string; rate: number; soldOut: boolean; meta: ServiceMeta }[] }[];
+  services: { kind: Kind; tiers: OrderTier[] }[];
 }[];
 
 const RISK_COLOR: Record<Risk, string> = { low: "#16A34A", med: "#D97706", high: "#DC2626" };
@@ -55,6 +69,8 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
   const [isPublic, setIsPublic] = useState(false);
   const [comments, setComments] = useState("");
   const [username, setUsername] = useState("");
+  const [fields, setFields] = useState<Record<string, string>>({});
+  const [noWarrantyOk, setNoWarrantyOk] = useState(false);
   const [sheet, setSheet] = useState<null | "drip" | "risk">(null);
   const [tab, setTab] = useState<"info" | "read" | "updates">("info");
   const [error, setError] = useState("");
@@ -64,14 +80,16 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
     return <div className="container-page py-16 text-center text-muted">{t("empty")}</div>;
   }
   const meta = tier.meta;
-  const hasComments = meta.type === "comments" || meta.type === "liveComments";
-  const isLive = meta.type === "live";
-  const liveAny = isLive || meta.type === "liveComments";
+  const isCatalog = isCatalogKind(service.kind);
+  const requireKeys = isCatalog ? (tier.require ?? []) : [];
+  const hasComments = !isCatalog && (meta.type === "comments" || meta.type === "liveComments");
+  const isLive = !isCatalog && meta.type === "live";
+  const liveAny = isLive || (!isCatalog && meta.type === "liveComments");
   const post = wantsPost(service.kind, meta.type);
   const commentList = parseComments(comments);
   const quantity = hasComments ? commentList.length : Number(qty) || 0;
   const total = withDiscount(servicePrice(tier.rate, quantity, meta.type, dur), discount);
-  const check = link.trim() ? checkLink(link, platform.slug, post, meta.postType) : null;
+  const check = !isCatalog && link.trim() ? checkLink(link, platform.slug, post, meta.postType) : null;
   const linkError = check && !check.ok ? t(`err_${check.error === "empty" ? "not_platform" : check.error}`, { platform: platform.name, example: linkExample(platform.slug, post) }) : "";
   const shortHint = check?.ok && isShortLink(check.url, platform.slug) ? t("shortLinkHint") : "";
   const linkOk = check?.ok && !shortHint ? (liveAny ? t("okLive") : post ? t("okPost") : t("okProfile")) : "";
@@ -80,8 +98,13 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
     : quantity < meta.min || quantity > meta.max ? t("range", { min: num(meta.min), max: num(meta.max) }) : "";
   const short = balance !== null && total > balance;
   const isHigh = meta.risk === "high";
-  const ready = signedIn && check?.ok && !rangeError && !short && (!isHigh || accepted) && isPublic && (meta.type !== "commentLikes" || username.trim().length > 0) && !tier.soldOut;
-  const chips = meta.min >= 500 ? [1000, 5000, 10000, 50000] : [100, 500, 1000, 5000];
+  const fieldsOk = !isCatalog || requireKeys.every((k) => (fields[k] ?? "").trim().length > 0);
+  const warrantyOk = !tier.noWarranty || noWarrantyOk;
+  const ready = signedIn && !rangeError && !short && (!isHigh || accepted) && !tier.soldOut
+    && (isCatalog ? fieldsOk && warrantyOk : !!(check?.ok) && isPublic && (meta.type !== "commentLikes" || username.trim().length > 0));
+  const chips = isCatalog
+    ? [1, 2, 5, 10, 20].filter((n) => n >= meta.min && n <= meta.max)
+    : meta.min >= 500 ? [1000, 5000, 10000, 50000] : [100, 500, 1000, 5000];
   const fmt = (n: number) => formatMoney(n, "HTG", locale);
   const priceLabel = hasComments ? `${(tier.rate / 100 / 1000).toFixed(2)} HTG` : fmt(tier.rate);
   const durLabel = (m: number) => (m >= 60 ? t("hours", { n: m / 60 }) : t("minutes", { n: m }));
@@ -89,21 +112,40 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
   const pickTier = (i: number) => {
     setTierPick(i);
     setAccepted(false);
+    setNoWarrantyOk(false);
+  };
+  const pickKind = (k: Kind) => {
+    setKindPick(k);
+    setTierPick(1);
+    setAccepted(false);
+    setNoWarrantyOk(false);
+    setFields({});
+    if (isCatalogKind(k)) setQty("1");
   };
   const submit = () => {
     setError("");
     start(async () => {
-      const r = await placeServiceOrder({
-        variantId: tier.id,
-        link,
-        quantity,
-        comments: hasComments ? comments : undefined,
-        username: meta.type === "commentLikes" ? username : undefined,
-        durationMin: isLive ? dur : undefined,
-        drip: meta.drip && drip,
-        acceptRisk: accepted,
-        publicOk: isPublic,
-      });
+      const r = await placeServiceOrder(isCatalog
+        ? {
+            variantId: tier.id,
+            link: "-",
+            quantity,
+            fields: Object.fromEntries(requireKeys.map((k) => [k, (fields[k] ?? "").trim()])),
+            noWarrantyAccepted: !!tier.noWarranty && noWarrantyOk,
+            acceptRisk: accepted,
+            publicOk: true,
+          }
+        : {
+            variantId: tier.id,
+            link,
+            quantity,
+            comments: hasComments ? comments : undefined,
+            username: meta.type === "commentLikes" ? username : undefined,
+            durationMin: isLive ? dur : undefined,
+            drip: meta.drip && drip,
+            acceptRisk: accepted,
+            publicOk: isPublic,
+          });
       if (r.ok) router.push(`/account/orders/${r.orderId}`);
       else if (r.error.startsWith("link_")) setError(t(`err_${r.error.slice(5)}`, { platform: platform.name, example: linkExample(platform.slug, post) }));
       else setError(t.has(`error_${r.error}`) ? t(`error_${r.error}`) : t("error_generic"));
@@ -141,7 +183,7 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
             {platform.services.map((s) => {
               const on = s.kind === service.kind;
               return (
-                <button key={s.kind} type="button" aria-pressed={on} onClick={() => { setKindPick(s.kind); setTierPick(1); setAccepted(false); }}
+                <button key={s.kind} type="button" aria-pressed={on} onClick={() => pickKind(s.kind)}
                   className={`min-h-[38px] rounded-[10px] border-2 px-3.5 text-[13px] font-bold ${on ? "border-text bg-primary-soft text-text" : "border-border bg-surface text-text/80"}`}>
                   {t(`kind_${s.kind}`)}
                 </button>
@@ -190,85 +232,125 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
 
         {/* 3 · Details */}
         <section className="flex flex-col gap-2.5">
-          <label htmlFor="link" className="text-sm font-semibold">{liveAny ? t("linkLive") : post ? t("linkPost") : t("linkProfile")}</label>
-          <input id="link" type="url" inputMode="url" autoComplete="off" value={link} onChange={(e) => setLink(e.target.value)} placeholder={linkExample(platform.slug, post)}
-            className={`h-[50px] rounded-xl bg-surface px-3.5 text-base ${linkError ? "border-2 border-danger" : linkOk ? "border-2 border-success" : "border border-border"}`} />
-          {linkError && <p role="alert" className="rounded-[10px] bg-danger-soft px-3 py-2.5 text-[13px] leading-normal text-danger">{linkError}</p>}
-          {shortHint && <p className="rounded-[10px] bg-warning-soft px-3 py-2.5 text-[13px] text-warning">{shortHint}</p>}
-          {linkOk && <p className="rounded-[10px] bg-success-soft px-3 py-2.5 text-[13px] text-success">{linkOk}</p>}
-          {liveAny && !linkError && <p className="text-xs text-muted">{t("liveLinkHint")}</p>}
-
-          {!hasComments && (
+          {isCatalog ? (
             <>
-              <label htmlFor="qty" className="mt-1 text-sm font-semibold">{t("quantity")}</label>
+              {(tier.delivery === "instant" || tier.delivery === "24h") && (
+                <div className={`inline-flex w-fit items-center rounded-full px-3 py-1.5 text-[12px] font-extrabold ${tier.delivery === "instant" ? "bg-success-soft text-success" : "bg-warning-soft text-warning"}`}>
+                  {tier.delivery === "instant" ? t("deliveryInstant") : t("delivery24h")}
+                </div>
+              )}
+
+              <label htmlFor="qty" className="text-sm font-semibold">{t("quantity")}</label>
               <input id="qty" type="number" inputMode="numeric" value={qty} onChange={(e) => setQty(e.target.value)}
                 className="h-[50px] rounded-xl border border-border bg-surface px-3.5 text-base" />
-              <div className="grid grid-cols-4 gap-2">
-                {chips.map((n) => (
-                  <button key={n} type="button" onClick={() => setQty(String(n))} className={`${pill(quantity === n)} px-0`}>{n >= 1000 ? `${n / 1000}k` : n}</button>
-                ))}
-              </div>
-            </>
-          )}
-
-          {isLive && (
-            <>
-              <div className="mt-1 text-sm font-semibold">{t("howLong")}</div>
-              <div className="grid grid-cols-4 gap-2">
-                {LIVE_DURATIONS.map((m) => (
-                  <button key={m} type="button" onClick={() => setDur(m)} className={`${pill(dur === m)} px-0`}>{m >= 60 ? t("hours", { n: m / 60 }) : t("minutes", { n: m })}</button>
-                ))}
-              </div>
-            </>
-          )}
-
-          {hasComments && (
-            <>
-              <div className="mt-1 flex items-center justify-between">
-                <label htmlFor="comments" className="text-sm font-semibold">{t("commentsLabel")}</label>
-                <span className="text-[13px] font-bold">{t("commentsCount", { n: commentList.length })}</span>
-              </div>
-              <textarea id="comments" rows={5} value={comments} onChange={(e) => setComments(e.target.value)}
-                className="rounded-xl border border-border bg-surface px-3.5 py-3 text-base leading-normal" />
-              {commentList.length === 1 && commentList[0].includes(",") && (
-                <button type="button" onClick={() => setComments(commentList[0].split(",").map((s) => s.trim()).filter(Boolean).join("\n"))}
-                  className="min-h-11 rounded-xl border border-[#F59E0B] bg-[#FFFBEB] text-[13px] font-bold text-[#92400E]">{t("splitCommas")}</button>
+              {chips.length > 0 && (
+                <div className="grid grid-cols-4 gap-2">
+                  {chips.map((n) => (
+                    <button key={n} type="button" onClick={() => setQty(String(n))} className={`${pill(quantity === n)} px-0`}>{n >= 1000 ? `${n / 1000}k` : n}</button>
+                  ))}
+                </div>
               )}
-              <div className="flex flex-wrap gap-1.5">
-                {t("presets").split("|").map((p) => (
-                  <button key={p} type="button" onClick={() => setComments((c) => (c.trim() ? `${c.replace(/\s+$/, "")}\n` : "") + p)}
-                    className="min-h-[38px] rounded-full border border-dashed border-[#94A3B8] bg-surface px-3 text-[13px] font-semibold">+ {p}</button>
-                ))}
-              </div>
-            </>
-          )}
 
-          {meta.type === "commentLikes" && (
+              {requireKeys.map((key) => (
+                <div key={key} className="flex flex-col gap-1.5">
+                  <label htmlFor={`req-${key}`} className="text-sm font-semibold">{key}</label>
+                  <input
+                    id={`req-${key}`}
+                    type="text"
+                    autoComplete="off"
+                    value={fields[key] ?? ""}
+                    onChange={(e) => setFields((f) => ({ ...f, [key]: e.target.value }))}
+                    className="h-[50px] rounded-xl border border-border bg-surface px-3.5 text-base"
+                  />
+                </div>
+              ))}
+              {requireKeys.length === 0 && (
+                <p className="text-xs text-muted">{t("requireFields")}</p>
+              )}
+            </>
+          ) : (
             <>
-              <label htmlFor="uname" className="mt-1 text-sm font-semibold">{t("commentAuthor")}</label>
-              <input id="uname" type="text" autoCapitalize="none" autoCorrect="off" placeholder="@non" value={username} onChange={(e) => setUsername(e.target.value)}
-                className="h-[50px] rounded-xl border border-border bg-surface px-3.5 text-base" />
+              <label htmlFor="link" className="text-sm font-semibold">{liveAny ? t("linkLive") : post ? t("linkPost") : t("linkProfile")}</label>
+              <input id="link" type="url" inputMode="url" autoComplete="off" value={link} onChange={(e) => setLink(e.target.value)} placeholder={linkExample(platform.slug, post)}
+                className={`h-[50px] rounded-xl bg-surface px-3.5 text-base ${linkError ? "border-2 border-danger" : linkOk ? "border-2 border-success" : "border border-border"}`} />
+              {linkError && <p role="alert" className="rounded-[10px] bg-danger-soft px-3 py-2.5 text-[13px] leading-normal text-danger">{linkError}</p>}
+              {shortHint && <p className="rounded-[10px] bg-warning-soft px-3 py-2.5 text-[13px] text-warning">{shortHint}</p>}
+              {linkOk && <p className="rounded-[10px] bg-success-soft px-3 py-2.5 text-[13px] text-success">{linkOk}</p>}
+              {liveAny && !linkError && <p className="text-xs text-muted">{t("liveLinkHint")}</p>}
+
+              {!hasComments && (
+                <>
+                  <label htmlFor="qty" className="mt-1 text-sm font-semibold">{t("quantity")}</label>
+                  <input id="qty" type="number" inputMode="numeric" value={qty} onChange={(e) => setQty(e.target.value)}
+                    className="h-[50px] rounded-xl border border-border bg-surface px-3.5 text-base" />
+                  <div className="grid grid-cols-4 gap-2">
+                    {chips.map((n) => (
+                      <button key={n} type="button" onClick={() => setQty(String(n))} className={`${pill(quantity === n)} px-0`}>{n >= 1000 ? `${n / 1000}k` : n}</button>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {isLive && (
+                <>
+                  <div className="mt-1 text-sm font-semibold">{t("howLong")}</div>
+                  <div className="grid grid-cols-4 gap-2">
+                    {LIVE_DURATIONS.map((m) => (
+                      <button key={m} type="button" onClick={() => setDur(m)} className={`${pill(dur === m)} px-0`}>{m >= 60 ? t("hours", { n: m / 60 }) : t("minutes", { n: m })}</button>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {hasComments && (
+                <>
+                  <div className="mt-1 flex items-center justify-between">
+                    <label htmlFor="comments" className="text-sm font-semibold">{t("commentsLabel")}</label>
+                    <span className="text-[13px] font-bold">{t("commentsCount", { n: commentList.length })}</span>
+                  </div>
+                  <textarea id="comments" rows={5} value={comments} onChange={(e) => setComments(e.target.value)}
+                    className="rounded-xl border border-border bg-surface px-3.5 py-3 text-base leading-normal" />
+                  {commentList.length === 1 && commentList[0].includes(",") && (
+                    <button type="button" onClick={() => setComments(commentList[0].split(",").map((s) => s.trim()).filter(Boolean).join("\n"))}
+                      className="min-h-11 rounded-xl border border-[#F59E0B] bg-[#FFFBEB] text-[13px] font-bold text-[#92400E]">{t("splitCommas")}</button>
+                  )}
+                  <div className="flex flex-wrap gap-1.5">
+                    {t("presets").split("|").map((p) => (
+                      <button key={p} type="button" onClick={() => setComments((c) => (c.trim() ? `${c.replace(/\s+$/, "")}\n` : "") + p)}
+                        className="min-h-[38px] rounded-full border border-dashed border-[#94A3B8] bg-surface px-3 text-[13px] font-semibold">+ {p}</button>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {meta.type === "commentLikes" && (
+                <>
+                  <label htmlFor="uname" className="mt-1 text-sm font-semibold">{t("commentAuthor")}</label>
+                  <input id="uname" type="text" autoCapitalize="none" autoCorrect="off" placeholder="@non" value={username} onChange={(e) => setUsername(e.target.value)}
+                    className="h-[50px] rounded-xl border border-border bg-surface px-3.5 text-base" />
+                </>
+              )}
+
+              {liveAny && (
+                <div className="flex gap-2.5 rounded-xl bg-[#FFEDD5] p-3 text-[13px] leading-normal text-[#7C2D12]">
+                  <span className="flex h-[22px] flex-none items-center rounded-md bg-[#DC2626] px-2 text-[11px] font-extrabold text-white">LIVE</span>
+                  <span>{t("liveWarn")}</span>
+                </div>
+              )}
+
+              {meta.drip && (
+                <div className="mt-1 flex items-center gap-2 rounded-[14px] border border-border bg-surface py-1.5 pl-3.5 pr-1.5">
+                  <div className="flex flex-1 flex-col gap-0.5">
+                    <span className="text-sm font-bold">{t("dripTitle")}</span>
+                    <span className="text-xs text-muted">{drip ? t("dripOn", { runs: DRIP_RUNS, minutes: DRIP_INTERVAL_MIN }) : t("dripOff")}</span>
+                  </div>
+                  <button type="button" onClick={() => setSheet("drip")} aria-label={t("dripWhat")} className="h-10 w-10 flex-none rounded-full bg-surface-2 font-extrabold text-text/80">?</button>
+                  <button type="button" onClick={() => setDrip((d) => !d)} aria-pressed={drip} aria-label={t("dripToggle")} className="grid h-11 w-[60px] flex-none place-items-center">
+                    <span className={`flex h-7 w-12 rounded-full p-[3px] ${drip ? "justify-end bg-text" : "justify-start bg-surface-2"}`}><span className="h-[22px] w-[22px] rounded-full bg-surface keep-white" /></span>
+                  </button>
+                </div>
+              )}
             </>
-          )}
-
-          {liveAny && (
-            <div className="flex gap-2.5 rounded-xl bg-[#FFEDD5] p-3 text-[13px] leading-normal text-[#7C2D12]">
-              <span className="flex h-[22px] flex-none items-center rounded-md bg-[#DC2626] px-2 text-[11px] font-extrabold text-white">LIVE</span>
-              <span>{t("liveWarn")}</span>
-            </div>
-          )}
-
-          {meta.drip && (
-            <div className="mt-1 flex items-center gap-2 rounded-[14px] border border-border bg-surface py-1.5 pl-3.5 pr-1.5">
-              <div className="flex flex-1 flex-col gap-0.5">
-                <span className="text-sm font-bold">{t("dripTitle")}</span>
-                <span className="text-xs text-muted">{drip ? t("dripOn", { runs: DRIP_RUNS, minutes: DRIP_INTERVAL_MIN }) : t("dripOff")}</span>
-              </div>
-              <button type="button" onClick={() => setSheet("drip")} aria-label={t("dripWhat")} className="h-10 w-10 flex-none rounded-full bg-surface-2 font-extrabold text-text/80">?</button>
-              <button type="button" onClick={() => setDrip((d) => !d)} aria-pressed={drip} aria-label={t("dripToggle")} className="grid h-11 w-[60px] flex-none place-items-center">
-                <span className={`flex h-7 w-12 rounded-full p-[3px] ${drip ? "justify-end bg-text" : "justify-start bg-surface-2"}`}><span className="h-[22px] w-[22px] rounded-full bg-surface keep-white" /></span>
-              </button>
-            </div>
           )}
         </section>
 
@@ -276,7 +358,7 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
         <section className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-4">
           <div className="flex justify-between gap-2.5 text-sm"><span className="text-muted">{t("service")}</span><span className="text-right font-semibold">{`${platform.name} ${t(`kind_${service.kind}`)} · ${tier.name}`}</span></div>
           <div className="flex justify-between text-sm"><span className="text-muted">{t("quantity")}</span><span className="font-semibold">{hasComments ? t("commentsCount", { n: quantity }) : `${num(quantity)}${isLive ? ` · ${durLabel(dur)}` : ""}`}</span></div>
-          <div className="flex justify-between text-sm"><span className="text-muted">{t("avgDelivery")}</span><span className="font-semibold">{meta.avg[locale]}</span></div>
+          <div className="flex justify-between text-sm"><span className="text-muted">{t("avgDelivery")}</span><span className="font-semibold">{isCatalog && (tier.delivery === "instant" || tier.delivery === "24h") ? (tier.delivery === "instant" ? t("deliveryInstant") : t("delivery24h")) : (meta.avg[locale] ?? "")}</span></div>
           {discount > 0 && <div className="flex justify-between text-sm"><span className="text-muted">VIP</span><span className="font-semibold text-success">-{discount}%</span></div>}
           <div className="my-1 h-px bg-border" />
           <div className="flex items-baseline justify-between"><span className="text-[15px] font-bold">{t("total")}</span><span className="text-2xl font-extrabold">{fmt(total)}</span></div>
@@ -288,10 +370,22 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
           )}
         </section>
 
-        <label className="flex cursor-pointer items-start gap-2.5 rounded-2xl border border-border bg-surface p-3.5 text-[13px] leading-normal">
-          <input type="checkbox" checked={isPublic} onChange={() => setIsPublic((v) => !v)} className="m-0 h-[22px] w-[22px] flex-none accent-text" />
-          <span>{t("publicConfirm")}</span>
-        </label>
+        {!isCatalog && (
+          <label className="flex cursor-pointer items-start gap-2.5 rounded-2xl border border-border bg-surface p-3.5 text-[13px] leading-normal">
+            <input type="checkbox" checked={isPublic} onChange={() => setIsPublic((v) => !v)} className="m-0 h-[22px] w-[22px] flex-none accent-text" />
+            <span>{t("publicConfirm")}</span>
+          </label>
+        )}
+
+        {isCatalog && tier.noWarranty && (
+          <label className="flex cursor-pointer items-start gap-2.5 rounded-2xl border-2 border-[#FCA5A5] bg-[#FEF2F2] p-3.5 text-[13px] leading-normal text-[#7F1D1D]">
+            <input type="checkbox" checked={noWarrantyOk} onChange={() => setNoWarrantyOk((v) => !v)} className="m-0 h-[22px] w-[22px] flex-none accent-[#DC2626]" />
+            <span>
+              <b className="block">{t("noWarrantyTitle")}</b>
+              {t("noWarrantyBody")}
+            </span>
+          </label>
+        )}
 
         {isHigh && (
           <label className="flex cursor-pointer items-start gap-2.5 rounded-2xl border-2 border-[#FCA5A5] bg-[#FEF2F2] p-3.5 text-[13px] leading-normal text-[#7F1D1D]">
