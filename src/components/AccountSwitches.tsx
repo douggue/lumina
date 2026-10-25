@@ -15,7 +15,7 @@ export function MarketingSwitch({ initial, label, sub }: { initial: boolean; lab
       <button type="button" role="switch" aria-checked={on} aria-label={label} disabled={pending}
         onClick={() => { const next = !on; setOn(next); start(async () => { const r = await setMarketing(next); if (!r.ok) setOn(!next); }); }}
         className="flex h-11 w-[60px] flex-none items-center justify-end">
-        <span className={`flex h-7 w-12 rounded-full p-[3px] ${on ? "justify-end bg-text" : "justify-start bg-[#CBD2E1]"}`}><span className="h-[22px] w-[22px] rounded-full bg-white" /></span>
+        <span className={`flex h-7 w-12 rounded-full p-[3px] ${on ? "justify-end bg-text" : "justify-start bg-surface-2"}`}><span className="h-[22px] w-[22px] rounded-full bg-white" /></span>
       </button>
     </div>
   );

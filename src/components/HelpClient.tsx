@@ -18,7 +18,7 @@ export function OrderLookup({ signedIn }: { signedIn: boolean }) {
     <section className="flex flex-col gap-2.5 rounded-2xl border border-border bg-surface p-3.5">
       <label htmlFor="lookup" className="text-sm font-bold">{t("lookup")}</label>
       {!signedIn ? (
-        <Link href="/auth/login?next=/help" className="text-sm font-semibold text-[#00209F] dark:text-primary">{t("signIn")}</Link>
+        <Link href="/auth/login?next=/help" className="text-sm font-semibold text-primary">{t("signIn")}</Link>
       ) : (
         <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); start(async () => setResult(await lookupOrder(Number(q.replace(/\D/g, ""))))); }}>
           <input id="lookup" inputMode="numeric" placeholder={t("lookupPlaceholder")} value={q} onChange={(e) => { setQ(e.target.value); setResult(null); }}
@@ -26,11 +26,11 @@ export function OrderLookup({ signedIn }: { signedIn: boolean }) {
           <button disabled={pending || !q.trim()} className="h-12 flex-none rounded-xl bg-text px-4 text-sm font-bold text-surface disabled:opacity-60">{t("search")}</button>
         </form>
       )}
-      {result && !result.ok && <p className="text-[13px] text-[#991B1B]">{t("notFound")}</p>}
+      {result && !result.ok && <p className="text-[13px] text-danger">{t("notFound")}</p>}
       {result?.ok && (
-        <Link href={`/account/orders/${result.id}`} className="flex flex-col gap-1 rounded-xl bg-[#EFF6FF] p-3 text-text dark:bg-surface-2">
+        <Link href={`/account/orders/${result.id}`} className="flex flex-col gap-1 rounded-xl bg-primary-soft p-3 text-text">
           <span className="text-sm font-bold">#{result.number} · {txt(result.name, locale)}{result.quantity ? ` · ${Number(result.quantity).toLocaleString("en-US")}` : ""}</span>
-          <span className="text-[13px] text-[#1E40AF] dark:text-primary">{to(`status.${result.status}`)} · {formatMoney(result.total, "HTG", locale)}</span>
+          <span className="text-[13px] text-primary">{to(`status.${result.status}`)} · {formatMoney(result.total, "HTG", locale)}</span>
         </Link>
       )}
     </section>
@@ -46,7 +46,7 @@ export function Faq({ items }: { items: { q: string; a: string }[] }) {
         <div key={f.q} className="rounded-[14px] border border-border bg-surface">
           <button type="button" aria-expanded={open === i} onClick={() => setOpen(open === i ? -1 : i)} className="flex min-h-[50px] w-full items-center justify-between gap-2.5 px-3.5 text-left text-sm font-bold">
             {f.q}
-            <span className="text-lg text-[#64748B]" aria-hidden>{open === i ? "−" : "+"}</span>
+            <span className="text-lg text-muted" aria-hidden>{open === i ? "−" : "+"}</span>
           </button>
           {open === i && <p className="px-3.5 pb-3.5 text-[13px] leading-normal text-text/80">{f.a}</p>}
         </div>

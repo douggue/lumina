@@ -121,7 +121,7 @@ export function PushSwitch({ label, sub }: { label: string; sub: string }) {
           <span className="text-xs text-muted">{sub}</span>
         </span>
         <button type="button" role="switch" aria-checked={on} aria-label={label} disabled={busy || blocked || state === "loading"} onClick={on ? disable : enable} className="flex h-11 w-[60px] flex-none items-center justify-end disabled:opacity-50">
-          <span className={`flex h-7 w-12 rounded-full p-[3px] ${on ? "justify-end bg-text" : "justify-start bg-[#CBD2E1]"}`}><span className="h-[22px] w-[22px] rounded-full bg-white" /></span>
+          <span className={`flex h-7 w-12 rounded-full p-[3px] ${on ? "justify-end bg-text" : "justify-start bg-surface-2"}`}><span className="h-[22px] w-[22px] rounded-full bg-white" /></span>
         </button>
       </div>
       {note && <p className="pb-1 text-xs text-muted">{note}</p>}

@@ -150,12 +150,12 @@ export function AuthForm({ mode: firstMode, google = false }: { mode: "login" | 
                 setError(tg("error"));
               }
             }}
-            className="flex h-[52px] w-full items-center justify-center gap-2.5 rounded-[14px] border border-border keep-white bg-white text-[15px] font-bold text-[#0F172A] disabled:opacity-60"
+            className="flex h-[52px] w-full items-center justify-center gap-2.5 rounded-[14px] border border-border keep-white bg-white text-[15px] font-bold text-navy disabled:opacity-60"
           >
             <GoogleLogo />
             {tg("continue")}
           </button>
-          <div className="flex items-center gap-2.5 text-[13px] text-[#64748B]" aria-hidden>
+          <div className="flex items-center gap-2.5 text-[13px] text-muted" aria-hidden>
             <span className="h-px flex-1 bg-border" />
             {tg("or")}
             <span className="h-px flex-1 bg-border" />
@@ -176,7 +176,7 @@ export function AuthForm({ mode: firstMode, google = false }: { mode: "login" | 
         <div className="flex flex-col gap-1.5">
           <div className="flex items-baseline justify-between">
             <label htmlFor="password" className="text-sm font-semibold">{t("password")}</label>
-            {mode === "login" && <Link href="/auth/forgot" className="text-[13px] font-semibold text-[#00209F] dark:text-primary">{tu("forgotShort")}</Link>}
+            {mode === "login" && <Link href="/auth/forgot" className="text-[13px] font-semibold text-primary">{tu("forgotShort")}</Link>}
           </div>
           <div className="relative">
             <input
@@ -198,8 +198,8 @@ export function AuthForm({ mode: firstMode, google = false }: { mode: "login" | 
         </div>
         {mode === "register" && (
           <label className="flex min-h-11 cursor-pointer items-start gap-2.5 text-[13px] leading-normal text-text/80">
-            <input type="checkbox" checked={agree} onChange={() => setAgree((a) => !a)} required className="m-0 h-[22px] w-[22px] flex-none accent-[#0F172A]" />
-            <span>{tu.rich("terms", { link: (c) => <Link href="/terms" className="font-semibold text-[#00209F] underline dark:text-primary">{c}</Link> })}</span>
+            <input type="checkbox" checked={agree} onChange={() => setAgree((a) => !a)} required className="m-0 h-[22px] w-[22px] flex-none accent-text" />
+            <span>{tu.rich("terms", { link: (c) => <Link href="/terms" className="font-semibold text-primary underline">{c}</Link> })}</span>
           </label>
         )}
       </div>
@@ -211,7 +211,7 @@ export function AuthForm({ mode: firstMode, google = false }: { mode: "login" | 
       >
         {loading ? tc("loading") : mode === "login" ? tu("tabLogin") : tu("tabRegister")}
       </button>
-      <p className="text-center text-xs leading-normal text-[#64748B]">{tu("secure")}</p>
+      <p className="text-center text-xs leading-normal text-muted">{tu("secure")}</p>
     </form>
   );
 }
