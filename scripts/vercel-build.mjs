@@ -3,7 +3,7 @@
  * - DATABASE_URL: the pooled connection the site uses.
  * - DATABASE_URL_UNPOOLED: the direct connection migrations need. If missing, it is taken from
  *   POSTGRES_URL_NON_POOLING / DIRECT_URL, or derived from a Neon pooled URL (host without "-pooler").
- * Then: prisma generate → prisma migrate deploy → next build.
+ * Then: emit public assets → prisma generate → prisma migrate deploy → next build.
  */
 import { execSync } from "node:child_process";
 
@@ -36,6 +36,7 @@ const missing = ["BETTER_AUTH_SECRET", "ENCRYPTION_KEY", "CRON_SECRET"].filter((
 if (missing.length) console.warn(`\n⚠ Not set yet: ${missing.join(", ")} (Settings → Environment Variables). The site needs them to work.\n`);
 
 const run = (cmd) => execSync(cmd, { stdio: "inherit", env });
+run("node scripts/emit-public-assets.mjs");
 run("npx prisma generate");
 run("npx prisma migrate deploy");
 run("npx next build");
