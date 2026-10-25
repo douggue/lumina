@@ -157,7 +157,7 @@ export function NewServiceBuilder({ platforms }: { platforms: { slug: string; na
           {platforms.map((p) => <option key={p.slug} value={p.slug}>{p.name}</option>)}
         </select>
         <select value={kind} onChange={(e) => { setKind(e.target.value); reset(); }} className={input} aria-label="Kind">
-          {["followers", "likes", "views", "comments", "live"].map((k) => <option key={k} value={k}>{k}</option>)}
+          {["followers", "likes", "views", "comments", "live", "account", "sms"].map((k) => <option key={k} value={k}>{k}</option>)}
         </select>
       </div>
       <div className="grid gap-1.5 sm:grid-cols-3">
