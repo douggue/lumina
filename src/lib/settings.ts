@@ -71,6 +71,16 @@ export type Settings = {
   trialStrict: boolean;
   trialPerDay: number;
   trialPerIpPerDay: number;
+  /** Require WhatsApp-verified phone before creating a trial (no-op until Meta tokens / WA_VERIFY_STUB) */
+  trialRequirePhoneVerified: boolean;
+  /** Refuse VPN / proxy / datacenter IPs for trials */
+  trialBlockVpn: boolean;
+  /** Risk score <= this → auto-approve band (only applied when trialAutoApprove) */
+  trialRiskAutoMax: number;
+  /** Risk score >= this → refuse */
+  trialRiskRefuseMin: number;
+  /** When true, low-risk trials are approved without staff */
+  trialAutoApprove: boolean;
   trialOffers: { key: string; product: string; tier: number; quantity: number; label: Record<string, string>; avg: Record<string, string> }[];
   /** Services status per platform (category slug) shown on the help page and home bar; missing = normal */
   serviceStatus: Record<string, "ok" | "slow" | "pause">;
@@ -214,6 +224,11 @@ export const DEFAULT_SETTINGS: Settings = {
   trialStrict: false,
   trialPerDay: 30,
   trialPerIpPerDay: 3,
+  trialRequirePhoneVerified: false,
+  trialBlockVpn: false,
+  trialRiskAutoMax: 2,
+  trialRiskRefuseMin: 8,
+  trialAutoApprove: false,
   trialOffers: [
     { key: "tt-views", product: "tiktok-views", tier: 0, quantity: 100, label: { ht: "100 vi TikTok", fr: "100 vues TikTok" }, avg: { ht: "10 minit", fr: "10 minutes" } },
     { key: "ig-likes", product: "instagram-likes", tier: 0, quantity: 20, label: { ht: "20 like Instagram", fr: "20 likes Instagram" }, avg: { ht: "25 minit", fr: "25 minutes" } },
