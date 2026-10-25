@@ -12,7 +12,7 @@ export function EarningsCalculator({ tiers }: { tiers: { name: string; pct: numb
   const tier = [...tiers].reverse().find((x) => friends >= x.minActive) ?? tiers[0];
   const earn = Math.round((friends * spend * (tier?.pct ?? 0)) / 100);
   const fmt = (n: number) => formatMoney(n, "HTG", locale);
-  const step = "h-11 w-11 rounded-xl border border-[#CBD2E1] bg-surface text-xl font-extrabold dark:border-border";
+  const step = "h-11 w-11 rounded-xl border border-border bg-surface text-xl font-extrabold";
   return (
     <section className="flex flex-col gap-3.5 rounded-[18px] border border-border bg-surface p-4">
       <h2 className="text-lg font-extrabold">{t("calcTitle")}</h2>
@@ -29,7 +29,7 @@ export function EarningsCalculator({ tiers }: { tiers: { name: string; pct: numb
         <div className="grid grid-cols-3 gap-1.5">
           {[50_000, 100_000, 250_000].map((v) => (
             <button key={v} type="button" aria-pressed={spend === v} onClick={() => setSpend(v)}
-              className={`min-h-11 rounded-xl text-[13px] font-bold ${spend === v ? "border-2 border-[#00209F] bg-[#EEF1FF] text-[#00209F] dark:bg-surface-2 dark:text-primary" : "border border-[#CBD2E1] bg-surface dark:border-border"}`}>{fmt(v)}</button>
+              className={`min-h-11 rounded-xl text-[13px] font-bold ${spend === v ? "border-2 border-cyan bg-primary-soft text-cyan" : "border border-border bg-surface"}`}>{fmt(v)}</button>
           ))}
         </div>
       </div>

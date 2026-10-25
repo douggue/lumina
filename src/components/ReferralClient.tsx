@@ -17,7 +17,7 @@ export function TierCard(p: {
     <section className="flex flex-col gap-3 rounded-[20px] bg-[#0F172A] p-[18px] dark:border dark:border-border dark:bg-surface-2 text-white">
       <div className="flex items-center justify-between gap-2.5">
         <div className="flex items-center gap-2.5">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#CBD5E1] text-[#0F172A]">
+          <span className="grid h-10 w-10 place-items-center rounded-xl bg-surface-2 text-text">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="12" cy="9" r="6" /><polyline points="8.2 13.5 7 22 12 19 17 22 15.8 13.5" /></svg>
           </span>
           <span>
@@ -77,7 +77,7 @@ export function EarningsCard({ available, pending, min, name, phone }: { availab
       setMsg(r.ok ? { ok: true, text: t("walletDone", { amount: fmt(available) }) } : { ok: false, text: error(r.error) });
       router.refresh();
     });
-  const pick = (m: "MONCASH" | "NATCASH") => `flex min-h-[52px] items-center justify-center rounded-[14px] ${method === m ? "border-2 border-text" : "border border-[#CBD2E1] dark:border-border"} keep-white bg-white`;
+  const pick = (m: "MONCASH" | "NATCASH") => `flex min-h-[52px] items-center justify-center rounded-[14px] ${method === m ? "border-2 border-text" : "border border-border"} keep-white bg-white`;
   return (
     <section className="flex flex-col gap-3 rounded-[18px] border border-border bg-surface p-4">
       <div className="flex items-start justify-between gap-2.5">
@@ -93,8 +93,8 @@ export function EarningsCard({ available, pending, min, name, phone }: { availab
       </div>
       <div className="grid grid-cols-[2fr_1fr] gap-2">
         <button type="button" disabled={!canWithdraw || pendingTx} onClick={() => { setSheet(true); setSent(false); setMsg(null); }}
-          className={`min-h-[50px] rounded-[14px] text-[15px] font-extrabold ${canWithdraw ? "bg-[#00209F] text-white" : "bg-[#CBD5E1] text-[#475569]"}`}>{t("withdraw")}</button>
-        <button type="button" disabled={available <= 0 || pendingTx} onClick={toWallet} className="min-h-[50px] rounded-[14px] border border-[#CBD2E1] bg-surface text-[13px] font-bold disabled:opacity-50 dark:border-border">{t("toWallet")}</button>
+          className={`min-h-[50px] rounded-[14px] text-[15px] font-extrabold ${canWithdraw ? "bg-cyan text-white" : "bg-surface-2 text-muted"}`}>{t("withdraw")}</button>
+        <button type="button" disabled={available <= 0 || pendingTx} onClick={toWallet} className="min-h-[50px] rounded-[14px] border border-border bg-surface text-[13px] font-bold disabled:opacity-50">{t("toWallet")}</button>
       </div>
       {!canWithdraw && <span className="text-xs font-semibold text-[#92400E]">{t("needMore", { amount: fmt(min - available) })}</span>}
       {msg && <span className={`rounded-[10px] px-3 py-2.5 text-[13px] font-semibold ${msg.ok ? "bg-[#DCFCE7] text-[#166534]" : "bg-[#FEE2E2] text-[#991B1B]"}`}>{msg.text}</span>}
@@ -126,15 +126,15 @@ export function EarningsCard({ available, pending, min, name, phone }: { availab
                   <button type="button" aria-pressed={method === "NATCASH"} onClick={() => setMethod("NATCASH")} className={pick("NATCASH")}><PayLogo brand="natcash" height={20} /></button>
                 </div>
                 <label className="flex flex-col gap-1.5 text-[13px] font-bold">{t("amount")}
-                  <input value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" className="h-[50px] rounded-xl border border-[#CBD2E1] bg-surface px-3 text-lg font-extrabold dark:border-border" />
+                  <input value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" className="h-[50px] rounded-xl border border-border bg-surface px-3 text-lg font-extrabold" />
                   <span className="text-xs font-normal text-muted">{t("range", { min: fmt(min), max: fmt(available) })}</span>
                 </label>
                 <label className="flex flex-col gap-1.5 text-[13px] font-bold">{t("number", { method: method === "MONCASH" ? "MonCash" : "NatCash" })}
-                  <input value={tel} onChange={(e) => setTel(e.target.value)} type="tel" inputMode="tel" placeholder="+509 …" className="h-[50px] rounded-xl border border-[#CBD2E1] bg-surface px-3 text-base font-semibold dark:border-border" />
+                  <input value={tel} onChange={(e) => setTel(e.target.value)} type="tel" inputMode="tel" placeholder="+509 …" className="h-[50px] rounded-xl border border-border bg-surface px-3 text-base font-semibold" />
                   <span className="text-xs font-normal text-muted">{t("sameName", { name })}</span>
                 </label>
                 {msg && !msg.ok && <span className="rounded-[10px] bg-[#FEE2E2] px-3 py-2.5 text-[13px] font-semibold text-[#991B1B]">{msg.text}</span>}
-                <button type="button" disabled={pendingTx} onClick={withdraw} className="min-h-[52px] rounded-[14px] bg-[#00209F] text-base font-extrabold text-white">{pendingTx ? "…" : t("send")}</button>
+                <button type="button" disabled={pendingTx} onClick={withdraw} className="min-h-[52px] rounded-[14px] bg-cyan text-base font-extrabold text-white">{pendingTx ? "…" : t("send")}</button>
               </>
             )}
           </div>
@@ -152,10 +152,10 @@ export function ShareBox({ link, message }: { link: string; message: string }) {
     <section className="flex flex-col gap-2.5">
       <label htmlFor="reflink" className="text-sm font-bold">{t("yourLink")}</label>
       <div className="flex gap-2">
-        <input id="reflink" readOnly value={link.replace(/^https?:\/\//, "")} className="h-12 min-w-0 flex-1 rounded-xl border border-[#CBD2E1] bg-surface px-3 text-[15px] font-semibold dark:border-border" />
+        <input id="reflink" readOnly value={link.replace(/^https?:\/\//, "")} className="h-12 min-w-0 flex-1 rounded-xl border border-border bg-surface px-3 text-[15px] font-semibold" />
         <CopyButton value={link} label={t("copy")} done={t("copied")} />
       </div>
-      <p className="rounded-xl border border-dashed border-[#CBD2E1] bg-surface p-3 text-[13px] leading-normal text-[#334155] dark:border-border">{message}</p>
+      <p className="rounded-xl border border-dashed border-border bg-surface p-3 text-[13px] leading-normal text-text/80">{message}</p>
       <div className="grid grid-cols-2 gap-2">
         <a href={`https://wa.me/?text=${enc}`} target="_blank" rel="noopener noreferrer" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#15803D] text-sm font-bold text-white">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.4A8.5 8.5 0 1 1 21 11.5z" /></svg>WhatsApp

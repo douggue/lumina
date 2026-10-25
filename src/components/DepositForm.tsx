@@ -191,7 +191,7 @@ export function DepositForm(p: Props) {
         <div className="grid grid-cols-4 gap-2">
           {(crypto ? USD_PRESETS : HTG_PRESETS).map((v) => (
             <button key={v} type="button" onClick={() => setAmount(String(v))}
-              className={`min-h-[46px] rounded-xl border text-sm font-bold ${minor === v * 100 ? "border-text bg-text text-surface" : "border-[#CBD2E1] bg-surface text-text dark:border-border"}`}>
+              className={`min-h-[46px] rounded-xl border text-sm font-bold ${minor === v * 100 ? "border-text bg-text text-surface" : "border-border bg-surface text-text"}`}>
               {crypto ? `$${v}` : v.toLocaleString("en-US")}
             </button>
           ))}
@@ -201,7 +201,7 @@ export function DepositForm(p: Props) {
           <span className="relative flex-1">
             {crypto && <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 font-semibold text-muted">$</span>}
             <input id="amount" name="amount" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value.replace(",", "."))} required
-              className={`h-11 w-full rounded-xl border border-[#CBD2E1] bg-surface text-base font-bold dark:border-border ${crypto ? "pl-8 pr-3" : "pl-3 pr-14"}`} />
+              className={`h-11 w-full rounded-xl border border-border bg-surface text-base font-bold ${crypto ? "pl-8 pr-3" : "pl-3 pr-14"}`} />
             {!crypto && <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-semibold text-muted">HTG</span>}
           </span>
         </label>
@@ -354,7 +354,7 @@ export function DepositForm(p: Props) {
 
         {error && <p className="rounded-xl bg-danger-soft px-4 py-3 text-sm text-danger" role="alert">{error}</p>}
         <Turnstile key={captchaKey} locale={locale} />
-        <button className="h-[54px] w-full rounded-[14px] bg-text text-base font-bold text-surface disabled:bg-[#CBD5E1] disabled:text-[#475569]" disabled={pending || !minor || shotBusy}>
+        <button className="h-[54px] w-full rounded-[14px] bg-text text-base font-bold text-surface disabled:bg-surface-2 disabled:text-muted" disabled={pending || !minor || shotBusy}>
           {pending ? tc("loading") : m.kind === "moncash" ? tu("pay", { amount: formatMoney(minor ?? 0, currency, locale), method: m.name }) : tu("send", { amount: minor ? formatMoney(minor, currency, locale) : "" })}
         </button>
       </div>

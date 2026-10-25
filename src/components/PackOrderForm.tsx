@@ -41,7 +41,7 @@ export function PackOrderForm(p: {
       if (r.ok) router.push(`/account/orders/${r.orderId}`);
       else setError(t.has(`error_${r.error}`) ? t(`error_${r.error}`, { max: p.maxVideos }) : t("error_generic"));
     });
-  const field = "rounded-xl border border-[#CBD2E1] bg-surface px-3.5 text-base dark:border-border";
+  const field = "rounded-xl border border-border bg-surface px-3.5 text-base";
   return (
     <div className="mx-auto flex w-full max-w-[560px] flex-col gap-4 px-5 pb-8 pt-4">
       <section className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-4">
@@ -53,9 +53,13 @@ export function PackOrderForm(p: {
           </div>
         ))}
         <div className="my-1 h-px bg-border" />
+        <div className="flex items-baseline justify-between gap-2">
+          <span className="text-sm text-muted">{t("separately")} <s className="text-muted">{fmt(p.separate)}</s></span>
+          <span className="rounded-full bg-success-soft px-2.5 py-1 text-xs font-bold text-success">-{p.discountPct}%</span>
+        </div>
         <div className="flex items-baseline justify-between">
-          <span className="text-sm text-muted">{t("separately")} <s>{fmt(p.separate)}</s></span>
-          <span className="rounded-full bg-[#DCFCE7] px-2.5 py-1 text-xs font-bold text-[#166534]">-{p.discountPct}%</span>
+          <span className="text-sm font-semibold text-text">{t("packPrice")}</span>
+          <span className="text-lg font-extrabold text-text">{fmt(p.price)}</span>
         </div>
         {p.newOnly && <p className="text-xs text-muted">{t("newOnly")}</p>}
       </section>
@@ -72,7 +76,7 @@ export function PackOrderForm(p: {
         <section className="flex flex-col gap-2">
           <div className="flex items-baseline justify-between">
             <label htmlFor="videos" className="text-sm font-semibold">{t("videosLabel")}</label>
-            <span className={`text-[13px] font-bold ${tooMany ? "text-[#B91C1C]" : ""}`}>{t("videoCount", { n: list.length, max: p.maxVideos })}</span>
+            <span className={`text-[13px] font-bold ${tooMany ? "text-danger" : ""}`}>{t("videoCount", { n: list.length, max: p.maxVideos })}</span>
           </div>
           <textarea id="videos" rows={4} value={videos} onChange={(e) => setVideos(e.target.value)} placeholder={`${p.videoExample}\n${p.videoExample}`} className={`${field} py-3 leading-normal`} />
           <p className="text-xs text-muted">{t("videosHint", { max: p.maxVideos })}</p>
@@ -89,12 +93,12 @@ export function PackOrderForm(p: {
       )}
 
       <label className="flex cursor-pointer items-start gap-2.5 rounded-2xl border border-border bg-surface p-3.5 text-[13px] leading-normal">
-        <input type="checkbox" checked={isPublic} onChange={() => setIsPublic((v) => !v)} className="m-0 h-[22px] w-[22px] flex-none accent-[#0F172A]" />
+        <input type="checkbox" checked={isPublic} onChange={() => setIsPublic((v) => !v)} className="m-0 h-[22px] w-[22px] flex-none accent-text" />
         <span>{t("publicConfirm")}</span>
       </label>
       {p.high && (
-        <label className="flex cursor-pointer items-start gap-2.5 rounded-2xl border-2 border-[#FCA5A5] bg-[#FEF2F2] p-3.5 text-[13px] leading-normal text-[#7F1D1D]">
-          <input type="checkbox" checked={accepted} onChange={() => setAccepted((a) => !a)} className="m-0 h-[22px] w-[22px] flex-none accent-[#DC2626]" />
+        <label className="flex cursor-pointer items-start gap-2.5 rounded-2xl border-2 border-danger/40 bg-danger-soft p-3.5 text-[13px] leading-normal text-danger">
+          <input type="checkbox" checked={accepted} onChange={() => setAccepted((a) => !a)} className="m-0 h-[22px] w-[22px] flex-none accent-danger" />
           <span>{t("riskAccept")}</span>
         </label>
       )}
@@ -103,12 +107,12 @@ export function PackOrderForm(p: {
         <span className="text-[15px] font-bold">{t("total")}{p.discount > 0 ? ` (VIP -${p.discount}%)` : ""}</span>
         <span className="text-2xl font-extrabold">{fmt(total)}</span>
       </section>
-      {short && <p className="rounded-[10px] bg-[#FEE2E2] px-3 py-2.5 text-[13px] text-[#991B1B]">{t("short")} <Link href="/account/wallet" className="font-bold underline">{t("addFunds")}</Link></p>}
-      {!p.available && <p className="rounded-[10px] bg-[#FEF3C7] px-3 py-2.5 text-[13px] text-[#92400E]">{t("unavailable")}</p>}
-      {error && <p role="alert" className="rounded-[10px] bg-[#FEE2E2] px-3 py-2.5 text-[13px] text-[#991B1B]">{error}</p>}
+      {short && <p className="rounded-[10px] bg-danger-soft px-3 py-2.5 text-[13px] text-danger">{t("short")} <Link href="/account/wallet" className="font-bold underline">{t("addFunds")}</Link></p>}
+      {!p.available && <p className="rounded-[10px] bg-warning-soft px-3 py-2.5 text-[13px] text-warning">{t("unavailable")}</p>}
+      {error && <p role="alert" className="rounded-[10px] bg-danger-soft px-3 py-2.5 text-[13px] text-danger">{error}</p>}
       {p.signedIn ? (
         <button type="button" onClick={submit} disabled={!ready || pending}
-          className={`flex h-[54px] items-center justify-center rounded-[14px] text-base font-bold ${ready && !pending ? "bg-text text-surface" : "bg-[#CBD5E1] text-[#475569]"}`}>
+          className={`flex h-[54px] items-center justify-center rounded-[14px] text-base font-bold ${ready && !pending ? "bg-text text-surface" : "bg-surface-2 text-muted"}`}>
           {pending ? t("sending") : t("confirm", { total: fmt(total) })}
         </button>
       ) : (
