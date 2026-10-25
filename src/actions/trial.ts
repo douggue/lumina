@@ -22,6 +22,7 @@ export async function submitTrial(raw: unknown): Promise<{ ok: true } | { ok: fa
   if (!parsed.success) return { ok: false, error: "link" };
   const phone = normalizePhone(parsed.data.phone);
   if (!phone) return { ok: false, error: "phone" };
+  // Backend also gates via settings.trialRequirePhoneVerified inside requestTrial.
   if (whatsappVerifyEnabled() && !(await isPhoneVerified(user.id, phone))) {
     return { ok: false, error: "phone_verify" };
   }
@@ -36,8 +37,9 @@ export async function submitTrial(raw: unknown): Promise<{ ok: true } | { ok: fa
 }
 
 /**
- * Start WhatsApp phone verify — contract: startWhatsAppVerify({ phone }) → { code, waUrl, expiresAt }.
- * Customer opens waUrl and SENDS the code; Meta webhook (Backend) sets PhoneVerification.verifiedAt.
+ * Start WhatsApp phone verify.
+ * → { ok, code, waUrl, expiresAt } | { ok:false, error: signin|phone|wa_off }
+ * Customer opens waUrl and SENDS the code; Meta webhook sets PhoneVerification.verifiedAt.
  */
 export async function startWhatsAppVerify(
   raw: unknown,
@@ -55,37 +57,22 @@ export async function startWhatsAppVerify(
     const r = await issuePhoneCode(user.id, parsed.data.phone);
     let waUrl = r.clickToChat;
     if (!waUrl) {
-      // Fallback display number from store settings when Meta display env is empty.
       const settings = await getSettings();
       const digits = String(settings.whatsappNumber || "").replace(/\D/g, "");
-      if (!digits) return { ok: false, error: "phone" };
-      waUrl = `https://wa.me/${digits}?text=${encodeURIComponent(r.code)}`;
+      if (!digits) return { ok: false, error: "wa_off" };
+      waUrl = `https://wa.me/${digits}?text=${encodeURIComponent(`Lumina verify ${r.code}`)}`;
     }
     return { ok: true, code: r.code, waUrl, expiresAt: r.expiresAt.toISOString() };
   } catch (e) {
     const msg = e instanceof Error ? e.message : "";
     if (msg === "phone") return { ok: false, error: "phone" };
-    // Feature off / DB not migrated yet — soft stub so UI can still be demoed locally.
-    if (msg === "wa_off" || /phoneVerification|PhoneVerification|does not exist/i.test(String(e))) {
-      const phone = normalizePhone(parsed.data.phone);
-      if (!phone) return { ok: false, error: "phone" };
-      const settings = await getSettings();
-      const digits = String(settings.whatsappNumber || process.env.NEXT_PUBLIC_WA_VERIFY_NUMBER || "").replace(/\D/g, "") || "50900000000";
-      const code = String(100000 + (Date.now() % 900000));
-      const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
-      return {
-        ok: true,
-        code,
-        waUrl: `https://wa.me/${digits}?text=${encodeURIComponent(code)}`,
-        expiresAt,
-      };
-    }
+    if (msg === "wa_off") return { ok: false, error: "wa_off" };
     console.error("startWhatsAppVerify failed", e);
     return { ok: false, error: "phone" };
   }
 }
 
-/** Poll until Meta inbound webhook marked the code verified. */
+/** Poll until Meta inbound webhook marked the code verified. Stays false until then (waiting UI). */
 export async function pollWhatsAppVerify(
   raw: unknown,
 ): Promise<{ ok: true; verified: boolean } | { ok: false; error: string }> {
@@ -100,10 +87,8 @@ export async function pollWhatsAppVerify(
   const phone = normalizePhone(parsed.data.phone);
   if (!phone) return { ok: false, error: "phone" };
   try {
-    const verified = await isPhoneVerified(user.id, phone);
-    return { ok: true, verified };
+    return { ok: true, verified: await isPhoneVerified(user.id, phone) };
   } catch (e) {
-    // Schema not migrated yet — keep waiting UI honest.
     console.error("pollWhatsAppVerify failed", e);
     return { ok: true, verified: false };
   }
