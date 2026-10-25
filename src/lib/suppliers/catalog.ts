@@ -277,11 +277,12 @@ export async function updateRealAverages() {
 
 /** Dashboard "Needs attention" (mockup): low balance, stuck orders, losing or vanished services, nothing linked yet. */
 export async function providerAlerts() {
+  // SMM + YTSeller: stuck orders, low balance, catalog drift after sync.
   const [suppliers, choices, s, stuck] = await Promise.all([
-    prisma.supplier.findMany({ where: { isEnabled: true, preset: { in: SMM } } }),
+    prisma.supplier.findMany({ where: { isEnabled: true, preset: { in: CATALOG } } }),
     listChoices(),
     getSettings(),
-    prisma.supplierOrder.count({ where: { supplier: { preset: { in: SMM } }, OR: [{ status: "UNKNOWN" }, { status: "PENDING", nextCheckAt: null }, { status: "PENDING", createdAt: { lt: new Date(Date.now() - 6 * 3_600_000) }, remains: null }] } }),
+    prisma.supplierOrder.count({ where: { supplier: { preset: { in: CATALOG } }, OR: [{ status: "UNKNOWN" }, { status: "PENDING", nextCheckAt: null }, { status: "PENDING", createdAt: { lt: new Date(Date.now() - 6 * 3_600_000) }, remains: null }] } }),
   ]);
   const alerts: { title: string; text: string; href: string; tone: "red" | "amber" | "blue" }[] = [];
   if (stuck) alerts.push({ title: `${stuck} stuck order${stuck > 1 ? "s" : ""}`, text: "No clear answer from the provider (or none for over 6 hours). Re-check on the provider's site, then close or refund.", href: "/admin/suppliers", tone: "red" });
@@ -299,7 +300,8 @@ export async function providerAlerts() {
     const p = c.provider;
     if (!p?.rateChangedAt || p.rateChangedAt < week || p.prevRate == null) continue;
     const up = Number(p.rate) > Number(p.prevRate);
-    alerts.push({ title: `${c.supplier?.name} ${up ? "raised" : "lowered"} a price`, text: `${(c.product.name as Record<string, string>).ht} · ${(c.name as Record<string, string>).ht}: $${Number(p.prevRate).toFixed(2)} → $${Number(p.rate).toFixed(2)} per 1K. Check the selling price.`, href: "/admin/pricing", tone: up ? "amber" : "blue" });
+    const unit = c.supplier?.preset === "ytseller" ? "each" : "per 1K";
+    alerts.push({ title: `${c.supplier?.name} ${up ? "raised" : "lowered"} a price`, text: `${(c.product.name as Record<string, string>).ht} · ${(c.name as Record<string, string>).ht}: $${Number(p.prevRate).toFixed(2)} → $${Number(p.rate).toFixed(2)} ${unit}. Check the selling price.`, href: "/admin/pricing", tone: up ? "amber" : "blue" });
   }
   for (const x of suppliers) {
     const first = await prisma.providerService.aggregate({ where: { supplierId: x.id }, _min: { firstSeenAt: true } });
@@ -309,6 +311,8 @@ export async function providerAlerts() {
     if (fresh) alerts.push({ title: `${fresh} new service${fresh > 1 ? "s" : ""} at ${x.name}`, text: "Maybe cheaper or better than what you sell. Compare them in Services & risk.", href: "/admin/services", tone: "blue" });
   }
   if (suppliers.length && !choices.some((c) => c.provider)) alerts.push({ title: "Nothing linked yet", text: "No choice points to a provider service, so orders stay manual. Link them in Services.", href: "/admin/services", tone: "amber" });
+  const soldOut = choices.filter((c) => c.supplier?.preset === "ytseller" && c.provider && !c.provider.removedAt && c.provider.max <= 0).length;
+  if (soldOut) alerts.push({ title: `${soldOut} account/SMS choice${soldOut > 1 ? "s" : ""} sold out`, text: "YTSeller stock is 0. Pause the choice or wait for restock after the next Sync.", href: "/admin/services", tone: "amber" });
   return alerts;
 }
 

@@ -7,6 +7,9 @@ import { assertUser } from "@/lib/session";
 import { getBalances } from "@/lib/ledger";
 import { parseMeta } from "@/lib/services";
 import { requestSmmCancel, requestSmmRefill } from "@/lib/suppliers/smm-orders";
+import { refreshYtsellerCodes } from "@/lib/suppliers/ytseller-orders";
+import { decrypt } from "@/lib/crypto";
+import { extractTotpSecret, generateTotp } from "@/lib/totp";
 import { audit } from "@/lib/audit";
 import { savePrivateImage, uploadsEnabled } from "@/lib/storage";
 
@@ -237,4 +240,57 @@ export async function lookupOrder(number: number): Promise<{ ok: true; id: strin
   if (!o) return { ok: false, error: "missing" };
   const fv = (o.items[0]?.fieldValues ?? {}) as Record<string, string>;
   return { ok: true, id: o.id, number: o.number, status: o.status, total: o.total, name: o.items[0]?.productName ?? null, quantity: fv.quantity ?? null, createdAt: o.createdAt.toISOString() };
+}
+
+// ───────────── YTSeller account / SMS helpers (order page) ─────────────
+
+/**
+ * Pull new delivery lines from YTSeller (SMS codes keep arriving after the first delivery).
+ * Never places a new provider order — only result_product + append.
+ */
+export async function refreshDeliveryCodes(orderId: string): Promise<{ ok: true; added: number } | { ok: false; error: string }> {
+  const user = await assertUser();
+  const order = await prisma.order.findFirst({
+    where: { id: orderId, userId: user.id },
+    include: { items: { include: { supplierOrders: { where: { supplier: { preset: "ytseller" } }, take: 1 } } } },
+  });
+  if (!order) return { ok: false, error: "missing" };
+  const so = order.items.flatMap((i) => i.supplierOrders)[0];
+  if (!so) return { ok: false, error: "not_ytseller" };
+  const r = await refreshYtsellerCodes(so.id);
+  if (r.error && r.added === 0) return { ok: false, error: r.error };
+  await audit(user.id, "code.refresh.customer", "Order", order.id, { added: r.added });
+  revalidatePath(`/[locale]/account/orders/${order.id}`, "page");
+  return { ok: true, added: r.added };
+}
+
+/**
+ * Customer 2FA tool: generate a 6-digit TOTP from a Base32 secret on a delivered account line
+ * (or a secret the customer pastes). YTSeller's own site does this in-browser; we keep the secret
+ * server-side so the order page can show a button without shipping secrets to the client again.
+ */
+export async function generateAccount2fa(input: {
+  orderId: string;
+  codeItemId?: string;
+  /** Optional pasted Base32 secret (when the line has no detectable secret). */
+  secret?: string;
+}): Promise<{ ok: true; code: string; expiresIn: number } | { ok: false; error: string }> {
+  const user = await assertUser();
+  const order = await prisma.order.findFirst({
+    where: { id: input.orderId, userId: user.id },
+    include: { items: { include: { codes: true } } },
+  });
+  if (!order) return { ok: false, error: "missing" };
+  let secret = (input.secret ?? "").replace(/\s+/g, "").toUpperCase() || null;
+  if (!secret) {
+    const codes = order.items.flatMap((i) => i.codes);
+    const pick = input.codeItemId ? codes.find((c) => c.id === input.codeItemId) : codes[0];
+    if (!pick) return { ok: false, error: "no_code" };
+    secret = extractTotpSecret(decrypt(pick.codeEncrypted));
+  }
+  if (!secret) return { ok: false, error: "no_secret" };
+  const totp = generateTotp(secret);
+  if (!totp) return { ok: false, error: "bad_secret" };
+  await audit(user.id, "code.2fa.customer", "Order", order.id, { codeItemId: input.codeItemId ?? null });
+  return { ok: true, code: totp.code, expiresIn: totp.expiresIn };
 }

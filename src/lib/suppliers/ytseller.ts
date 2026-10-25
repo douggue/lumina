@@ -30,6 +30,12 @@ const int = (v: unknown) => (v === null || v === undefined || v === "" || !Numbe
 
 type Row = { id: string; baseUrl: string; secrets: string | null };
 
+/** Money to give back for the undelivered part: linePrice × remains ÷ quantity. */
+export function ytPartialRefund(linePrice: number, quantity: number, remains: number) {
+  if (quantity <= 0 || remains <= 0) return 0;
+  return Math.min(linePrice, Math.round((linePrice * Math.min(remains, quantity)) / quantity));
+}
+
 /** Our meaning of a provider status. */
 export function ytOutcome(status: string): "running" | "done" | "partial" | "canceled" | "unknown" {
   const s = status.trim().toLowerCase();
@@ -123,6 +129,7 @@ export type YtAddInput = { productId: string; quantity?: number; transId: string
  */
 export async function ytAdd(s: Row, input: YtAddInput, supplierOrderId: string): Promise<{ result: "ok"; orderId: string } | { result: "refused" | "unknown"; message: string }> {
   const params: Record<string, string | number | undefined> = {
+    product: input.productId,
     product_id: input.productId,
     quantity: input.quantity ?? 1,
     trans_id: input.transId,
@@ -139,11 +146,18 @@ export async function ytAdd(s: Row, input: YtAddInput, supplierOrderId: string):
   return { result: unsure ? "unknown" : "refused", message: r.error ?? "No order id in the reply" };
 }
 
-export async function ytStatus(s: Row, orderId: string, supplierOrderId: string | null = null): Promise<{ status: YtStatus; charge: number | null; error?: string }> {
+export async function ytStatus(s: Row, orderId: string, supplierOrderId: string | null = null): Promise<{ status: YtStatus; charge: number | null; remains: number | null; error?: string }> {
   const r = await ytCall(s, "product_order_status", { order: orderId, order_id: orderId }, supplierOrderId);
-  if (r.error) return { status: "", charge: null, error: r.error };
+  if (r.error) return { status: "", charge: null, remains: null, error: r.error };
   const o = (r.data ?? {}) as Record<string, unknown>;
-  return { status: String(o.status ?? ""), charge: o.charge === undefined || o.charge === "" ? null : Number(o.charge), error: typeof o.error === "string" ? o.error : undefined };
+  const remainsRaw = o.remains ?? o.remain ?? o.remaining;
+  const remains = remainsRaw === undefined || remainsRaw === "" || remainsRaw === null ? null : int(remainsRaw);
+  return {
+    status: String(o.status ?? ""),
+    charge: o.charge === undefined || o.charge === "" ? null : Number(o.charge),
+    remains,
+    error: typeof o.error === "string" ? o.error : undefined,
+  };
 }
 
 /** Delivered login / SMS lines from result_product. */
