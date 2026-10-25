@@ -38,7 +38,7 @@ export default async function HelpPage({ params }: { params: Promise<{ locale: s
           <a href={wa} target="_blank" rel="noopener" className="flex min-h-[54px] items-center justify-center gap-2 rounded-[14px] bg-[#15803D] text-[15px] font-bold text-white">
             <WhatsAppIcon width={20} height={20} />{t("whatsapp")}
           </a>
-          <Link href={user ? "/account/support" : "/auth/login?next=/account/support"} className="flex min-h-[54px] items-center justify-center gap-2 rounded-[14px] border border-[#CBD2E1] bg-surface text-[15px] font-bold text-text dark:border-border">
+          <Link href={user ? "/account/support" : "/auth/login?next=/account/support"} className="flex min-h-[54px] items-center justify-center gap-2 rounded-[14px] border border-border bg-surface text-[15px] font-bold text-text">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M4 4h16v12H8l-4 4z" /></svg>{t("ticket")}
           </Link>
         </div>

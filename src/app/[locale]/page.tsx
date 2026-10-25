@@ -62,7 +62,7 @@ export default async function HomePage({ params, searchParams }: { params: Promi
           <h1 className="relative max-w-[240px] text-[25px] font-extrabold leading-[1.15] md:max-w-none md:text-3xl">{heroTitle}</h1>
           <p className="relative text-sm leading-normal text-[#DCE3FF]">{heroSubtitle}</p>
           <PayBadges className="relative" />
-          <Link href="/order" className="relative self-start rounded-xl bg-white px-[18px] py-3 text-[15px] font-bold text-[#0F172A]">{th("heroCta")}</Link>
+          <Link href="/order" className="relative self-start keep-white rounded-xl bg-white px-[18px] py-3 text-[15px] font-bold text-[#0F172A]">{th("heroCta")}</Link>
         </section>
 
         <Link href="/trial" className="flex items-center gap-3 rounded-2xl border-2 border-dashed border-[#F59E0B] bg-surface p-3.5 text-text">

@@ -73,7 +73,7 @@ export default async function ReferralPublicPage({ params }: { params: Promise<{
       <section className="flex flex-col gap-3 rounded-[20px] bg-[#0F172A] p-5 text-center dark:border dark:border-border dark:bg-surface-2 text-white">
         <span className="text-xl font-extrabold">{t("endTitle")}</span>
         <span className="text-sm text-[#CBD5E1]">{t("endText")}</span>
-        <Link href={cta.href} className="flex min-h-[52px] items-center justify-center rounded-[14px] bg-white text-base font-extrabold text-[#0F172A]">{cta.label}</Link>
+        <Link href={cta.href} className="flex min-h-[52px] items-center justify-center keep-white rounded-[14px] bg-white text-base font-extrabold text-[#0F172A]">{cta.label}</Link>
         {!user && <Link href="/auth/login?next=/account/referrals" className="p-2 text-sm font-bold text-[#CBD5E1]">{t("haveAccount")}</Link>}
       </section>
     </div>
