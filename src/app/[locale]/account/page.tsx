@@ -96,7 +96,7 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
               <span className="text-sm font-semibold">{t("twofa")}</span>
               <span className="text-xs text-muted">{t("twofaSub")}</span>
             </span>
-            <span className={`text-xs font-bold ${user.twoFactorEnabled ? "text-[#166534] dark:text-success" : "text-muted"}`}>{user.twoFactorEnabled ? t("on") : t("off")}</span>
+            <span className={`text-xs font-bold ${user.twoFactorEnabled ? "text-success" : "text-muted"}`}>{user.twoFactorEnabled ? t("on") : t("off")}</span>
           </Link>
           <Link href="/account/notifications" className={row}>{t("install")}<Chevron /></Link>
         </section>
@@ -105,7 +105,7 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
           {links.map((l) => (
             <Link key={l.href} href={l.href} className={row}>{l.label}<Chevron /></Link>
           ))}
-          <SignOutButton className="flex min-h-[54px] w-full items-center gap-2 text-sm font-bold text-[#B91C1C]" />
+          <SignOutButton className="flex min-h-[54px] w-full items-center gap-2 text-sm font-bold text-danger" />
         </section>
         <CommunityBar settings={settings} label={t("community")} />
       </div>

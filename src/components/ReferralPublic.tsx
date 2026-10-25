@@ -33,10 +33,10 @@ export function EarningsCalculator({ tiers }: { tiers: { name: string; pct: numb
           ))}
         </div>
       </div>
-      <div className="flex flex-col gap-1 rounded-[14px] border border-[#BBF7D0] bg-[#F0FDF4] p-3.5 dark:border-border dark:bg-surface-2">
-        <span className="text-[13px] font-bold text-[#166534]">{t("calcResult")}</span>
-        <span className="text-[30px] font-extrabold tracking-[-0.5px] text-[#166534]">{fmt(earn)} <span className="text-base">{t("perMonth")}</span></span>
-        <span className="text-xs text-[#3F6212] dark:text-muted">{t("calcLine", { n: friends, spend: fmt(spend), pct: tier?.pct ?? 0, tier: tier?.name ?? "" })}</span>
+      <div className="flex flex-col gap-1 rounded-[14px] border border-success/30 bg-success-soft p-3.5">
+        <span className="text-[13px] font-bold text-success">{t("calcResult")}</span>
+        <span className="text-[30px] font-extrabold tracking-[-0.5px] text-success">{fmt(earn)} <span className="text-base">{t("perMonth")}</span></span>
+        <span className="text-xs text-success">{t("calcLine", { n: friends, spend: fmt(spend), pct: tier?.pct ?? 0, tier: tier?.name ?? "" })}</span>
       </div>
       <span className="text-xs text-muted">{t("calcNote")}</span>
     </section>

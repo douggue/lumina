@@ -49,7 +49,7 @@ export default async function NotificationsPage({ params }: { params: Promise<{ 
         back="/"
         backLabel={tc("back")}
         right={items.some((i) => !i.readAt) && (
-          <form action={markNotificationsRead}><button className="min-h-11 px-2.5 text-[13px] font-bold text-[#00209F] dark:text-primary">{t("markAll")}</button></form>
+          <form action={markNotificationsRead}><button className="min-h-11 px-2.5 text-[13px] font-bold text-primary">{t("markAll")}</button></form>
         )}
       />
       <div className="mx-auto flex max-w-[560px] flex-col gap-2.5 px-5 py-4">
@@ -64,11 +64,11 @@ export default async function NotificationsPage({ params }: { params: Promise<{ 
               <span className="flex flex-1 flex-col gap-[3px]">
                 <span className="text-sm font-bold">{t.has(n.type) ? t(n.type) : t("other")}</span>
                 <span className="text-[13px] leading-snug text-text/80">{render(n.type, n.params as Record<string, string | number>)}</span>
-                <span className="text-[11px] text-[#64748B]">{when(n.createdAt)}</span>
+                <span className="text-[11px] text-muted">{when(n.createdAt)}</span>
               </span>
             </>
           );
-          const cls = `flex gap-3 rounded-[14px] bg-surface px-3.5 py-3 text-text ${unread ? "border border-[#C7D2FE] shadow-[inset_3px_0_0_#0F172A] dark:border-primary/40" : "border border-border"}`;
+          const cls = `flex gap-3 rounded-[14px] bg-surface px-3.5 py-3 text-text ${unread ? "border border-primary/40 shadow-[inset_3px_0_0_var(--text)]" : "border border-border"}`;
           return n.link ? <Link key={n.id} href={n.link} className={cls}>{inner}</Link> : <div key={n.id} className={cls}>{inner}</div>;
         })}
       </div>
