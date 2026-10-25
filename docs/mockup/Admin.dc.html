@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HaitiViral – Admin dashboard</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#00209F}a:hover{color:#001670}
+</style>
+</helmet>
+<div style="box-sizing: border-box; min-height: 900px; background: #F5F6FB; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0F172A; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <aside style="flex: 1 1 220px; max-width: 100%; background: #0F172A; color: #E2E8F0; padding: 20px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
+    <div style="display: flex; align-items: center; gap: 8px; padding: 0 8px">
+      <div style="width: 30px; height: 30px; border-radius: 8px; background: #00209F; display: flex; align-items: center; justify-content: center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="15 7 21 7 21 13"></polyline></svg>
+      </div>
+      <div style="font-size: 17px; font-weight: 800; color: #FFFFFF">Haiti<span style="color: #FF6B7D">Viral</span> <span style="font-size: 11px; font-weight: 700; color: #94A3B8">ADMIN</span></div>
+    </div>
+    <nav aria-label="Admin" style="display: flex; flex-direction: column; gap: 2px">
+      <sc-for list="{{nav}}" as="n" hint-placeholder-count="8">
+        <a href="{{n.href}}" style="{{n.style}}">{{n.label}}</a>
+      </sc-for>
+    </nav>
+  </aside>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 28px; box-sizing: border-box; display: flex; flex-direction: column; gap: 22px">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px">
+      <div>
+        <h1 style="margin: 0; font-size: 24px; font-weight: 800">Dashboard</h1>
+        <div style="font-size: 13px; color: #5B6478; margin-top: 4px">Today · example numbers</div>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap">
+        <button type="button" style="min-height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid #CBD2E1; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; color: #0F172A">Check orders now</button>
+        <button type="button" style="min-height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid #CBD2E1; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; color: #0F172A">Sync services</button>
+        <button type="button" style="min-height: 40px; padding: 0 14px; border-radius: 10px; border: none; background: #00209F; font: inherit; font-size: 13px; font-weight: 700; color: #FFFFFF">Add provider</button>
+      </div>
+    </div>
+
+    <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px">
+      <sc-for list="{{kpis}}" as="k" hint-placeholder-count="4">
+        <div style="background: #FFFFFF; border: 1px solid #E5E7EF; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 6px">
+          <div style="font-size: 13px; color: #5B6478; font-weight: 600">{{k.label}}</div>
+          <div style="font-size: 26px; font-weight: 800; letter-spacing: -0.4px">{{k.value}}</div>
+          <div style="font-size: 12px; color: #5B6478">{{k.sub}}</div>
+        </div>
+      </sc-for>
+    </section>
+
+    <section style="display: flex; flex-wrap: wrap; gap: 16px">
+      <div style="flex: 2 1 420px; min-width: 0; background: #FFFFFF; border: 1px solid #E5E7EF; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Providers</h2>
+        <div style="overflow-x: auto">
+          <table style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 460px">
+            <thead>
+              <tr style="text-align: left; color: #5B6478; font-size: 12px">
+                <th style="padding: 8px 6px; font-weight: 700">Provider</th>
+                <th style="padding: 8px 6px; font-weight: 700">Balance</th>
+                <th style="padding: 8px 6px; font-weight: 700">Services</th>
+                <th style="padding: 8px 6px; font-weight: 700">Orders today</th>
+                <th style="padding: 8px 6px; font-weight: 700">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{providers}}" as="p" hint-placeholder-count="3">
+                <tr style="border-top: 1px solid #EEF0F5">
+                  <td style="padding: 12px 6px; font-weight: 700">{{p.name}}</td>
+                  <td style="padding: 12px 6px">{{p.balance}}</td>
+                  <td style="padding: 12px 6px">{{p.services}}</td>
+                  <td style="padding: 12px 6px">{{p.orders}}</td>
+                  <td style="padding: 12px 6px"><span style="{{p.badge}}">{{p.status}}</span></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="flex: 1 1 280px; min-width: 0; background: #FFFFFF; border: 1px solid #E5E7EF; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Needs attention</h2>
+        <sc-for list="{{alerts}}" as="a" hint-placeholder-count="3">
+          <div style="{{a.style}}">
+            <div style="font-size: 13px; font-weight: 700">{{a.title}}</div>
+            <div style="font-size: 12px; line-height: 1.45">{{a.text}}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="background: #FFFFFF; border: 1px solid #E5E7EF; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 700">Latest orders</h2>
+      <div style="overflow-x: auto">
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 640px">
+          <thead>
+            <tr style="text-align: left; color: #5B6478; font-size: 12px">
+              <th style="padding: 8px 6px; font-weight: 700">#</th>
+              <th style="padding: 8px 6px; font-weight: 700">Customer</th>
+              <th style="padding: 8px 6px; font-weight: 700">Service</th>
+              <th style="padding: 8px 6px; font-weight: 700">Qty</th>
+              <th style="padding: 8px 6px; font-weight: 700">Price</th>
+              <th style="padding: 8px 6px; font-weight: 700">Cost</th>
+              <th style="padding: 8px 6px; font-weight: 700">Profit</th>
+              <th style="padding: 8px 6px; font-weight: 700">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{orders}}" as="o" hint-placeholder-count="5">
+              <tr style="border-top: 1px solid #EEF0F5">
+                <td style="padding: 11px 6px; color: #5B6478">{{o.id}}</td>
+                <td style="padding: 11px 6px; font-weight: 600">{{o.customer}}</td>
+                <td style="padding: 11px 6px">{{o.service}}</td>
+                <td style="padding: 11px 6px">{{o.qty}}</td>
+                <td style="padding: 11px 6px">{{o.price}}</td>
+                <td style="padding: 11px 6px; color: #5B6478">{{o.cost}}</td>
+                <td style="padding: 11px 6px; font-weight: 700; color: #166534">{{o.profit}}</td>
+                <td style="padding: 11px 6px"><span style="{{o.badge}}">{{o.status}}</span></td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const badge = (bg, fg) => 'font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: ' + bg + '; color: ' + fg + '; white-space: nowrap';
+    const B = {
+      ok: badge('#DCFCE7', '#166534'), low: badge('#FEF3C7', '#92400E'), run: badge('#DBEAFE', '#1E40AF'),
+      partial: badge('#FEF3C7', '#92400E'), done: badge('#DCFCE7', '#166534'), stuck: badge('#FEE2E2', '#991B1B')
+    };
+    const navItem = (label, on) => ({ label, href: label === 'Services' ? 'AdminServices.dc.html' : label === 'Pricing' ? 'AdminPricing.dc.html' : label === 'Dashboard' ? 'Admin.dc.html' : '#', style: 'display: block; padding: 10px 12px; border-radius: 10px; font-size: 14px; text-decoration: none; ' + (on ? 'background: #1E293B; color: #FFFFFF; font-weight: 700' : 'color: #CBD5E1; font-weight: 500') });
+    const alert = (kind, title, text) => ({ title, text, style: 'padding: 10px 12px; border-radius: 10px; display: flex; flex-direction: column; gap: 3px; ' + (kind === 'red' ? 'background: #FEE2E2; color: #7F1D1D' : kind === 'amber' ? 'background: #FEF3C7; color: #78350F' : 'background: #DBEAFE; color: #1E3A8A') });
+    return {
+      nav: ['Dashboard', 'Orders', 'Services', 'Pricing', 'Providers', 'Customers', 'Payments', 'Referrals', 'Settings'].map((l, i) => navItem(l, i === 0)),
+      kpis: [
+        { label: 'Sales', value: 'G 48,600', sub: '212 orders' },
+        { label: 'Provider cost', value: 'G 27,900', sub: '$212 at 131.5 HTG/$' },
+        { label: 'Real profit', value: 'G 17,900', sub: 'after referral, bonus, fees · 37%' },
+        { label: 'Wallet top-ups', value: 'G 52,000', sub: 'MonCash 71% · NatCash 24% · Bank 5%' }
+      ],
+      providers: [
+        { name: 'Provider A', balance: '$184.20', services: '312 on sale', orders: '141', status: 'OK', badge: B.ok },
+        { name: 'Provider B', balance: '$12.75', services: '96 on sale', orders: '58', status: 'Low balance', badge: B.low },
+        { name: 'Provider C', balance: '$66.00', services: '40 on sale', orders: '13', status: 'OK', badge: B.ok }
+      ],
+      alerts: [
+        alert('amber', '4 orders waiting for balance', 'Provider B balance too low. They are queued and will be sent automatically after you top up.'),
+        alert('red', '2 stuck orders', 'No answer from the provider for over 6 hours. Re-check or refund.'),
+        alert('amber', 'Provider B balance low', 'Top up before it runs out. Orders will pause at $5.'),
+        alert('blue', '3 services paused', 'The provider raised its price above your selling price. Review prices.')
+      ],
+      orders: [
+        { id: '10483', customer: 'jean.p', service: 'Instagram Like', qty: '2,000', price: 'G 180', cost: 'G 98', profit: 'G 82', status: 'In progress', badge: B.run },
+        { id: '10482', customer: 'mika_ht', service: 'TikTok Followers', qty: '1,000', price: 'G 375', cost: 'G 210', profit: 'G 165', status: 'Completed', badge: B.done },
+        { id: '10481', customer: 'studio509', service: 'YouTube Views', qty: '10,000', price: 'G 2,600', cost: 'G 1,480', profit: 'G 1,120', status: 'In progress', badge: B.run },
+        { id: '10479', customer: 'djlove', service: 'YouTube Views', qty: '5,000', price: 'G 1,000', cost: 'G 570', profit: 'G 430', status: 'Partial · G 300 refunded', badge: B.partial },
+        { id: '10474', customer: 'roselaure', service: 'Facebook Followers', qty: '500', price: 'G 190', cost: 'G 104', profit: '—', status: 'Stuck', badge: B.stuck }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

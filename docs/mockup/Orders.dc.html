@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ht">
+<head>
+<meta charset="utf-8">
+<title>HaitiViral – Kòmand mwen yo</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#00209F}a:hover{color:#001670}
+</style>
+</helmet>
+<div style="width: 390px; height: 1050px; box-sizing: border-box; background: #F5F6FB; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0F172A; display: flex; flex-direction: column; overflow: hidden">
+
+  <header style="padding: 16px 20px 12px; background: #FFFFFF; border-bottom: 1px solid #E5E7EF; display: flex; flex-direction: column; gap: 12px">
+    <h1 style="margin: 0; font-size: 20px; font-weight: 800">Kòmand mwen yo</h1>
+    <div style="display: flex; gap: 8px; overflow: hidden">
+      <sc-for list="{{filters}}" as="f" hint-placeholder-count="4">
+        <button type="button" style="{{f.style}}">{{f.label}}</button>
+      </sc-for>
+    </div>
+  </header>
+
+  <main style="flex: 1; overflow: hidden; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px">
+    <sc-for list="{{orders}}" as="o" hint-placeholder-count="4">
+      <article style="background: #FFFFFF; border: 1px solid #E5E7EF; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px">
+          <div style="display: flex; gap: 10px; align-items: center">
+            <div style="width: 38px; height: 38px; border-radius: 11px; background: {{o.bg}}; color: #FFFFFF; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center">{{o.letter}}</div>
+            <div style="display: flex; flex-direction: column; gap: 2px">
+              <div style="font-size: 15px; font-weight: 700">{{o.name}}</div>
+              <div style="font-size: 12px; color: #5B6478">#{{o.id}} · {{o.date}}</div>
+            </div>
+          </div>
+          <span style="{{o.badge}}">{{o.status}}</span>
+        </div>
+        <div style="height: 8px; border-radius: 999px; background: #EEF0F5; overflow: hidden"><div style="{{o.bar}}"></div></div>
+        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #5B6478">
+          <span>Kòmanse: {{o.start}}</span><span>{{o.progress}}</span><span style="font-weight: 700; color: #0F172A">{{o.price}}</span>
+        </div>
+        <sc-if value="{{o.note}}" hint-placeholder-val="{{ false }}">
+          <div style="{{o.noteStyle}}">{{o.note}}</div>
+        </sc-if>
+        <sc-if value="{{o.refill}}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; gap: 8px">
+            <button type="button" style="flex: 1; min-height: 44px; border-radius: 12px; border: 1px solid #00209F; background: #FFFFFF; color: #00209F; font: inherit; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"></path><path d="M21 3v5h-5"></path></svg>Refill</button>
+            <a href="NewOrder.dc.html" style="flex: 1; min-height: 44px; border-radius: 12px; background: #EEF1FF; color: #00209F; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-decoration: none">Kòmande ankò</a>
+          </div>
+        </sc-if>
+        <sc-if value="{{o.eta}}" hint-placeholder-val="{{ false }}">
+          <div style="font-size: 12px; color: #1E40AF">{{o.eta}}</div>
+        </sc-if>
+        <sc-if value="{{o.cancel}}" hint-placeholder-val="{{ false }}">
+          <button type="button" style="min-height: 44px; border-radius: 12px; border: 1px solid #FCA5A5; background: #FFFFFF; color: #B91C1C; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer">Mande anile (si founisè a aksepte, kòb la tounen)</button>
+        </sc-if>
+      </article>
+    </sc-for>
+  </main>
+
+  <nav aria-label="Meni" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: #FFFFFF; border-top: 1px solid #E5E7EF; padding: 6px 4px 18px">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 0; font-size: 11px; font-weight: 600; color: #5B6478; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7M5 10v10h14V10"></path></svg>Akèy</a>
+    <a href="NewOrder.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 0; font-size: 11px; font-weight: 600; color: #5B6478; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M12 8v8M8 12h8"></path></svg>Kòmande</a>
+    <a href="Orders.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 0; font-size: 11px; font-weight: 700; color: #0F172A; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h1M3 12h1M3 18h1"></path></svg>Kòmand yo</a>
+    <a href="Wallet.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 0; font-size: 11px; font-weight: 600; color: #5B6478; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3zM2 10h20"></path></svg>Bous</a>
+    <a href="Account.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 0; font-size: 11px; font-weight: 600; color: #5B6478; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8a4 4 0 1 0 0 8M4 21a8 8 0 0 1 16 0"></path></svg>Kont</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":980}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const S = {
+      done: ['Konplete', '#DCFCE7', '#166534', '#16A34A'],
+      run: ['Ap trete', '#DBEAFE', '#1E40AF', '#2563EB'],
+      partial: ['Pasyèl', '#FEF3C7', '#92400E', '#D97706'],
+      cancel: ['Anile', '#FEE2E2', '#991B1B', '#DC2626']
+    };
+    const make = (o) => {
+      const s = S[o.kind];
+      return { ...o, status: s[0],
+        badge: 'flex: none; font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 999px; background: ' + s[1] + '; color: ' + s[2],
+        bar: 'height: 100%; border-radius: 999px; width: ' + o.pct + '%; background: ' + s[3],
+        noteStyle: 'font-size: 12px; line-height: 1.45; padding: 9px 11px; border-radius: 10px; background: ' + s[1] + '; color: ' + s[2] };
+    };
+    const filter = (label, on) => ({ label, style: 'flex: none; min-height: 36px; padding: 0 14px; border-radius: 999px; font: inherit; font-size: 13px; font-weight: 700; ' + (on ? 'background: #0F172A; color: #FFFFFF; border: 1px solid #0F172A' : 'background: #FFFFFF; color: #334155; border: 1px solid #CBD2E1') });
+    return {
+      filters: [filter('Tout', true), filter('Ap trete', false), filter('Konplete', false), filter('Pasyèl', false)],
+      orders: [
+        make({ id: '10483', date: 'Jodi a 2:14 PM', name: 'Instagram Like · 2,000', letter: 'IG', bg: '#C13584', kind: 'run', pct: 45, start: '312', progress: '900 / 2,000', price: 'G 180', note: '', refill: false, cancel: true, eta: 'Mwayèn sèvis sa a: 25 minit' }),
+        make({ id: '10482', date: 'Yè', name: 'TikTok Abòne · 1,000', letter: 'TT', bg: '#111111', kind: 'done', pct: 100, start: '1,840', progress: '1,000 / 1,000', price: 'G 375', note: '', refill: true }),
+        make({ id: '10479', date: '18 okt', name: 'YouTube Vi · 5,000', letter: 'YT', bg: '#CC0000', kind: 'partial', pct: 77, start: '9,102', progress: '3,850 / 5,000', price: 'G 1,000', note: 'Founisè a pa t ka fini. G 300 tounen nan bous ou otomatikman.', refill: false }),
+        make({ id: '10476', date: '15 okt', name: 'Facebook Paj Like · 500', letter: 'FB', bg: '#1877F2', kind: 'cancel', pct: 0, start: '—', progress: '0 / 500', price: 'G 210', note: 'Kòmand lan anile. G 210 ranbouse nan bous ou.', refill: false })
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

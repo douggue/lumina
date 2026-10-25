@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ht">
+<head>
+<meta charset="utf-8">
+<title>HaitiViral – Bous</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#00209F}a:hover{color:#001670}
+</style>
+</helmet>
+<div style="width: 390px; height: 980px; box-sizing: border-box; background: #F5F6FB; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0F172A; display: flex; flex-direction: column; overflow: hidden">
+
+  <header style="padding: 16px 20px; background: #FFFFFF; border-bottom: 1px solid #E5E7EF">
+    <h1 style="margin: 0; font-size: 20px; font-weight: 800">Bous mwen</h1>
+  </header>
+
+  <main style="flex: 1; overflow: hidden; padding: 18px 20px; display: flex; flex-direction: column; gap: 18px">
+    <section style="background: #0F172A; color: #FFFFFF; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden">
+      <div style="position: absolute; right: -30px; bottom: -50px; width: 140px; height: 140px; border-radius: 50%; background: #00209F"></div>
+      <div style="position: absolute; right: 50px; bottom: -70px; width: 110px; height: 110px; border-radius: 50%; background: #D21034"></div>
+      <div style="position: relative; font-size: 13px; color: #CBD5E1">Balans</div>
+      <div style="position: relative; font-size: 34px; font-weight: 800; letter-spacing: -0.5px">G 1,250.00</div>
+      <div style="position: relative; font-size: 12px; color: #CBD5E1">G 375 bloke pou kòmand k ap trete</div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 10px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 700">Ajoute kòb</h2>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+        <sc-for list="{{amounts}}" as="a" hint-placeholder-count="4">
+          <button type="button" onClick="{{a.pick}}" style="{{a.style}}">{{a.label}}</button>
+        </sc-for>
+      </div>
+      <sc-if value="{{bonus}}" hint-placeholder-val="{{ false }}">
+        <div style="font-size: 13px; font-weight: 600; color: #166534; background: #DCFCE7; padding: 10px 12px; border-radius: 10px">+5% bonis: ou resevwa {{bonusTotal}}</div>
+      </sc-if>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 10px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 700">Metòd peman</h2>
+      <sc-for list="{{methods}}" as="m" hint-placeholder-count="3">
+        <button type="button" onClick="{{m.pick}}" style="{{m.style}}">
+          <div style="width: 42px; height: 42px; border-radius: 12px; background: {{m.bg}}; color: #FFFFFF; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: center; flex: none">{{m.letter}}</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; flex: 1; text-align: left">
+            <div style="font-size: 15px; font-weight: 700">{{m.name}}</div>
+            <div style="font-size: 12px; color: #5B6478">{{m.meta}}</div>
+          </div>
+          <div style="{{m.radio}}"><div style="{{m.dot}}"></div></div>
+        </button>
+      </sc-for>
+    </section>
+
+    <button type="button" style="height: 54px; border-radius: 14px; background: #00209F; color: #FFFFFF; border: none; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer">{{cta}}</button>
+
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 700">Dènye mouvman</h2>
+      <sc-for list="{{tx}}" as="t" hint-placeholder-count="3">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #E5E7EF">
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <div style="font-size: 14px; font-weight: 600">{{t.label}}</div>
+            <div style="font-size: 12px; color: #5B6478">{{t.date}}</div>
+          </div>
+          <div style="{{t.style}}">{{t.amount}}</div>
+        </div>
+      </sc-for>
+    </section>
+  </main>
+
+  <nav aria-label="Meni" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: #FFFFFF; border-top: 1px solid #E5E7EF; padding: 6px 4px 18px">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 0; font-size: 11px; font-weight: 600; color: #5B6478; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7M5 10v10h14V10"></path></svg>Akèy</a>
+    <a href="NewOrder.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 0; font-size: 11px; font-weight: 600; color: #5B6478; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M12 8v8M8 12h8"></path></svg>Kòmande</a>
+    <a href="Orders.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 0; font-size: 11px; font-weight: 600; color: #5B6478; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h1M3 12h1M3 18h1"></path></svg>Kòmand yo</a>
+    <a href="Wallet.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 0; font-size: 11px; font-weight: 700; color: #0F172A; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3zM2 10h20"></path></svg>Bous</a>
+    <a href="Account.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 0; font-size: 11px; font-weight: 600; color: #5B6478; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8a4 4 0 1 0 0 8M4 21a8 8 0 0 1 16 0"></path></svg>Kont</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":980}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { amount: 1000, method: 'moncash' };
+  }
+  renderVals() {
+    const st = this.state;
+    const fmt = (n) => 'G ' + n.toLocaleString('en-US');
+    const chip = (on) => 'min-height: 46px; border-radius: 12px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; ' + (on ? 'background: #00209F; color: #FFFFFF; border: 1px solid #00209F' : 'background: #FFFFFF; color: #0F172A; border: 1px solid #CBD2E1');
+    const methods = [
+      { id: 'moncash', name: 'MonCash', letter: 'MC', bg: '#E30613', meta: 'Otomatik · kòb la antre touswit' },
+      { id: 'natcash', name: 'NatCash', letter: 'NC', bg: '#F27A1A', meta: 'Otomatik · kòb la antre touswit' },
+      { id: 'bank', name: 'Transfè labank', letter: 'BK', bg: '#334155', meta: 'Voye prèv la · verifye nan kèk èdtan' }
+    ];
+    const chosen = methods.find((m) => m.id === st.method);
+    return {
+      amounts: [250, 500, 1000, 2500].map((n) => ({ label: n.toLocaleString('en-US'), style: chip(n === st.amount), pick: () => this.setState({ amount: n }) })),
+      bonus: st.amount >= 2500,
+      bonusTotal: fmt(Math.round(st.amount * 1.05)),
+      methods: methods.map((m) => {
+        const on = m.id === st.method;
+        return { ...m, pick: () => this.setState({ method: m.id }),
+          style: 'display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; font: inherit; color: #0F172A; cursor: pointer; background: #FFFFFF; ' + (on ? 'border: 2px solid #00209F' : 'border: 2px solid #E5E7EF'),
+          radio: 'flex: none; width: 22px; height: 22px; border-radius: 50%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid ' + (on ? '#00209F' : '#94A3B8'),
+          dot: 'width: 10px; height: 10px; border-radius: 50%; background: ' + (on ? '#00209F' : 'transparent') };
+      }),
+      cta: 'Peye ' + fmt(st.amount) + ' ak ' + chosen.name,
+      tx: [
+        { label: 'Depo MonCash', date: 'Jodi a 1:52 PM', amount: '+ G 1,000', style: 'font-size: 14px; font-weight: 700; color: #166534' },
+        { label: 'Kòmand #10483', date: 'Jodi a 2:14 PM', amount: '− G 180', style: 'font-size: 14px; font-weight: 700; color: #0F172A' },
+        { label: 'Ranbousman #10479 (pasyèl)', date: '18 okt', amount: '+ G 300', style: 'font-size: 14px; font-weight: 700; color: #166534' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

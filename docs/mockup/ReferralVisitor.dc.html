@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ht">
+<head>
+<meta charset="utf-8">
+<title>HaitiViral – Fè lajan</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#00209F}a:hover{color:#001670}
+</style>
+</helmet>
+<div style="width: 390px; height: 1820px; box-sizing: border-box; background: #F5F6FB; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0F172A; display: flex; flex-direction: column; overflow: hidden">
+
+  <header style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 16px; background: #FFFFFF; border-bottom: 1px solid #E5E7EF">
+    <a href="Main.dc.html" aria-label="HaitiViral, akèy" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: #0F172A; min-height: 44px">
+      <span style="width: 30px; height: 30px; border-radius: 8px; background: #00209F; display: flex; align-items: center; justify-content: center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="15 7 21 7 21 13"></polyline></svg>
+      </span>
+      <span style="font-size: 17px; font-weight: 800">Haiti<span style="color: #D21034">Viral</span></span>
+    </a>
+    <a href="Login.dc.html" style="min-height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid #CBD2E1; display: flex; align-items: center; font-size: 14px; font-weight: 700; color: #0F172A; text-decoration: none">Konekte</a>
+  </header>
+
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 22px; padding: 20px 20px 28px">
+
+    <section style="background: #00209F; color: #FFFFFF; border-radius: 22px; padding: 22px 20px; display: flex; flex-direction: column; gap: 14px; position: relative; overflow: hidden">
+      <div style="position: absolute; right: -40px; top: -40px; width: 150px; height: 150px; border-radius: 50%; background: #D21034"></div>
+      <div style="position: relative; font-size: 12px; font-weight: 800; letter-spacing: 0.6px; color: #DCE3FF">PWOGRAM AFILYE</div>
+      <h1 style="position: relative; margin: 0; font-size: 27px; line-height: 1.18; font-weight: 800; max-width: 290px">Pataje HaitiViral. Touche lajan. Retire l sou telefòn ou.</h1>
+      <p style="position: relative; margin: 0; font-size: 15px; line-height: 1.5; color: #E5EAFF">Touche jiska <b style="color: #FFFFFF">12%</b> sou chak kòmand zanmi w fè, epi retire kòb la sou MonCash oswa NatCash.</p>
+      <div style="position: relative; display: flex; gap: 8px">
+        <span style="font-size: 12px; font-weight: 800; padding: 6px 10px; border-radius: 8px; background: #FFFFFF; color: #B4122E">MonCash</span>
+        <span style="font-size: 12px; font-weight: 800; padding: 6px 10px; border-radius: 8px; background: #FFFFFF; color: #1D4ED8">NatCash</span>
+        <span style="font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: rgba(255,255,255,0.14); color: #FFFFFF">Gratis pou kòmanse</span>
+      </div>
+      <a href="Login.dc.html" style="position: relative; min-height: 52px; border-radius: 14px; background: #FFFFFF; color: #00209F; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; text-decoration: none">Kreye kont mwen gratis</a>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 10px">
+      <h2 style="margin: 0; font-size: 18px; font-weight: 800">Kijan sa mache</h2>
+      <sc-for list="{{steps}}" as="s" hint-placeholder-count="3">
+        <div style="display: flex; gap: 12px; align-items: flex-start; background: #FFFFFF; border: 1px solid #E5E7EF; border-radius: 14px; padding: 14px">
+          <div style="flex: none; width: 34px; height: 34px; border-radius: 50%; background: #0F172A; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800">{{s.n}}</div>
+          <div style="display: flex; flex-direction: column; gap: 3px">
+            <div style="font-size: 15px; font-weight: 800">{{s.title}}</div>
+            <div style="font-size: 13px; line-height: 1.45; color: #5B6478">{{s.text}}</div>
+          </div>
+        </div>
+      </sc-for>
+    </section>
+
+    <section style="background: #FFFFFF; border: 1px solid #E5E7EF; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+      <h2 style="margin: 0; font-size: 18px; font-weight: 800">Kalkile sa w ka touche</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px">
+        <span id="fl" style="font-size: 14px; font-weight: 700">Zanmi ki kòmande</span>
+        <div role="group" aria-labelledby="fl" style="display: flex; align-items: center; gap: 6px">
+          <button type="button" onClick="{{less}}" aria-label="Mwens zanmi" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #CBD2E1; background: #FFFFFF; font: inherit; font-size: 20px; font-weight: 800; color: #0F172A; cursor: pointer">−</button>
+          <span style="min-width: 40px; text-align: center; font-size: 20px; font-weight: 800">{{friends}}</span>
+          <button type="button" onClick="{{more}}" aria-label="Plis zanmi" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #CBD2E1; background: #FFFFFF; font: inherit; font-size: 20px; font-weight: 800; color: #0F172A; cursor: pointer">+</button>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 14px; font-weight: 700">Chak zanmi depanse pa mwa</span>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px">
+          <sc-for list="{{spends}}" as="p" hint-placeholder-count="3">
+            <button type="button" aria-pressed="{{p.on}}" onClick="{{p.pick}}" style="{{p.style}}">{{p.label}}</button>
+          </sc-for>
+        </div>
+      </div>
+      <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 4px">
+        <div style="font-size: 13px; color: #166534; font-weight: 700">Ou ta touche anviwon</div>
+        <div style="font-size: 30px; font-weight: 800; color: #166534; letter-spacing: -0.5px">{{earn}} <span style="font-size: 16px">/ mwa</span></div>
+        <div style="font-size: 12px; color: #3F6212">{{earnNote}}</div>
+      </div>
+      <div style="font-size: 12px; color: #5B6478">Se yon egzanp. Sa w touche depann de kòmand zanmi w yo fè vre.</div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 10px">
+      <h2 style="margin: 0; font-size: 18px; font-weight: 800">Plis zanmi, plis pousantaj</h2>
+      <sc-for list="{{tiers}}" as="t" hint-placeholder-count="4">
+        <div style="display: flex; align-items: center; gap: 12px; background: #FFFFFF; border: 1px solid #E5E7EF; border-radius: 14px; padding: 12px 14px">
+          <div style="{{t.dot}}"></div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+            <div style="font-size: 15px; font-weight: 800">{{t.name}}</div>
+            <div style="font-size: 12px; color: #5B6478">{{t.need}}</div>
+          </div>
+          <div style="font-size: 20px; font-weight: 800; color: #00209F">{{t.pct}}</div>
+        </div>
+      </sc-for>
+      <div style="font-size: 12px; color: #5B6478">Nivo a kalkile sou 30 dènye jou yo. "Aktif" = zanmi ki gen omwen yon kòmand ki fini.</div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <h2 style="margin: 0; font-size: 18px; font-weight: 800">Kesyon moun poze</h2>
+      <sc-for list="{{faq}}" as="q" hint-placeholder-count="4">
+        <div style="background: #FFFFFF; border: 1px solid #E5E7EF; border-radius: 14px">
+          <button type="button" aria-expanded="{{q.open}}" onClick="{{q.toggle}}" style="width: 100%; min-height: 52px; padding: 12px 14px; border: none; background: transparent; font: inherit; font-size: 14px; font-weight: 700; color: #0F172A; display: flex; justify-content: space-between; align-items: center; gap: 10px; text-align: left; cursor: pointer">
+            <span>{{q.q}}</span><span aria-hidden="true" style="font-size: 18px; color: #5B6478">{{q.sign}}</span>
+          </button>
+          <sc-if value="{{q.isOpen}}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 0 14px 14px; font-size: 13px; line-height: 1.5; color: #5B6478">{{q.a}}</div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </section>
+
+    <section style="background: #0F172A; color: #FFFFFF; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 12px; text-align: center">
+      <div style="font-size: 20px; font-weight: 800">Kòmanse touche jodi a</div>
+      <div style="font-size: 14px; color: #CBD5E1">Kreye kont ou, pran lyen ou, voye l bay zanmi w sou WhatsApp.</div>
+      <a href="Login.dc.html" style="min-height: 52px; border-radius: 14px; background: #FFFFFF; color: #0F172A; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; text-decoration: none">Kreye kont mwen gratis</a>
+      <a href="Login.dc.html" style="font-size: 14px; font-weight: 700; color: #CBD5E1; padding: 8px">Mwen gen kont deja · Konekte</a>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1820}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { friends: 10, spend: 1000, open: 0 };
+  }
+  renderVals() {
+    const st = this.state;
+    const n = (v) => Math.round(v).toLocaleString('en-US');
+    // Tier from the number of active friends (the spending route to a tier is left out of the example).
+    const pct = st.friends >= 50 ? 12 : st.friends >= 20 ? 10 : st.friends >= 5 ? 7 : 5;
+    const tierName = pct === 12 ? 'Dyaman' : pct === 10 ? 'Lò' : pct === 7 ? 'Ajan' : 'Bwonz';
+    const earn = st.friends * st.spend * pct / 100;
+    const chip = (on) => 'min-height: 44px; border-radius: 12px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; ' + (on ? 'border: 2px solid #00209F; background: #EEF1FF; color: #00209F' : 'border: 1px solid #CBD2E1; background: #FFFFFF; color: #334155');
+    const dot = (c) => 'flex: none; width: 14px; height: 14px; border-radius: 50%; background: ' + c;
+    const faq = [
+      ['Kilè m ka retire kòb mwen?', 'Depi ou gen omwen 500 HTG disponib. Komisyon an vin disponib 3 jou apre kòmand zanmi w lan fini. Nou voye l nan 24 è (jou travay).'],
+      ['Ki jan m resevwa kòb la?', 'Sou MonCash oswa NatCash, nan nimewo ki sou kont ou, oswa ou mete l nan bous HaitiViral ou pou kòmande touswit.'],
+      ['Èske gen frè pou m enskri?', 'Non. Kont lan gratis e pa gen okenn obligasyon pou w achte anyen.'],
+      ['Èske m ka envite tèt mwen?', 'Non. Kont ki se menm moun nan (menm telefòn, menm aparèy) pa bay komisyon, epi yo ka bloke.']
+    ];
+    return {
+      friends: String(st.friends),
+      less: () => this.setState({ friends: Math.max(1, st.friends - 1) }),
+      more: () => this.setState({ friends: Math.min(100, st.friends + 1) }),
+      spends: [500, 1000, 2500].map((v) => ({ label: n(v) + ' HTG', on: String(st.spend === v), pick: () => this.setState({ spend: v }), style: chip(st.spend === v) })),
+      earn: n(earn) + ' HTG',
+      earnNote: st.friends + ' zanmi × ' + n(st.spend) + ' HTG × ' + pct + '% (nivo ' + tierName + ')',
+      steps: [
+        { n: '1', title: 'Pran lyen pa w la', text: 'Kreye kont gratis. Ou jwenn yon lyen ak yon kòd pèsonèl touswit.' },
+        { n: '2', title: 'Pataje l', text: 'Voye l sou WhatsApp, Facebook, TikTok oswa nan gwoup ou yo. Zanmi w enskri ak lyen ou.' },
+        { n: '3', title: 'Touche, epi retire', text: 'Chak fwa yo kòmande, ou touche yon pousantaj. Retire l sou MonCash oswa NatCash.' }
+      ],
+      tiers: [
+        { name: 'Bwonz', need: 'Depi w enskri', pct: '5%', dot: dot('#B45309') },
+        { name: 'Ajan', need: '5 zanmi aktif oswa 10,000 HTG kòmand', pct: '7%', dot: dot('#94A3B8') },
+        { name: 'Lò', need: '20 zanmi aktif oswa 50,000 HTG kòmand', pct: '10%', dot: dot('#EAB308') },
+        { name: 'Dyaman', need: '50 zanmi aktif oswa 150,000 HTG kòmand', pct: '12%', dot: dot('#0EA5E9') }
+      ],
+      faq: faq.map(([q, a], i) => ({ q, a, isOpen: st.open === i, open: String(st.open === i), sign: st.open === i ? '−' : '+', toggle: () => this.setState({ open: st.open === i ? -1 : i }) }))
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ht">
+<head>
+<meta charset="utf-8">
+<title>HaitiViral – Kreye kont / Konekte</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#00209F}a:hover{color:#001670}
+</style>
+</helmet>
+<div style="width: 390px; height: 900px; box-sizing: border-box; background: #FFFFFF; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0F172A; display: flex; flex-direction: column; padding: 28px 24px; gap: 20px; overflow: hidden">
+
+  <div style="display: flex; justify-content: space-between; align-items: center">
+    <div style="display: flex; align-items: center; gap: 8px">
+      <div style="width: 34px; height: 34px; border-radius: 10px; background: #0F172A; display: flex; align-items: center; justify-content: center">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="15 7 21 7 21 13"></polyline></svg>
+      </div>
+      <div style="font-size: 20px; font-weight: 800">Haiti<span style="color: #D21034">Viral</span></div>
+    </div>
+    <div role="group" aria-label="Lang" style="display: flex; border: 1px solid #CBD2E1; border-radius: 10px; overflow: hidden">
+      <button type="button" onClick="{{setKr}}" style="{{krStyle}}">KR</button>
+      <button type="button" onClick="{{setFr}}" style="{{frStyle}}">FR</button>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 6px">
+    <h1 style="margin: 0; font-size: 26px; font-weight: 800; line-height: 1.2">{{title}}</h1>
+    <p style="margin: 0; font-size: 14px; color: #5B6478; line-height: 1.5">{{subtitle}}</p>
+  </div>
+
+  <div role="tablist" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); background: #F1F5F9; border-radius: 12px; padding: 4px">
+    <button type="button" role="tab" aria-selected="{{signupSel}}" onClick="{{toSignup}}" style="{{signupTab}}">{{tSignup}}</button>
+    <button type="button" role="tab" aria-selected="{{loginSel}}" onClick="{{toLogin}}" style="{{loginTab}}">{{tLogin}}</button>
+  </div>
+
+  <button type="button" style="height: 52px; border-radius: 14px; border: 1px solid #CBD2E1; background: #FFFFFF; font: inherit; font-size: 15px; font-weight: 700; color: #0F172A; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer">
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.5 12.3c0-.8-.1-1.5-.2-2.2H12v4.2h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2-1.9 3.2-4.7 3.2-8z"></path><path fill="#34A853" d="M12 23c3 0 5.5-1 7.3-2.7l-3.6-2.7c-1 .7-2.2 1.1-3.7 1.1-2.9 0-5.3-1.9-6.2-4.5H2.1v2.8A11 11 0 0 0 12 23z"></path><path fill="#FBBC05" d="M5.8 14.2a6.6 6.6 0 0 1 0-4.3V7.1H2.1a11 11 0 0 0 0 9.9z"></path><path fill="#EA4335" d="M12 5.4c1.6 0 3 .6 4.2 1.6l3.1-3.1A11 11 0 0 0 2.1 7.1l3.7 2.8C6.7 7.3 9.1 5.4 12 5.4z"></path></svg>
+    {{tGoogle}}
+  </button>
+
+  <div style="display: flex; align-items: center; gap: 10px; color: #64748B; font-size: 13px">
+    <div style="flex: 1; height: 1px; background: #E5E7EF"></div>{{tOr}}<div style="flex: 1; height: 1px; background: #E5E7EF"></div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 12px">
+    <sc-if value="{{isSignup}}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="name" style="font-size: 14px; font-weight: 600">{{tName}}</label>
+        <input id="name" type="text" autocomplete="name" style="height: 50px; box-sizing: border-box; padding: 0 14px; border: 1px solid #CBD2E1; border-radius: 12px; font: inherit; font-size: 16px">
+      </div>
+    </sc-if>
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <label for="email" style="font-size: 14px; font-weight: 600">Email</label>
+      <input id="email" type="email" autocomplete="email" placeholder="non@gmail.com" style="height: 50px; box-sizing: border-box; padding: 0 14px; border: 1px solid #CBD2E1; border-radius: 12px; font: inherit; font-size: 16px">
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <label for="pw" style="font-size: 14px; font-weight: 600">{{tPassword}}</label>
+        <sc-if value="{{isLogin}}" hint-placeholder-val="{{ false }}"><a href="#" style="font-size: 13px; font-weight: 600">{{tForgot}}</a></sc-if>
+      </div>
+      <input id="pw" type="password" autocomplete="current-password" style="height: 50px; box-sizing: border-box; padding: 0 14px; border: 1px solid #CBD2E1; border-radius: 12px; font: inherit; font-size: 16px">
+    </div>
+    <sc-if value="{{isSignup}}" hint-placeholder-val="{{ true }}">
+      <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 13px; line-height: 1.5; color: #334155; cursor: pointer; min-height: 44px">
+        <input type="checkbox" checked="{{agree}}" onChange="{{toggleAgree}}" style="width: 22px; height: 22px; margin: 0; accent-color: #0F172A; flex: none">
+        <span>{{tTerms1}} <a href="#">{{tTerms2}}</a>{{tTerms3}}</span>
+      </label>
+    </sc-if>
+  </div>
+
+  <a href="Main.dc.html" style="{{ctaStyle}}">{{cta}}</a>
+  <div style="font-size: 12px; color: #64748B; text-align: center; line-height: 1.5">{{tSecure}}</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { mode: 'signup', lang: 'kr', agree: false };
+  }
+  renderVals() {
+    const st = this.state;
+    const kr = st.lang === 'kr';
+    const signup = st.mode === 'signup';
+    const T = kr ? {
+      title: signup ? 'Kreye kont ou' : 'Bon retou!', subtitle: signup ? 'Gratis. Mwens pase 1 minit.' : 'Konekte pou w kontinye.',
+      tSignup: 'Kreye kont', tLogin: 'Konekte', tGoogle: 'Kontinye ak Google', tOr: 'oswa', tName: 'Non ou', tPassword: 'Modpas', tForgot: 'Ou bliye l?',
+      tTerms1: 'Mwen dakò ak', tTerms2: 'Kondisyon itilizasyon yo', tTerms3: '. Mwen konprann HaitiViral pa gen okenn lyen ak TikTok, Instagram, Facebook oswa YouTube, e mwen itilize sèvis yo sou pwop responsablite m.',
+      cta: signup ? 'Kreye kont' : 'Konekte', tSecure: 'Pwoteje ak verifikasyon an 2 etap (2FA) si ou vle.'
+    } : {
+      title: signup ? 'Créez votre compte' : 'Bon retour !', subtitle: signup ? 'Gratuit. Moins d’une minute.' : 'Connectez-vous pour continuer.',
+      tSignup: 'Créer un compte', tLogin: 'Connexion', tGoogle: 'Continuer avec Google', tOr: 'ou', tName: 'Votre nom', tPassword: 'Mot de passe', tForgot: 'Oublié ?',
+      tTerms1: 'J’accepte les', tTerms2: 'Conditions d’utilisation', tTerms3: '. Je comprends que HaitiViral n’est pas lié à TikTok, Instagram, Facebook ou YouTube, et que j’utilise les services à mes propres risques.',
+      cta: signup ? 'Créer un compte' : 'Connexion', tSecure: 'Protégé par la vérification en 2 étapes (2FA) si vous le souhaitez.'
+    };
+    const tab = (on) => 'min-height: 42px; border-radius: 9px; border: none; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; ' + (on ? 'background: #FFFFFF; color: #0F172A; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12)' : 'background: transparent; color: #5B6478');
+    const lang = (on) => 'min-width: 44px; height: 36px; border: none; font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; ' + (on ? 'background: #0F172A; color: #FFFFFF' : 'background: #FFFFFF; color: #334155');
+    const ready = !signup || st.agree;
+    return {
+      ...T,
+      isSignup: signup, isLogin: !signup,
+      signupSel: signup ? 'true' : 'false', loginSel: signup ? 'false' : 'true',
+      signupTab: tab(signup), loginTab: tab(!signup),
+      toSignup: () => this.setState({ mode: 'signup' }), toLogin: () => this.setState({ mode: 'login' }),
+      krStyle: lang(kr), frStyle: lang(!kr),
+      setKr: () => this.setState({ lang: 'kr' }), setFr: () => this.setState({ lang: 'fr' }),
+      agree: !!st.agree, toggleAgree: () => this.setState({ agree: !st.agree }),
+      ctaStyle: 'display: flex; align-items: center; justify-content: center; height: 54px; border-radius: 14px; font-size: 16px; font-weight: 700; text-decoration: none; ' + (ready ? 'background: #0F172A; color: #FFFFFF' : 'background: #CBD5E1; color: #475569; pointer-events: none')
+    };
+  }
+}
+</script>
+</body>
+</html>

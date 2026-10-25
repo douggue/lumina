@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HaitiViral – Pricing and profit</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#00209F}a:hover{color:#001670}
+</style>
+</helmet>
+<div style="box-sizing: border-box; min-height: 1200px; background: #F5F6FB; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0F172A; display: flex; flex-wrap: wrap; align-items: stretch">
+
+  <aside style="flex: 1 1 220px; max-width: 100%; background: #0F172A; color: #E2E8F0; padding: 20px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
+    <div style="font-size: 17px; font-weight: 800; color: #FFFFFF; padding: 0 8px">Haiti<span style="color: #FF6B7D">Viral</span> <span style="font-size: 11px; font-weight: 700; color: #94A3B8">ADMIN</span></div>
+    <nav aria-label="Admin" style="display: flex; flex-direction: column; gap: 2px">
+      <sc-for list="{{nav}}" as="n" hint-placeholder-count="9">
+        <a href="{{n.href}}" style="{{n.style}}">{{n.label}}</a>
+      </sc-for>
+    </nav>
+  </aside>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 28px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+    <div>
+      <h1 style="margin: 0; font-size: 24px; font-weight: 800">Pricing, real profit and curated picks</h1>
+      <div style="font-size: 13px; color: #5B6478; margin-top: 4px">Change a value: every row recalculates. Example numbers.</div>
+    </div>
+
+    <section style="background: #FFFFFF; border: 1px solid #E5E7EF; border-radius: 14px; padding: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px">
+      <sc-for list="{{inputs}}" as="i" hint-placeholder-count="5">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="{{i.id}}" style="font-size: 12px; font-weight: 700; color: #5B6478">{{i.label}}</label>
+          <input id="{{i.id}}" type="number" step="{{i.step}}" value="{{i.value}}" onInput="{{i.set}}" style="height: 44px; box-sizing: border-box; padding: 0 12px; border: 1px solid #CBD2E1; border-radius: 10px; font: inherit; font-size: 16px; font-weight: 700">
+          <div style="font-size: 11px; color: #64748B">{{i.hint}}</div>
+        </div>
+      </sc-for>
+    </section>
+
+    <section style="background: #FFFFFF; border: 1px solid #E5E7EF; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Real profit per 1,000 (worst case: referred customer + top-up bonus)</h2>
+        <div style="font-size: 12px; color: #5B6478">{{summary}}</div>
+      </div>
+      <div style="overflow-x: auto">
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 860px">
+          <thead>
+            <tr style="text-align: right; color: #5B6478; font-size: 12px">
+              <th style="padding: 8px 6px; font-weight: 700; text-align: left">Service</th>
+              <th style="padding: 8px 6px; font-weight: 700">Provider cost</th>
+              <th style="padding: 8px 6px; font-weight: 700">= in HTG</th>
+              <th style="padding: 8px 6px; font-weight: 700">Selling price</th>
+              <th style="padding: 8px 6px; font-weight: 700">Referral</th>
+              <th style="padding: 8px 6px; font-weight: 700">Bonus</th>
+              <th style="padding: 8px 6px; font-weight: 700">Pay fee</th>
+              <th style="padding: 8px 6px; font-weight: 700">Real profit</th>
+              <th style="padding: 8px 6px; font-weight: 700; text-align: left">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+              <tr style="border-top: 1px solid #EEF0F5; text-align: right">
+                <td style="padding: 11px 6px; text-align: left; font-weight: 700">{{r.name}}</td>
+                <td style="padding: 11px 6px; color: #5B6478">{{r.usd}}</td>
+                <td style="padding: 11px 6px">{{r.cost}}</td>
+                <td style="padding: 11px 6px; font-weight: 700">{{r.sell}}</td>
+                <td style="padding: 11px 6px; color: #5B6478">{{r.ref}}</td>
+                <td style="padding: 11px 6px; color: #5B6478">{{r.bonus}}</td>
+                <td style="padding: 11px 6px; color: #5B6478">{{r.fee}}</td>
+                <td style="{{r.profitStyle}}">{{r.profit}}</td>
+                <td style="padding: 11px 6px; text-align: left"><span style="{{r.badge}}">{{r.status}}</span></td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-wrap: wrap; gap: 16px">
+      <div style="flex: 2 1 460px; min-width: 0; background: #FFFFFF; border: 1px solid #E5E7EF; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Curated picks · TikTok › Abòne</h2>
+        <div style="font-size: 12px; color: #5B6478">Customers see only these 3 choices. Each points to a provider service, with a backup used only if the first one refuses the order.</div>
+        <div style="overflow-x: auto">
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 520px">
+            <thead>
+              <tr style="text-align: left; color: #5B6478; font-size: 12px">
+                <th style="padding: 8px 6px; font-weight: 700">Shown as</th>
+                <th style="padding: 8px 6px; font-weight: 700">Main provider service</th>
+                <th style="padding: 8px 6px; font-weight: 700">Backup</th>
+                <th style="padding: 8px 6px; font-weight: 700">Real avg time</th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{picks}}" as="p" hint-placeholder-count="3">
+                <tr style="border-top: 1px solid #EEF0F5">
+                  <td style="padding: 11px 6px; font-weight: 800">{{p.tier}}</td>
+                  <td style="padding: 11px 6px">{{p.main}}</td>
+                  <td style="padding: 11px 6px; color: #5B6478">{{p.backup}}</td>
+                  <td style="padding: 11px 6px">{{p.avg}}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+        <button type="button" style="align-self: flex-start; min-height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid #CBD2E1; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; color: #0F172A">Edit picks</button>
+      </div>
+
+      <div style="flex: 1 1 300px; min-width: 0; background: #FFFFFF; border: 1px solid #E5E7EF; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">Starter packs</h2>
+        <sc-for list="{{packs}}" as="k" hint-placeholder-count="2">
+          <div style="border: 1px solid #E5E7EF; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px">
+            <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 14px"><span>{{k.name}}</span><span>{{k.price}}</span></div>
+            <div style="font-size: 12px; color: #5B6478">{{k.items}}</div>
+            <div style="font-size: 12px; color: #166534; font-weight: 700">{{k.profit}}</div>
+          </div>
+        </sc-for>
+        <h2 style="margin: 6px 0 0; font-size: 16px; font-weight: 700">VIP levels</h2>
+        <div style="font-size: 13px; line-height: 1.7; color: #334155">Bwonz 0% · <b>Ajan</b> -3% (G 5,000) · <b>Lò</b> -5% (G 15,000) · <b>Dyaman</b> -8% (G 50,000)</div>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1200}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { rate: 131.5, ref: 5, bonus: 5, fee: 3, minp: 15 };
+  }
+  renderVals() {
+    const st = this.state;
+    const n = (v) => Number(v) || 0;
+    const rate = n(st.rate), ref = n(st.ref) / 100, bonus = n(st.bonus) / 100, fee = n(st.fee) / 100, minp = n(st.minp);
+    const g = (v) => (v < 0 ? '−G ' : 'G ') + Math.abs(Math.round(v)).toLocaleString('en-US');
+    const pill = (bg, fg) => 'font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; background: ' + bg + '; color: ' + fg;
+    const data = [
+      ['TikTok Abòne · Pi bon kalite', 1.80, 420],
+      ['TikTok Like · Bon mache', 0.12, 40],
+      ['Instagram Abòne · Bon mache', 1.45, 300],
+      ['YouTube Vi · Pi bon kalite', 1.30, 260],
+      ['TikTok Live · HQ (30 min)', 7.50, 1400],
+      ['Instagram Kòmantè pèsonèl', 9.00, 1800],
+      ['YouTube Abòne · Bon mache', 10.50, 1600],
+      ['Facebook Live (30 min)', 5.00, 700]
+    ];
+    let ok = 0, low = 0, loss = 0;
+    const rows = data.map(([name, usd, sell]) => {
+      const cost = usd * rate, r = sell * ref, b = sell * bonus, f = sell * fee;
+      const profit = sell - cost - r - b - f;
+      const pct = sell ? profit / sell * 100 : 0;
+      let status, badge, color;
+      if (profit < 0) { status = 'Loss: auto-paused'; badge = pill('#FEE2E2', '#991B1B'); color = '#B91C1C'; loss++; }
+      else if (pct < minp) { status = 'Low margin'; badge = pill('#FEF3C7', '#92400E'); color = '#B45309'; low++; }
+      else { status = 'OK'; badge = pill('#DCFCE7', '#166534'); color = '#166534'; ok++; }
+      return { name, usd: '$' + usd.toFixed(2), cost: g(cost), sell: g(sell), ref: '−' + g(r).slice(0), bonus: '−' + g(b), fee: '−' + g(f),
+        profit: g(profit) + ' (' + Math.round(pct) + '%)', profitStyle: 'padding: 11px 6px; font-weight: 800; color: ' + color, status, badge };
+    });
+    const inp = (id, label, key, step, hint) => ({ id, label, step, hint, value: st[key], set: (e) => this.setState({ [key]: e.target.value }) });
+    const navItem = (label, href, on) => ({ label, href, style: 'display: block; padding: 10px 12px; border-radius: 10px; font-size: 14px; text-decoration: none; ' + (on ? 'background: #1E293B; color: #FFFFFF; font-weight: 700' : 'color: #CBD5E1; font-weight: 500') });
+    return {
+      nav: [navItem('Dashboard', 'Admin.dc.html', false), navItem('Orders', '#', false), navItem('Services & risk', 'AdminServices.dc.html', false), navItem('Pricing & profit', 'AdminPricing.dc.html', true), navItem('Providers', '#', false), navItem('Customers', '#', false), navItem('Payments', '#', false), navItem('Referrals', '#', false), navItem('Settings', '#', false)],
+      inputs: [
+        inp('rate', 'Exchange rate (HTG per $1)', 'rate', '0.5', 'Saved on every order'),
+        inp('ref', 'Referral commission %', 'ref', '1', 'Paid on completed orders'),
+        inp('bonus', 'Top-up bonus %', 'bonus', '1', 'Worst case counted'),
+        inp('fee', 'Payment fee %', 'fee', '0.5', 'MonCash / NatCash'),
+        inp('minp', 'Minimum profit %', 'minp', '1', 'Below = warning')
+      ],
+      summary: ok + ' OK · ' + low + ' low margin · ' + loss + ' losing (paused)',
+      rows,
+      picks: [
+        { tier: 'Bon mache', main: 'Provider A · #1043 Followers No Refill', backup: 'Provider C · #88', avg: '6 h (212 orders)' },
+        { tier: 'Pi bon kalite', main: 'Provider B · #221 Real / R30', backup: 'Provider A · #1050', avg: '2 h (530 orders)' },
+        { tier: 'Rapid', main: 'Provider A · #2210 R30 / 20K/Day', backup: '—', avg: '28 min (94 orders)' }
+      ],
+      packs: [
+        { name: 'TikTok Starter', price: 'G 405', items: '500 abòne + 1,000 like + 5,000 vi · -10%', profit: 'Real profit: G 118 (29%)' },
+        { name: 'Insta Starter', price: 'G 360', items: '500 abòne + 1,000 like + 2,000 vi reels · -10%', profit: 'Real profit: G 96 (27%)' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
