@@ -6,7 +6,7 @@ import { placeServiceOrder } from "@/actions/service-order";
 import { formatMoney } from "@/lib/money";
 import { withDiscount } from "@/lib/vip-math";
 import {
-  checkLink, DRIP_INTERVAL_MIN, DRIP_RUNS, LIVE_DURATIONS, linkExample, parseComments, servicePrice, wantsPost,
+  checkLink, isShortLink, DRIP_INTERVAL_MIN, DRIP_RUNS, LIVE_DURATIONS, linkExample, parseComments, servicePrice, wantsPost,
   type Kind, type Risk, type ServiceMeta,
 } from "@/lib/services";
 
@@ -24,7 +24,7 @@ const num = (n: number) => n.toLocaleString("en-US");
 
 /** Rounded chip: dark when selected (mockup "pill"). */
 const pill = (on: boolean) =>
-  `min-h-11 rounded-full border px-3.5 text-sm font-bold transition-colors ${on ? "border-text bg-text text-surface" : "border-[#CBD2E1] bg-surface text-text dark:border-border"}`;
+  `min-h-11 rounded-full border px-3.5 text-sm font-bold transition-colors ${on ? "border-text bg-text text-surface" : "border-border bg-surface text-text"}`;
 
 export type ServiceUpdateView = { id: string; kind: string; text: string; at: string };
 
@@ -73,7 +73,8 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
   const total = withDiscount(servicePrice(tier.rate, quantity, meta.type, dur), discount);
   const check = link.trim() ? checkLink(link, platform.slug, post, meta.postType) : null;
   const linkError = check && !check.ok ? t(`err_${check.error === "empty" ? "not_platform" : check.error}`, { platform: platform.name, example: linkExample(platform.slug, post) }) : "";
-  const linkOk = check?.ok ? (liveAny ? t("okLive") : post ? t("okPost") : t("okProfile")) : "";
+  const shortHint = check?.ok && isShortLink(check.url, platform.slug) ? t("shortLinkHint") : "";
+  const linkOk = check?.ok && !shortHint ? (liveAny ? t("okLive") : post ? t("okPost") : t("okProfile")) : "";
   const rangeError = hasComments
     ? quantity < meta.min ? t("minComments", { min: meta.min }) : quantity > meta.max ? t("range", { min: num(meta.min), max: num(meta.max) }) : ""
     : quantity < meta.min || quantity > meta.max ? t("range", { min: num(meta.min), max: num(meta.max) }) : "";
@@ -153,7 +154,7 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
         <section className="flex flex-col gap-2.5">
           <div className="flex items-baseline justify-between">
             <h2 className="text-[13px] font-bold uppercase tracking-[0.6px] text-muted">{t("chooseQuality")}</h2>
-            <button type="button" onClick={() => setSheet("risk")} className="min-h-9 px-1 text-xs font-bold text-[#00209F] dark:text-primary">{t("whatRisk")}</button>
+            <button type="button" onClick={() => setSheet("risk")} className="min-h-9 px-1 text-xs font-bold text-cyan">{t("whatRisk")}</button>
           </div>
           {service.tiers.map((x, i) => {
             const on = x.id === tier.id;
@@ -176,7 +177,7 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
                   <span className="whitespace-nowrap text-[15px] font-extrabold">{price}</span>
                   <span className="whitespace-nowrap text-[11px] text-muted">{per}</span>
                 </button>
-                <button type="button" onClick={() => { pickTier(i); setTab("info"); document.getElementById("service-details")?.scrollIntoView({ behavior: "smooth", block: "start" }); }} aria-label={t("details", { name: x.name })} className="grid w-11 flex-none place-items-center text-[#64748B]">
+                <button type="button" onClick={() => { pickTier(i); setTab("info"); document.getElementById("service-details")?.scrollIntoView({ behavior: "smooth", block: "start" }); }} aria-label={t("details", { name: x.name })} className="grid w-11 flex-none place-items-center text-muted">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" /></svg>
                 </button>
               </div>
@@ -191,15 +192,17 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
         <section className="flex flex-col gap-2.5">
           <label htmlFor="link" className="text-sm font-semibold">{liveAny ? t("linkLive") : post ? t("linkPost") : t("linkProfile")}</label>
           <input id="link" type="url" inputMode="url" autoComplete="off" value={link} onChange={(e) => setLink(e.target.value)} placeholder={linkExample(platform.slug, post)}
-            className={`h-[50px] rounded-xl bg-surface px-3.5 text-base ${linkError ? "border-2 border-[#DC2626]" : linkOk ? "border-2 border-[#16A34A]" : "border border-[#CBD2E1] dark:border-border"}`} />
-          {linkError && <p role="alert" className="rounded-[10px] bg-[#FEE2E2] px-3 py-2.5 text-[13px] leading-normal text-[#991B1B]">{linkError}</p>}
-          {linkOk && <p className="rounded-[10px] bg-[#DCFCE7] px-3 py-2.5 text-[13px] text-[#166534]">{linkOk}</p>}
+            className={`h-[50px] rounded-xl bg-surface px-3.5 text-base ${linkError ? "border-2 border-danger" : linkOk ? "border-2 border-success" : "border border-border"}`} />
+          {linkError && <p role="alert" className="rounded-[10px] bg-danger-soft px-3 py-2.5 text-[13px] leading-normal text-danger">{linkError}</p>}
+          {shortHint && <p className="rounded-[10px] bg-warning-soft px-3 py-2.5 text-[13px] text-warning">{shortHint}</p>}
+          {linkOk && <p className="rounded-[10px] bg-success-soft px-3 py-2.5 text-[13px] text-success">{linkOk}</p>}
+          {liveAny && !linkError && <p className="text-xs text-muted">{t("liveLinkHint")}</p>}
 
           {!hasComments && (
             <>
               <label htmlFor="qty" className="mt-1 text-sm font-semibold">{t("quantity")}</label>
               <input id="qty" type="number" inputMode="numeric" value={qty} onChange={(e) => setQty(e.target.value)}
-                className="h-[50px] rounded-xl border border-[#CBD2E1] bg-surface px-3.5 text-base dark:border-border" />
+                className="h-[50px] rounded-xl border border-border bg-surface px-3.5 text-base" />
               <div className="grid grid-cols-4 gap-2">
                 {chips.map((n) => (
                   <button key={n} type="button" onClick={() => setQty(String(n))} className={`${pill(quantity === n)} px-0`}>{n >= 1000 ? `${n / 1000}k` : n}</button>
@@ -226,7 +229,7 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
                 <span className="text-[13px] font-bold">{t("commentsCount", { n: commentList.length })}</span>
               </div>
               <textarea id="comments" rows={5} value={comments} onChange={(e) => setComments(e.target.value)}
-                className="rounded-xl border border-[#CBD2E1] bg-surface px-3.5 py-3 text-base leading-normal dark:border-border" />
+                className="rounded-xl border border-border bg-surface px-3.5 py-3 text-base leading-normal" />
               {commentList.length === 1 && commentList[0].includes(",") && (
                 <button type="button" onClick={() => setComments(commentList[0].split(",").map((s) => s.trim()).filter(Boolean).join("\n"))}
                   className="min-h-11 rounded-xl border border-[#F59E0B] bg-[#FFFBEB] text-[13px] font-bold text-[#92400E]">{t("splitCommas")}</button>
@@ -244,7 +247,7 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
             <>
               <label htmlFor="uname" className="mt-1 text-sm font-semibold">{t("commentAuthor")}</label>
               <input id="uname" type="text" autoCapitalize="none" autoCorrect="off" placeholder="@non" value={username} onChange={(e) => setUsername(e.target.value)}
-                className="h-[50px] rounded-xl border border-[#CBD2E1] bg-surface px-3.5 text-base dark:border-border" />
+                className="h-[50px] rounded-xl border border-border bg-surface px-3.5 text-base" />
             </>
           )}
 
@@ -263,7 +266,7 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
               </div>
               <button type="button" onClick={() => setSheet("drip")} aria-label={t("dripWhat")} className="h-10 w-10 flex-none rounded-full bg-surface-2 font-extrabold text-text/80">?</button>
               <button type="button" onClick={() => setDrip((d) => !d)} aria-pressed={drip} aria-label={t("dripToggle")} className="grid h-11 w-[60px] flex-none place-items-center">
-                <span className={`flex h-7 w-12 rounded-full p-[3px] ${drip ? "justify-end bg-text" : "justify-start bg-[#CBD2E1]"}`}><span className="h-[22px] w-[22px] rounded-full bg-white" /></span>
+                <span className={`flex h-7 w-12 rounded-full p-[3px] ${drip ? "justify-end bg-text" : "justify-start bg-surface-2"}`}><span className="h-[22px] w-[22px] rounded-full bg-surface keep-white" /></span>
               </button>
             </div>
           )}
@@ -274,19 +277,19 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
           <div className="flex justify-between gap-2.5 text-sm"><span className="text-muted">{t("service")}</span><span className="text-right font-semibold">{`${platform.name} ${t(`kind_${service.kind}`)} · ${tier.name}`}</span></div>
           <div className="flex justify-between text-sm"><span className="text-muted">{t("quantity")}</span><span className="font-semibold">{hasComments ? t("commentsCount", { n: quantity }) : `${num(quantity)}${isLive ? ` · ${durLabel(dur)}` : ""}`}</span></div>
           <div className="flex justify-between text-sm"><span className="text-muted">{t("avgDelivery")}</span><span className="font-semibold">{meta.avg[locale]}</span></div>
-          {discount > 0 && <div className="flex justify-between text-sm"><span className="text-muted">VIP</span><span className="font-semibold text-[#166534] dark:text-success">-{discount}%</span></div>}
+          {discount > 0 && <div className="flex justify-between text-sm"><span className="text-muted">VIP</span><span className="font-semibold text-success">-{discount}%</span></div>}
           <div className="my-1 h-px bg-border" />
           <div className="flex items-baseline justify-between"><span className="text-[15px] font-bold">{t("total")}</span><span className="text-2xl font-extrabold">{fmt(total)}</span></div>
-          {rangeError && <p className="rounded-[10px] bg-[#FEF3C7] px-3 py-2.5 text-[13px] text-[#92400E]">{rangeError}</p>}
+          {rangeError && <p className="rounded-[10px] bg-warning-soft px-3 py-2.5 text-[13px] text-warning">{rangeError}</p>}
           {short && (
-            <p className="rounded-[10px] bg-[#FEE2E2] px-3 py-2.5 text-[13px] text-[#991B1B]">
-              {t("short")} <Link href="/account/wallet" className="font-bold text-[#991B1B] underline">{t("addFunds")}</Link>
+            <p className="rounded-[10px] bg-danger-soft px-3 py-2.5 text-[13px] text-danger">
+              {t("short")} <Link href="/account/wallet" className="font-bold text-danger underline">{t("addFunds")}</Link>
             </p>
           )}
         </section>
 
         <label className="flex cursor-pointer items-start gap-2.5 rounded-2xl border border-border bg-surface p-3.5 text-[13px] leading-normal">
-          <input type="checkbox" checked={isPublic} onChange={() => setIsPublic((v) => !v)} className="m-0 h-[22px] w-[22px] flex-none accent-[#0F172A]" />
+          <input type="checkbox" checked={isPublic} onChange={() => setIsPublic((v) => !v)} className="m-0 h-[22px] w-[22px] flex-none accent-text" />
           <span>{t("publicConfirm")}</span>
         </label>
 
@@ -297,10 +300,10 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
           </label>
         )}
 
-        {error && <p role="alert" className="rounded-[10px] bg-[#FEE2E2] px-3 py-2.5 text-[13px] text-[#991B1B]">{error}</p>}
+        {error && <p role="alert" className="rounded-[10px] bg-danger-soft px-3 py-2.5 text-[13px] text-danger">{error}</p>}
         {signedIn ? (
           <button type="button" onClick={submit} disabled={!ready || pending}
-            className={`flex h-[54px] items-center justify-center rounded-[14px] text-base font-bold ${ready && !pending ? "bg-text text-surface" : "bg-[#CBD5E1] text-[#475569]"}`}>
+            className={`flex h-[54px] items-center justify-center rounded-[14px] text-base font-bold ${ready && !pending ? "bg-text text-surface" : "bg-surface-2 text-muted"}`}>
             {pending ? t("sending") : t("confirm", { total: fmt(total) })}
           </button>
         ) : (
@@ -313,10 +316,10 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
         <div className="fixed inset-0 z-50 flex flex-col justify-end bg-[rgba(15,23,42,0.55)]" onClick={() => setSheet(null)}>
           <div role="dialog" aria-modal="true" aria-label={info.title} onClick={(e) => e.stopPropagation()}
             className="mx-auto flex w-full max-w-[560px] flex-col gap-3.5 rounded-t-[22px] bg-surface px-[22px] pb-[calc(30px+env(safe-area-inset-bottom,0px))] pt-3">
-            <div className="h-[5px] w-10 self-center rounded-full bg-[#CBD2E1]" />
+            <div className="h-[5px] w-10 self-center rounded-full bg-border" />
             <h2 className="text-lg font-extrabold">{info.title}</h2>
             <p className="whitespace-pre-line text-[15px] leading-relaxed text-text/80">{info.text}</p>
-            {info.example && <div className="whitespace-pre-line rounded-xl bg-[#EEF1FF] px-3.5 py-3 text-sm leading-normal text-[#1E3A8A]">{info.example}</div>}
+            {info.example && <div className="whitespace-pre-line rounded-xl bg-primary-soft px-3.5 py-3 text-sm leading-normal text-cyan">{info.example}</div>}
             <button type="button" onClick={() => setSheet(null)} className="h-[50px] rounded-[14px] bg-text text-base font-bold text-surface">{t("gotIt")}</button>
           </div>
         </div>
@@ -325,7 +328,7 @@ export function OrderForm({ catalog, balance, signedIn, initial, discount = 0, u
   );
 }
 
-const TILE_TONE = { good: "bg-[#DCFCE7] text-[#166534]", warn: "bg-[#FEF3C7] text-[#92400E]", bad: "bg-[#FEE2E2] text-[#991B1B]", info: "bg-[#DBEAFE] text-[#1E40AF]" } as const;
+const TILE_TONE = { good: "bg-success-soft text-success", warn: "bg-warning-soft text-warning", bad: "bg-danger-soft text-danger", info: "bg-primary-soft text-cyan" } as const;
 type Tone = keyof typeof TILE_TONE;
 
 /** Details card (as on big SMM panels): tiles for the selected choice, then "read before ordering" and service news. */

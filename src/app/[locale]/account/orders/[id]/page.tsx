@@ -94,7 +94,7 @@ export default async function OrderPage({ params }: { params: Promise<{ locale: 
               <div>
                 <p className="font-medium">{itemTitle(item, locale)} × {item.quantity}</p>
                 <dl className="mt-1 space-y-0.5 text-sm">
-                  {Object.entries(item.fieldValues as Record<string, string>).filter(([k]) => !["riskAcceptedAt", "trial", "amountUsd", "feeUsd", "rate"].includes(k)).map(([k, v]) => (
+                  {Object.entries(item.fieldValues as Record<string, string>).filter(([k]) => !["link","quantity","noWarrantyAcceptedAt","publicConfirmedAt","riskAcceptedAt","trial","amountUsd","feeUsd","rate","publicOk"].includes(k)).map(([k, v]) => (
                     <div key={k} className="flex gap-1.5"><dt className="text-muted">{td.has(k) ? td(k) : k}:</dt><dd className="min-w-0 whitespace-pre-line break-all font-medium">{v}</dd></div>
                   ))}
                 </dl>
@@ -104,27 +104,54 @@ export default async function OrderPage({ params }: { params: Promise<{ locale: 
                 <StatusBadge status={item.status} label={to(`itemStatus.${item.status}`)} />
               </div>
             </div>
-            {item.codes.length > 0 && (
-              <div className="rounded-xl bg-surface-2 p-4">
-                <p className="mb-2 text-sm font-semibold">{to("yourCodes")}</p>
+            {item.codes.length > 0 && (() => {
+              const tags = item.variant.product.tags;
+              const isSms = tags.includes("kind:sms");
+              const isAccount = tags.includes("kind:account");
+              const title = isSms ? to("yourSms") : isAccount ? to("yourAccount") : to("yourCodes");
+              return (
+              <div className="rounded-xl border border-border bg-surface-2 p-4">
+                <p className="mb-2 text-sm font-semibold text-text">{title}</p>
                 <ul className="space-y-2">
                   {item.codes.map((c) => {
-                    const code = revealCode(c.codeEncrypted);
+                    const raw = revealCode(c.codeEncrypted);
+                    // Account lines: prefer user:pass split when provider returns "user:pass" or "user|pass".
+                    const parts = isAccount ? raw.split(/[:|\t]/).map((x) => x.trim()).filter(Boolean) : [];
+                    const user = parts.length >= 2 ? parts[0] : null;
+                    const pass = parts.length >= 2 ? parts.slice(1).join(":") : null;
                     return (
-                      <li key={c.id} className="flex items-center justify-between gap-3 rounded-lg bg-surface px-3 py-2">
-                        <code className="break-all font-mono text-sm font-semibold">{code}</code>
-                        <CopyButton value={code} label={to("copy")} done={to("copied")} />
+                      <li key={c.id} className="flex flex-col gap-1.5 rounded-lg border border-border bg-surface px-3 py-2">
+                        {user && pass ? (
+                          <>
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-xs font-semibold text-muted">{to("accountUser")}</span>
+                              <code className="break-all font-mono text-sm font-semibold text-text">{user}</code>
+                              <CopyButton value={user} label={to("copy")} done={to("copied")} />
+                            </div>
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-xs font-semibold text-muted">{to("accountPass")}</span>
+                              <code className="break-all font-mono text-sm font-semibold text-text">{pass}</code>
+                              <CopyButton value={pass} label={to("copy")} done={to("copied")} />
+                            </div>
+                          </>
+                        ) : (
+                          <div className="flex items-center justify-between gap-3">
+                            <code className="break-all font-mono text-sm font-semibold text-text">{raw}</code>
+                            <CopyButton value={raw} label={to("copy")} done={to("copied")} />
+                          </div>
+                        )}
                       </li>
                     );
                   })}
                 </ul>
               </div>
-            )}
+              );
+            })()}
             {item.supplierOrders[0] && (() => {
               const qty = Number((item.fieldValues as Record<string, string> | null)?.quantity) || 0;
               const part = item.supplierOrders[0];
               return (
-                <p className="rounded-xl bg-[#FEF3C7] p-4 text-sm text-[#92400E]">
+                <p className="rounded-xl bg-warning-soft p-4 text-sm text-warning">
                   {tu("notePartial", { done: Math.max(0, qty - (part.remains ?? 0)).toLocaleString("en-US"), total: qty.toLocaleString("en-US"), amount: formatMoney(part.refundedPartial ?? 0, order.currency, locale) })}
                 </p>
               );
