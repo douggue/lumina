@@ -6,8 +6,10 @@ import { siteUrl } from "../site-url";
 import { callSupplier } from "./engine";
 import type { CallResult, SupplierConfig } from "./types";
 import { isSmm, runSmmChecks, sendSmm, smmInclude } from "./smm-orders";
+import { checkYtseller, isYtseller, runYtsellerChecks, sendYtseller, ytInclude } from "./ytseller-orders";
 
 const SMM_PRESETS = ["smm_panel", "smm_mock"];
+const SPECIAL_PRESETS = [...SMM_PRESETS, "ytseller"];
 
 /**
  * Supplier orders, step by step:
@@ -120,6 +122,16 @@ export async function sendQueued(orderId?: string): Promise<string[]> {
       });
       continue;
     }
+    if (isYtseller(smm.supplier.preset)) {
+      const yt = await prisma.supplierOrder.findUniqueOrThrow({ where: { id: q.id }, include: ytInclude });
+      try {
+        if ((await sendYtseller(yt)) === "delivered") delivered.push(yt.orderItem.orderId);
+      } catch (e) {
+        console.error("YTSeller send failed", q.id, e);
+        await prisma.supplierOrder.updateMany({ where: { id: q.id, status: "SENDING" }, data: { status: "UNKNOWN", nextCheckAt: new Date(), message: "Sending stopped with an error: checking with YTSeller (trans_id kept)" } });
+      }
+      continue;
+    }
     const so = await prisma.supplierOrder.findUniqueOrThrow({ where: { id: q.id }, include });
     let r: CallResult;
     try {
@@ -138,6 +150,7 @@ export async function sendQueued(orderId?: string): Promise<string[]> {
 export async function checkSupplierOrder(id: string, force = false): Promise<string | null> {
   const row = await prisma.supplierOrder.findUnique({ where: { id }, select: { supplier: { select: { preset: true } } } });
   if (row && isSmm(row.supplier.preset)) return (await runSmmChecks([id]))[0] ?? null;
+  if (row && isYtseller(row.supplier.preset)) return checkYtseller(id, force);
   const claim = await prisma.supplierOrder.updateMany({
     where: { id, status: { in: force ? ["PENDING", "UNKNOWN", "FAILED"] : ["PENDING", "UNKNOWN"] }, OR: [{ lockedUntil: null }, { lockedUntil: { lt: new Date() } }] },
     data: { lockedUntil: new Date(Date.now() + 60_000), checks: { increment: 1 } },
@@ -173,7 +186,7 @@ export async function runSupplierCron() {
   // A send interrupted mid-way (server stopped) may or may not have reached the supplier: check, don't re-send.
   const stale = new Date(now - 2 * 60_000);
   const interrupted = await prisma.supplierOrder.updateMany({
-    where: { status: "SENDING", updatedAt: { lt: stale }, supplier: { preset: { notIn: SMM_PRESETS } } },
+    where: { status: "SENDING", updatedAt: { lt: stale }, supplier: { preset: { notIn: SPECIAL_PRESETS } } },
     data: { status: "UNKNOWN", nextCheckAt: new Date(), message: "Sending was interrupted: checking with the supplier" },
   });
   // SMM panels can't be asked about an order by our reference: an interrupted send goes to staff.
@@ -181,15 +194,21 @@ export async function runSupplierCron() {
     where: { status: "SENDING", updatedAt: { lt: stale }, supplier: { preset: { in: SMM_PRESETS } } },
     data: { status: "UNKNOWN", nextCheckAt: null, message: "Sending was interrupted: check on the provider's site, then close or retry here" },
   });
+  // YTSeller uses trans_id: interrupted send can be reconciled via status / never re-add blindly.
+  const ytInterrupted = await prisma.supplierOrder.updateMany({
+    where: { status: "SENDING", updatedAt: { lt: stale }, supplier: { preset: "ytseller" } },
+    data: { status: "UNKNOWN", nextCheckAt: new Date(), message: "Sending was interrupted: checking with YTSeller" },
+  });
   const delivered = await sendQueued();
   delivered.push(...(await runSmmChecks().catch((e) => (console.error("SMM checks failed", e), []))));
-  const due = await prisma.supplierOrder.findMany({ where: { status: { in: ["PENDING", "UNKNOWN"] }, nextCheckAt: { lte: new Date() }, supplier: { preset: { notIn: SMM_PRESETS } } }, select: { id: true }, orderBy: { nextCheckAt: "asc" }, take: 30 });
+  delivered.push(...(await runYtsellerChecks().catch((e) => (console.error("YTSeller checks failed", e), []))));
+  const due = await prisma.supplierOrder.findMany({ where: { status: { in: ["PENDING", "UNKNOWN"] }, nextCheckAt: { lte: new Date() }, supplier: { preset: { notIn: SPECIAL_PRESETS } } }, select: { id: true }, orderBy: { nextCheckAt: "asc" }, take: 30 });
   for (const d of due) {
     const o = await checkSupplierOrder(d.id).catch((e) => (console.error("supplier check failed", d.id, e), null));
     if (o) delivered.push(o);
   }
   await finishOrders(delivered);
-  return { supplierInterrupted: interrupted.count + smmInterrupted.count, supplierChecked: due.length, supplierDelivered: delivered.length };
+  return { supplierInterrupted: interrupted.count + smmInterrupted.count + ytInterrupted.count, supplierChecked: due.length, supplierDelivered: delivered.length };
 }
 
 /** After lines were delivered: let fulfillOrder close the order and tell the customer. */

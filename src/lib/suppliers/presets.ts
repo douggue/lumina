@@ -221,6 +221,41 @@ export const PRESETS: Record<string, Preset> = {
     },
   },
 
+  ytseller: {
+    label: "YTSeller (accounts + SMS numbers)",
+    baseUrl: "https://ytseller.com/api/v2",
+    skuHelp: "YTSeller product id (from Sync / products)",
+    config: {
+      secrets: ["apiKey"],
+      notes: "Accounts and SMS verification numbers. Orders use trans_id = our reference so a resend never buys twice. Delivered login/SMS lines are stored encrypted. Sync the product catalog from Admin → Services (or this supplier).",
+      order: {
+        method: "POST",
+        path: "",
+        encoding: "form",
+        body: { key: "{{secret.apiKey}}", action: "add_product_order", product_id: "{{sku}}", quantity: "{{quantity}}", trans_id: "{{ref}}" },
+        map: { orderId: "order", message: "error" },
+        errorPath: "error",
+        okOutcome: "PENDING",
+      },
+      status: {
+        method: "POST",
+        path: "",
+        encoding: "form",
+        body: { key: "{{secret.apiKey}}", action: "product_order_status", order: "{{supplierOrderId}}" },
+        map: { status: "status", message: "error" },
+        statusMap: { completed: "SUCCESS", pending: "PENDING", processing: "PENDING", "in progress": "PENDING", canceled: "FAILED", cancelled: "FAILED", partial: "PENDING" },
+      },
+      codes: {
+        method: "POST",
+        path: "",
+        encoding: "form",
+        body: { key: "{{secret.apiKey}}", action: "result_product", order: "{{supplierOrderId}}" },
+        map: { codes: "result" },
+      },
+      balance: { method: "POST", path: "", encoding: "form", body: { key: "{{secret.apiKey}}", action: "balance" }, map: { balance: "balance", currency: "currency" } },
+    },
+  },
+
   smm_mock: {
     label: "Test SMM panel (fake, for trying the setup; key: mock-key)",
     baseUrl: "/api/suppliers/mock-smm",
