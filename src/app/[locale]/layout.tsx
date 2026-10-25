@@ -13,7 +13,6 @@ import { AnnouncementBar } from "@/components/AnnouncementBar";
 import { alternates } from "@/lib/seo";
 import { themeAttrs, themeCss, themeScript, cssGuardScript } from "@/lib/theme-css";
 import { fullTheme } from "@/lib/settings";
-import { Plus_Jakarta_Sans } from "next/font/google";
 import { cookies, headers } from "next/headers";
 import { getUser } from "@/lib/session";
 import { ServiceWorker } from "@/components/ServiceWorker";
@@ -44,10 +43,6 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
-// Self-hosted at build time by Next.js (no request to Google from visitors' phones).
-const sans = Plus_Jakarta_Sans({ subsets: ["latin", "latin-ext"], variable: "--font-body", display: "swap" });
-const display = Plus_Jakarta_Sans({ subsets: ["latin", "latin-ext"], weight: ["700", "800"], variable: "--font-display-face", display: "swap" });
-
 export default async function LocaleLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
@@ -60,7 +55,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   const dark = themeCookie ? themeCookie === "dark" : fullTheme(settings.theme).defaultMode === "dark";
 
   return (
-    <html lang={locale} suppressHydrationWarning className={`${sans.variable} ${display.variable}${dataSaver ? " data-saver" : ""}${dark ? " dark" : ""}`} {...themeAttrs(settings.theme)}>
+    <html lang={locale} suppressHydrationWarning className={`${dataSaver ? "data-saver" : ""}${dark ? " dark" : ""}`.trim()} {...themeAttrs(settings.theme)}>
       <head>
         {/* Applies light/dark before paint to avoid a flash */}
         <script dangerouslySetInnerHTML={{ __html: themeScript(fullTheme(settings.theme).defaultMode) }} />
