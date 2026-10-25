@@ -56,3 +56,12 @@ After short-link resolve + `checkLink`, `socialAccountKey(url, platform)` stores
 - Instagram/YouTube **video** URLs without channel id fall back to media/video keys (not the channel) — profile/follower trials are the strong case.
 - Auto-approve is **off** by default (`trialAutoApprove: false`).
 - Device id still primarily `hv_dev` cookie; multi-storage hash not required for this slice.
+
+## C) Customer helpers (order page)
+
+| Action | Result |
+|---|---|
+| `refreshDeliveryCodes(orderId)` | `{ ok, added }` — re-fetch `result_product`, append new lines only |
+| `generateAccount2fa({ orderId, codeItemId?, secret? })` | `{ ok, code, expiresIn }` — local TOTP from Base32 secret on a delivered line |
+
+Partial/Canceled YTSeller orders auto-refund like SMM. Admin `providerAlerts` includes YTSeller.

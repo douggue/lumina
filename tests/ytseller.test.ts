@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 vi.mock("@/lib/db", () => ({ prisma: {} }));
-import { mapYtProduct, parseYtResult, ytOutcome } from "@/lib/suppliers/ytseller";
+import { mapYtProduct, parseYtResult, ytOutcome, ytPartialRefund } from "@/lib/suppliers/ytseller";
 import { socialAccountKey, socialAccountFromUrl } from "@/lib/social-account";
 import { isDisposableEmail, scoreTrialRisk, DEFAULT_TRIAL_THRESHOLDS } from "@/lib/trial-risk";
 
@@ -73,5 +73,14 @@ describe("trial risk score", () => {
   it("flags disposable domains", () => {
     expect(isDisposableEmail("a@mailinator.com")).toBe(true);
     expect(isDisposableEmail("a@gmail.com")).toBe(false);
+  });
+});
+
+describe("YTSeller partial refund math", () => {
+  it("pro-rates the line price by remains", () => {
+    expect(ytPartialRefund(1000, 10, 4)).toBe(400);
+    expect(ytPartialRefund(1000, 10, 0)).toBe(0);
+    expect(ytPartialRefund(1000, 10, 10)).toBe(1000);
+    expect(ytPartialRefund(1000, 0, 5)).toBe(0);
   });
 });
