@@ -104,7 +104,7 @@ export function ThemeSegment() {
     setMode(m);
   };
   return (
-    <div role="group" aria-label={t("theme")} className="flex overflow-hidden rounded-[10px] border border-[#CBD2E1] dark:border-border">
+    <div role="group" aria-label={t("theme")} className="flex overflow-hidden rounded-[10px] border border-border">
       {(["light", "dark", "system"] as const).map((m) => (
         <button key={m} type="button" onClick={() => pick(m)} aria-pressed={m === mode}
           className={`h-9 min-w-11 px-2.5 text-[13px] font-bold ${m === mode ? "bg-text text-surface" : "bg-surface text-text/80"}`}>
@@ -162,7 +162,7 @@ export function LangSegment({ full = false }: { full?: boolean }) {
   const t = useTranslations("common");
   const { locale, change, pending } = useChangeLocale();
   return (
-    <div role="group" aria-label={t("language")} className={`flex overflow-hidden rounded-[10px] border border-[#CBD2E1] dark:border-border ${pending ? "opacity-60" : ""}`}>
+    <div role="group" aria-label={t("language")} className={`flex overflow-hidden rounded-[10px] border border-border ${pending ? "opacity-60" : ""}`}>
       {locales.map((l) => (
         <button key={l} type="button" onClick={() => change(l)} aria-pressed={l === locale}
           className={`h-9 min-w-11 px-2 ${full ? "px-3 text-[13px] font-bold" : "text-xs font-extrabold"} ${l === locale ? "bg-text text-surface" : "bg-surface text-text/80"}`}>

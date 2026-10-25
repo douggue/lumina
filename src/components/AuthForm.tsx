@@ -120,7 +120,7 @@ export function AuthForm({ mode: firstMode, google = false }: { mode: "login" | 
 
   const [agree, setAgree] = useState(false);
   const tab = (on: boolean) => `flex min-h-[42px] items-center justify-center rounded-[9px] text-sm font-bold ${on ? "bg-surface text-text shadow-[0_1px_3px_rgba(15,23,42,0.12)]" : "text-muted"}`;
-  const field = "h-[50px] w-full rounded-xl border border-[#CBD2E1] bg-surface px-3.5 text-base dark:border-border";
+  const field = "h-[50px] w-full rounded-xl border border-border bg-surface px-3.5 text-base";
   return (
     <form method="post" onSubmit={onSubmit} className="mx-auto flex w-full max-w-md flex-col gap-5 px-6 pb-10 pt-7">
       <div className="flex items-center justify-between">
@@ -150,7 +150,7 @@ export function AuthForm({ mode: firstMode, google = false }: { mode: "login" | 
                 setError(tg("error"));
               }
             }}
-            className="flex h-[52px] w-full items-center justify-center gap-2.5 rounded-[14px] border border-[#CBD2E1] bg-white text-[15px] font-bold text-[#0F172A] disabled:opacity-60"
+            className="flex h-[52px] w-full items-center justify-center gap-2.5 rounded-[14px] border border-border keep-white bg-white text-[15px] font-bold text-[#0F172A] disabled:opacity-60"
           >
             <GoogleLogo />
             {tg("continue")}
@@ -206,7 +206,7 @@ export function AuthForm({ mode: firstMode, google = false }: { mode: "login" | 
       <Turnstile key={captchaKey} onToken={setCaptcha} locale={locale} />
       {error && <p className="rounded-xl bg-danger-soft px-4 py-3 text-sm text-danger" role="alert">{error}</p>}
       <button
-        className="flex h-[54px] w-full items-center justify-center rounded-[14px] bg-text text-base font-bold text-surface disabled:bg-[#CBD5E1] disabled:text-[#475569]"
+        className="flex h-[54px] w-full items-center justify-center rounded-[14px] bg-text text-base font-bold text-surface disabled:bg-surface-2 disabled:text-muted"
         disabled={loading || !hydrated || (turnstileOn && !captcha) || (mode === "register" && !agree)}
       >
         {loading ? tc("loading") : mode === "login" ? tu("tabLogin") : tu("tabRegister")}

@@ -22,7 +22,7 @@ export function OrderLookup({ signedIn }: { signedIn: boolean }) {
       ) : (
         <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); start(async () => setResult(await lookupOrder(Number(q.replace(/\D/g, ""))))); }}>
           <input id="lookup" inputMode="numeric" placeholder={t("lookupPlaceholder")} value={q} onChange={(e) => { setQ(e.target.value); setResult(null); }}
-            className="h-12 min-w-0 flex-1 rounded-xl border border-[#CBD2E1] bg-surface px-3 text-base dark:border-border" />
+            className="h-12 min-w-0 flex-1 rounded-xl border border-border bg-surface px-3 text-base" />
           <button disabled={pending || !q.trim()} className="h-12 flex-none rounded-xl bg-text px-4 text-sm font-bold text-surface disabled:opacity-60">{t("search")}</button>
         </form>
       )}
