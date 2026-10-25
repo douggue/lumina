@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ht">
+<head>
+<meta charset="utf-8">
+<title>HaitiViral – Notifikasyon</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#00209F}a:hover{color:#001670}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F5F6FB; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0F172A; display: flex; flex-direction: column; overflow: hidden">
+
+  <header style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #FFFFFF; border-bottom: 1px solid #E5E7EF">
+    <a href="Main.dc.html" aria-label="Retounen" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #0F172A; border-radius: 12px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </a>
+    <h1 style="margin: 0; font-size: 18px; font-weight: 800; flex: 1">Notifikasyon</h1>
+    <button type="button" style="min-height: 44px; padding: 0 10px; background: none; border: none; font: inherit; font-size: 13px; font-weight: 700; color: #00209F">Make tout li</button>
+  </header>
+
+  <main style="flex: 1; overflow: hidden; padding: 16px 20px; display: flex; flex-direction: column; gap: 10px">
+    <section style="background: #0F172A; color: #FFFFFF; border-radius: 16px; padding: 14px; display: flex; gap: 12px; align-items: center">
+      <div style="width: 44px; height: 44px; border-radius: 12px; background: #FFFFFF; color: #0F172A; display: flex; align-items: center; justify-content: center; flex: none">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3"></rect><path d="M11 18h2"></path></svg>
+      </div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 3px">
+        <div style="font-size: 14px; font-weight: 800">Enstale HaitiViral</div>
+        <div style="font-size: 12px; line-height: 1.45; color: #CBD5E1">Sou iPhone: peze Pataje, apre "Ajoute sou ekran akèy". Konsa w ap resevwa notifikasyon yo.</div>
+      </div>
+    </section>
+
+    <sc-for list="{{items}}" as="n" hint-placeholder-count="5">
+      <a href="{{n.href}}" style="{{n.style}}">
+        <div style="{{n.iconStyle}}">{{n.icon}}</div>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 3px">
+          <div style="font-size: 14px; font-weight: 700">{{n.title}}</div>
+          <div style="font-size: 13px; line-height: 1.45; color: #334155">{{n.text}}</div>
+          <div style="font-size: 11px; color: #64748B">{{n.time}}</div>
+        </div>
+      </a>
+    </sc-for>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const n = (title, text, time, kind, unread, href) => {
+      const K = { ok: ['#DCFCE7', '#166534', '✓'], money: ['#DBEAFE', '#1E40AF', 'G'], refund: ['#FEF3C7', '#92400E', '↺'], promo: ['#FCE7F3', '#9D174D', '%'] };
+      return { title, text, time, href,
+        icon: K[kind][2],
+        iconStyle: 'width: 40px; height: 40px; border-radius: 12px; flex: none; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; background: ' + K[kind][0] + '; color: ' + K[kind][1],
+        style: 'display: flex; gap: 12px; padding: 12px 14px; border-radius: 14px; text-decoration: none; color: #0F172A; ' + (unread ? 'background: #FFFFFF; border: 1px solid #C7D2FE; box-shadow: inset 3px 0 0 #0F172A' : 'background: #FFFFFF; border: 1px solid #E5E7EF') };
+    };
+    return {
+      items: [
+        n('Kòmand #10482 fini', 'TikTok Abòne · 1,000 rive sou kont ou.', 'Gen 5 minit', 'ok', true, 'Orders.dc.html'),
+        n('Depo resevwa', 'G 1,000 MonCash antre nan bous ou.', 'Jodi a 1:52 PM', 'money', true, 'Wallet.dc.html'),
+        n('Ranbousman pasyèl', 'Kòmand #10479: G 300 tounen nan bous ou.', '18 okt', 'refund', false, 'Orders.dc.html'),
+        n('Komisyon zanmi', 'studio509 fè yon kòmand: +G 45 (disponib nan 7 jou).', '17 okt', 'money', false, 'Referral.dc.html'),
+        n('Pwomosyon', 'Wikenn sa a: -10% sou tout sèvis Live.', '15 okt', 'promo', false, 'NewOrder.dc.html')
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
