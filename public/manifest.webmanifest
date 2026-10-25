@@ -1,0 +1,78 @@
+{
+  "id": "/",
+  "name": "HaitiViral",
+  "short_name": "HaitiViral",
+  "description": "Abòne, like, vi ak live pou rezo sosyal ou, peye ak MonCash oswa NatCash.",
+  "start_url": "/?source=app",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "portrait",
+  "background_color": "#F5F6FB",
+  "theme_color": "#FFFFFF",
+  "lang": "ht",
+  "dir": "ltr",
+  "categories": [
+    "social",
+    "shopping",
+    "business"
+  ],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nouvo kòmand / Nouvelle commande",
+      "short_name": "Kòmande",
+      "url": "/store?source=app",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Kòmand mwen yo / Mes commandes",
+      "short_name": "Kòmand",
+      "url": "/account/orders?source=app",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Ajoute kòb / Ajouter des fonds",
+      "short_name": "Bous",
+      "url": "/account/wallet?source=app",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
