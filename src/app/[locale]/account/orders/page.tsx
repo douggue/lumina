@@ -10,12 +10,12 @@ import { PageBar } from "@/components/PageBar";
 import { OrderHelpButton } from "@/components/OrderHelpButton";
 
 type Look = "run" | "done" | "partial" | "cancel" | "wait";
-const LOOK: Record<Look, [bg: string, fg: string, bar: string]> = {
-  run: ["#DBEAFE", "#1E40AF", "#2563EB"],
-  done: ["#DCFCE7", "#166534", "#16A34A"],
-  partial: ["#FEF3C7", "#92400E", "#D97706"],
-  cancel: ["#FEE2E2", "#991B1B", "#DC2626"],
-  wait: ["#F1F5F9", "#334155", "#94A3B8"],
+const LOOK: Record<Look, { badge: string; bar: string; note: string }> = {
+  run: { badge: "bg-primary-soft text-primary", bar: "bg-primary", note: "bg-primary-soft text-primary" },
+  done: { badge: "bg-success-soft text-success", bar: "bg-success", note: "bg-success-soft text-success" },
+  partial: { badge: "bg-warning-soft text-warning", bar: "bg-warning", note: "bg-warning-soft text-warning" },
+  cancel: { badge: "bg-danger-soft text-danger", bar: "bg-danger", note: "bg-danger-soft text-danger" },
+  wait: { badge: "bg-surface-2 text-muted", bar: "bg-muted", note: "bg-surface-2 text-muted" },
 };
 const lookOf = (s: OrderStatus): Look =>
   s === "FULFILLED" ? "done" : s === "PAID" || s === "PROCESSING" ? "run" : s === "AWAITING_PAYMENT" || s === "PAYMENT_REVIEW" ? "wait" : "cancel";
@@ -92,7 +92,7 @@ export default async function OrdersPage({ params, searchParams }: { params: Pro
           const so = item?.supplierOrders[0];
           const refundedPart = o.items.reduce((a, i) => a + (i.supplierOrders[0]?.refundedPartial ?? 0), 0);
           const look: Look = refundedPart > 0 && o.status === "FULFILLED" ? "partial" : lookOf(o.status);
-          const [bg, fg, bar] = LOOK[look];
+          const tone = LOOK[look];
           // Real progress from the provider when known (quantity − remains), otherwise a small "started" bar.
           const done = look === "done" ? qty : o.items.reduce((a, i) => a + lineDone(i), 0);
           const pct = look === "done" ? 100 : qty && done ? Math.round((done / qty) * 100) : look === "run" ? 8 : 0;
@@ -114,9 +114,9 @@ export default async function OrdersPage({ params, searchParams }: { params: Pro
                     <span className="text-xs text-muted">#{o.number} · {day(o.createdAt)}</span>
                   </span>
                 </span>
-                <span className="flex-none rounded-full px-2.5 py-[5px] text-xs font-bold" style={{ background: bg, color: fg }}>{statusLabel}</span>
+                <span className={`flex-none rounded-full px-2.5 py-[5px] text-xs font-bold ${tone.badge}`}>{statusLabel}</span>
               </Link>
-              <div className="h-2 overflow-hidden rounded-full bg-[#EEF0F5] dark:bg-surface-2"><div className="h-full rounded-full" style={{ width: `${pct}%`, background: bar }} /></div>
+              <div className="h-2 overflow-hidden rounded-full bg-surface-2"><div className={`h-full rounded-full ${tone.bar}`} style={{ width: `${pct}%` }} /></div>
               {pack && (
                 <ul className="flex flex-col gap-1 rounded-[10px] bg-surface-2 px-3 py-2 text-xs">
                   {o.items.map((i) => {
@@ -124,7 +124,7 @@ export default async function OrdersPage({ params, searchParams }: { params: Pro
                     return (
                       <li key={i.id} className="flex justify-between gap-2">
                         <span className="truncate">{txt(i.variant.product.name, locale)}</span>
-                        <span className={`flex-none font-semibold ${i.status === "FAILED" ? "text-[#B91C1C]" : ""}`}>{i.status === "FAILED" ? t("lineRefunded") : `${lineDone(i).toLocaleString("en-US")} / ${q.toLocaleString("en-US")}`}</span>
+                        <span className={`flex-none font-semibold ${i.status === "FAILED" ? "text-danger" : ""}`}>{i.status === "FAILED" ? t("lineRefunded") : `${lineDone(i).toLocaleString("en-US")} / ${q.toLocaleString("en-US")}`}</span>
                       </li>
                     );
                   })}
@@ -135,8 +135,8 @@ export default async function OrdersPage({ params, searchParams }: { params: Pro
                 <span>{qty ? t("delivered", { done: done.toLocaleString("en-US"), total: qty.toLocaleString("en-US") }) : ""}</span>
                 <span className="font-bold text-text">{o.total === 0 ? t("free") : formatMoney(o.total, o.currency, locale)}</span>
               </div>
-              {look === "partial" && <p className="rounded-[10px] px-3 py-2.5 text-xs leading-normal dark:!bg-surface-2 dark:!text-text" style={{ background: bg, color: fg }}>{t("notePartial", { done: done.toLocaleString("en-US"), total: qty.toLocaleString("en-US"), amount: formatMoney(refundedPart, o.currency, locale) })}</p>}
-              {refunded && <p className="rounded-[10px] px-3 py-2.5 text-xs leading-normal dark:!bg-surface-2 dark:!text-text" style={{ background: bg, color: fg }}>{t("noteRefunded", { amount: formatMoney(o.total, o.currency, locale) })}</p>}
+              {look === "partial" && <p className={`rounded-[10px] px-3 py-2.5 text-xs leading-normal ${tone.note}`}>{t("notePartial", { done: done.toLocaleString("en-US"), total: qty.toLocaleString("en-US"), amount: formatMoney(refundedPart, o.currency, locale) })}</p>}
+              {refunded && <p className={`rounded-[10px] px-3 py-2.5 text-xs leading-normal ${tone.note}`}>{t("noteRefunded", { amount: formatMoney(o.total, o.currency, locale) })}</p>}
               {(look === "done" || look === "partial") && (
                 <div className="flex gap-2">
                   {!pack && !!meta?.refillDays && (
@@ -151,9 +151,9 @@ export default async function OrdersPage({ params, searchParams }: { params: Pro
                   )}
                 </div>
               )}
-              {look === "run" && meta && <p className="text-xs text-[#1E40AF] dark:text-primary">{t("avg", { time: txt(meta.avg, locale) })}</p>}
+              {look === "run" && meta && <p className="text-xs text-primary">{t("avg", { time: txt(meta.avg, locale) })}</p>}
               {look === "run" && (
-                <OrderHelpButton orderId={o.id} kind="cancel" label={t("cancel")} className="min-h-11 w-full rounded-xl border border-[#FCA5A5] bg-surface px-3 text-sm font-bold text-[#B91C1C]" />
+                <OrderHelpButton orderId={o.id} kind="cancel" label={t("cancel")} className="min-h-11 w-full rounded-xl border border-danger/40 bg-surface px-3 text-sm font-bold text-danger" />
               )}
             </article>
           );

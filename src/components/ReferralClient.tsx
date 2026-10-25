@@ -21,24 +21,24 @@ export function TierCard(p: {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="12" cy="9" r="6" /><polyline points="8.2 13.5 7 22 12 19 17 22 15.8 13.5" /></svg>
           </span>
           <span>
-            <span className="block text-xs font-semibold text-[#94A3B8]">{p.title}</span>
+            <span className="block text-xs font-semibold text-white/55">{p.title}</span>
             <span className="block text-xl font-extrabold">{p.name}</span>
           </span>
         </div>
-        <span className="rounded-full bg-[#1E293B] px-2.5 py-1 text-xs font-bold text-[#CBD5E1]">{p.window}</span>
+        <span className="rounded-full bg-white/10 px-2.5 py-1 text-xs font-bold text-white/70">{p.window}</span>
       </div>
       <div className="flex flex-col gap-1.5">
-        <span className="text-[13px] text-[#CBD5E1]">{p.line}</span>
-        <span className="h-2.5 overflow-hidden rounded-full bg-[#1E293B]"><span className="block h-full rounded-full bg-[#FBBF24]" style={{ width: `${p.progress}%` }} /></span>
-        {p.need && <span className="text-[13px] leading-snug text-[#E2E8F0]">{p.need}</span>}
+        <span className="text-[13px] text-white/70">{p.line}</span>
+        <span className="h-2.5 overflow-hidden rounded-full bg-white/10"><span className="block h-full rounded-full bg-warning" style={{ width: `${p.progress}%` }} /></span>
+        {p.need && <span className="text-[13px] leading-snug text-white/85">{p.need}</span>}
       </div>
-      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="min-h-10 self-start rounded-[10px] border border-[#334155] px-3 text-[13px] font-bold">{open ? p.hideLabel : p.showLabel}</button>
+      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="min-h-10 self-start rounded-[10px] border border-white/20 px-3 text-[13px] font-bold">{open ? p.hideLabel : p.showLabel}</button>
       {open && (
         <ul className="flex flex-col gap-1.5">
           {p.tiers.map((x) => (
-            <li key={x.key} className={`flex items-center gap-2.5 rounded-[10px] px-2.5 py-2 text-sm ${x.current ? "bg-[#1E293B] text-[#FBBF24]" : "text-[#E2E8F0]"}`}>
+            <li key={x.key} className={`flex items-center gap-2.5 rounded-[10px] px-2.5 py-2 text-sm ${x.current ? "bg-white/10 text-warning" : "text-white/85"}`}>
               <span className="font-extrabold">{x.name}</span>
-              <span className="flex-1 text-right text-xs text-[#94A3B8]">{x.need}</span>
+              <span className="flex-1 text-right text-xs text-white/55">{x.need}</span>
               <span className="min-w-10 text-right font-extrabold">{x.pct}%</span>
             </li>
           ))}
@@ -83,12 +83,12 @@ export function EarningsCard({ available, pending, min, name, phone }: { availab
       <div className="flex items-start justify-between gap-2.5">
         <div className="flex flex-col gap-0.5">
           <span className="text-[13px] font-semibold text-muted">{t("canWithdraw")}</span>
-          <span className="text-[30px] font-extrabold tracking-[-0.5px] text-[#166534]">{fmt(available)}</span>
+          <span className="text-[30px] font-extrabold tracking-[-0.5px] text-success">{fmt(available)}</span>
           {pending > 0 && <span className="text-xs text-muted">{t("waiting", { amount: fmt(pending) })}</span>}
         </div>
         <span className="flex flex-col gap-1.5">
-          <span className="keep-white rounded-lg border border-[#E5E7EF] bg-white px-2 py-1"><PayLogo brand="moncash" height={14} /></span>
-          <span className="keep-white rounded-lg border border-[#E5E7EF] bg-white px-2 py-1"><PayLogo brand="natcash" height={14} /></span>
+          <span className="keep-white rounded-lg border border-border bg-white px-2 py-1"><PayLogo brand="moncash" height={14} /></span>
+          <span className="keep-white rounded-lg border border-border bg-white px-2 py-1"><PayLogo brand="natcash" height={14} /></span>
         </span>
       </div>
       <div className="grid grid-cols-[2fr_1fr] gap-2">
@@ -96,8 +96,8 @@ export function EarningsCard({ available, pending, min, name, phone }: { availab
           className={`min-h-[50px] rounded-[14px] text-[15px] font-extrabold ${canWithdraw ? "bg-cyan text-white" : "bg-surface-2 text-muted"}`}>{t("withdraw")}</button>
         <button type="button" disabled={available <= 0 || pendingTx} onClick={toWallet} className="min-h-[50px] rounded-[14px] border border-border bg-surface text-[13px] font-bold disabled:opacity-50">{t("toWallet")}</button>
       </div>
-      {!canWithdraw && <span className="text-xs font-semibold text-[#92400E]">{t("needMore", { amount: fmt(min - available) })}</span>}
-      {msg && <span className={`rounded-[10px] px-3 py-2.5 text-[13px] font-semibold ${msg.ok ? "bg-[#DCFCE7] text-[#166534]" : "bg-[#FEE2E2] text-[#991B1B]"}`}>{msg.text}</span>}
+      {!canWithdraw && <span className="text-xs font-semibold text-warning">{t("needMore", { amount: fmt(min - available) })}</span>}
+      {msg && <span className={`rounded-[10px] px-3 py-2.5 text-[13px] font-semibold ${msg.ok ? "bg-success-soft text-success" : "bg-danger-soft text-danger"}`}>{msg.text}</span>}
       <span className="text-xs text-muted">{t("minLine", { min: fmt(min) })}</span>
 
       {sheet && (
@@ -112,7 +112,7 @@ export function EarningsCard({ available, pending, min, name, phone }: { availab
             </div>
             {sent ? (
               <div className="flex flex-col items-center gap-2.5 py-2 text-center">
-                <span className="grid h-14 w-14 place-items-center rounded-full bg-[#DCFCE7] text-[#166534]">
+                <span className="grid h-14 w-14 place-items-center rounded-full bg-success-soft text-success">
                   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden><polyline points="5 12 10 17 19 7" /></svg>
                 </span>
                 <span className="text-[17px] font-extrabold">{t("sentTitle")}</span>
@@ -133,7 +133,7 @@ export function EarningsCard({ available, pending, min, name, phone }: { availab
                   <input value={tel} onChange={(e) => setTel(e.target.value)} type="tel" inputMode="tel" placeholder="+509 …" className="h-[50px] rounded-xl border border-border bg-surface px-3 text-base font-semibold" />
                   <span className="text-xs font-normal text-muted">{t("sameName", { name })}</span>
                 </label>
-                {msg && !msg.ok && <span className="rounded-[10px] bg-[#FEE2E2] px-3 py-2.5 text-[13px] font-semibold text-[#991B1B]">{msg.text}</span>}
+                {msg && !msg.ok && <span className="rounded-[10px] bg-danger-soft px-3 py-2.5 text-[13px] font-semibold text-danger">{msg.text}</span>}
                 <button type="button" disabled={pendingTx} onClick={withdraw} className="min-h-[52px] rounded-[14px] bg-cyan text-base font-extrabold text-white">{pendingTx ? "…" : t("send")}</button>
               </>
             )}
@@ -169,7 +169,7 @@ export function ShareBox({ link, message }: { link: string; message: string }) {
 }
 
 type Row = { id: string; initial: string; name: string; meta: string; value: string; tone: "good" | "bad" | "muted" };
-const TONE = { good: ["bg-[#E0E6FF] text-[#00209F]", "text-[#166534]"], bad: ["bg-[#FEE2E2] text-[#991B1B]", "text-[#991B1B]"], muted: ["bg-[#F1F5F9] text-[#475569]", "text-muted"] } as const;
+const TONE = { good: ["bg-primary-soft text-primary", "text-success"], bad: ["bg-danger-soft text-danger", "text-danger"], muted: ["bg-surface-2 text-muted", "text-muted"] } as const;
 
 /** Two tabs: friends (with what each brought) and past withdrawals. */
 export function ReferralLists(p: { friendsLabel: string; payoutsLabel: string; emptyFriends: string; emptyPayouts: string; friends: Row[]; payouts: Row[] }) {
@@ -178,7 +178,7 @@ export function ReferralLists(p: { friendsLabel: string; payoutsLabel: string; e
   const tabCls = (on: boolean) => `min-h-10 rounded-[9px] text-sm font-bold ${on ? "bg-surface text-text shadow-[0_1px_3px_rgba(15,23,42,0.12)]" : "text-muted"}`;
   return (
     <section className="flex flex-col gap-2">
-      <div role="tablist" className="grid grid-cols-2 gap-1 rounded-xl bg-[#E9ECF4] p-1">
+      <div role="tablist" className="grid grid-cols-2 gap-1 rounded-xl bg-surface-2 p-1">
         <button type="button" role="tab" aria-selected={tab === "friends"} onClick={() => setTab("friends")} className={tabCls(tab === "friends")}>{p.friendsLabel}</button>
         <button type="button" role="tab" aria-selected={tab === "payouts"} onClick={() => setTab("payouts")} className={tabCls(tab === "payouts")}>{p.payoutsLabel}</button>
       </div>

@@ -219,7 +219,7 @@ export function DepositForm(p: Props) {
               <button key={x.key} type="button" role="radio" aria-checked={on} onClick={() => switchTo(x.key)}
                 className={`flex items-center gap-3 rounded-[14px] border-2 bg-surface px-3.5 py-3 text-left ${on ? "border-text" : "border-border"}`}>
                 {x.brand ? (
-                  <span className="flex h-[42px] w-[104px] flex-none items-center justify-center keep-white rounded-xl border border-[#E5E7EF] bg-white px-2"><PayLogo brand={x.brand} height={20} /></span>
+                  <span className="flex h-[42px] w-[104px] flex-none items-center justify-center keep-white rounded-xl border border-border bg-white px-2"><PayLogo brand={x.brand} height={20} /></span>
                 ) : x.logo ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={x.logo} alt="" className="h-[42px] w-[42px] keep-white flex-none rounded-xl bg-white object-contain p-1" />
@@ -230,7 +230,7 @@ export function DepositForm(p: Props) {
                   <span className={x.brand ? "sr-only" : "text-[15px] font-bold"}>{x.name}</span>
                   <span className="text-xs text-muted">{meta}</span>
                 </span>
-                <span className={`grid h-[22px] w-[22px] flex-none place-items-center rounded-full border-2 ${on ? "border-text" : "border-[#94A3B8]"}`}>
+                <span className={`grid h-[22px] w-[22px] flex-none place-items-center rounded-full border-2 ${on ? "border-text" : "border-muted"}`}>
                   <span className={`h-2.5 w-2.5 rounded-full ${on ? "bg-text" : ""}`} />
                 </span>
               </button>

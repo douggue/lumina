@@ -8,7 +8,7 @@ export function OrderHelpButton({ orderId, kind, label, className, children }: {
   const t = useTranslations("ordersUi");
   const [note, setNote] = useState<{ ok: boolean; text: string } | null>(null);
   const [pending, start] = useTransition();
-  if (note?.ok) return <p className="rounded-[10px] bg-[#DCFCE7] px-3 py-2.5 text-xs text-[#166534]">{note.text}</p>;
+  if (note?.ok) return <p className="rounded-[10px] bg-success-soft px-3 py-2.5 text-xs text-success">{note.text}</p>;
   return (
     <div className="flex flex-1 flex-col gap-1.5">
       <button
@@ -26,7 +26,7 @@ export function OrderHelpButton({ orderId, kind, label, className, children }: {
         {children}
         {label}
       </button>
-      {note && <p className="text-xs text-[#B91C1C]">{note.text}</p>}
+      {note && <p className="text-xs text-danger">{note.text}</p>}
     </div>
   );
 }
