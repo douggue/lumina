@@ -59,7 +59,7 @@ export default async function ReferralPublicPage({ params }: { params: Promise<{
               <span className="text-[15px] font-extrabold">{txt(x.name, locale)}</span>
               <span className="text-xs text-muted">{x.minActive || x.minVolume ? t("tierNeed", { n: x.minActive, amount: fmt(x.minVolume) }) : t("tierStart")}</span>
             </span>
-            <span className="text-xl font-extrabold text-[#00209F] dark:text-primary">{x.pct}%</span>
+            <span className="text-xl font-extrabold text-primary">{x.pct}%</span>
           </div>
         ))}
         <p className="text-xs text-muted">{t("tiersNote")}</p>

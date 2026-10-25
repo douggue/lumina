@@ -16,7 +16,7 @@ export default async function ReferralsPage({ params }: { params: Promise<{ loca
   setRequestLocale(locale);
   const user = await requireUser(locale);
   const [t, tr, tc, settings] = await Promise.all([getTranslations("refUi"), getTranslations("referrals"), getTranslations("common"), getSettings()]);
-  const bar = <PageBar title={tr("title")} back="/account" backLabel={tc("back")} right={<Link href="/referral" className="px-1.5 text-[13px] font-bold text-[#00209F] dark:text-primary">{t("how")}</Link>} />;
+  const bar = <PageBar title={tr("title")} back="/account" backLabel={tc("back")} right={<Link href="/referral" className="px-1.5 text-[13px] font-bold text-primary">{t("how")}</Link>} />;
   if (!settings.referralEnabled) {
     return (
       <>
@@ -66,8 +66,8 @@ export default async function ReferralsPage({ params }: { params: Promise<{ loca
         <section className="grid grid-cols-3 gap-2">
           {[
             [String(stats.invited), t("statInvited"), ""],
-            [String(stats.active), t("statActive"), "text-[#00209F] dark:text-primary"],
-            [fmt(earnedTotal._sum.amount ?? 0), t("statEarned"), "text-[#166534]"],
+            [String(stats.active), t("statActive"), "text-primary"],
+            [fmt(earnedTotal._sum.amount ?? 0), t("statEarned"), "text-success"],
           ].map(([v, l, c]) => (
             <div key={l} className="flex flex-col items-center gap-1 rounded-[14px] border border-border bg-surface px-2 py-3 text-center">
               <span className={`text-lg font-extrabold ${c}`}>{v}</span>

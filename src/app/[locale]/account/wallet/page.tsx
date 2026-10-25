@@ -93,7 +93,7 @@ export default async function WalletPage({ params }: { params: Promise<{ locale:
                 <span className="truncate text-sm font-semibold">{label(e)}</span>
                 <span className="text-xs text-muted">{e.createdAt.toLocaleDateString(locale === "fr" ? "fr-FR" : "fr-HT", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
               </span>
-              <span className={`flex-none text-sm font-bold ${e.amount > 0 ? "text-[#166534] dark:text-success" : "text-text"}`}>
+              <span className={`flex-none text-sm font-bold ${e.amount > 0 ? "text-success" : "text-text"}`}>
                 {e.amount > 0 ? "+ " : "− "}{formatMoney(Math.abs(e.amount), e.currency, locale)}
               </span>
             </div>

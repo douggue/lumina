@@ -45,13 +45,13 @@ export default async function HomePage({ params, searchParams }: { params: Promi
       {preview && <div className="bg-warning px-4 py-2 text-center text-sm font-semibold text-midnight">Preview of the unpublished homepage draft</div>}
 
       {Object.values(settings.serviceStatus ?? {}).some((s) => s !== "ok") ? (
-        <Link href="/help" className="flex items-center gap-2 border-b border-[#FDE68A] bg-[#FFFBEB] px-4 py-[9px] text-xs font-bold text-[#92400E]">
-          <span className="h-2 w-2 rounded-full bg-[#D97706]" />
+        <Link href="/help" className="flex items-center gap-2 border-b border-warning/40 bg-warning-soft px-4 py-[9px] text-xs font-bold text-warning">
+          <span className="h-2 w-2 rounded-full bg-warning" />
           {tc("statusSome")}
         </Link>
       ) : (
-        <Link href="/help" className="flex items-center gap-2 border-b border-[#DCFCE7] bg-[#F0FDF4] px-4 py-[9px] text-xs font-bold text-[#166534] dark:border-success-soft dark:bg-success-soft dark:text-success">
-          <span className="h-2 w-2 rounded-full bg-[#16A34A]" />
+        <Link href="/help" className="flex items-center gap-2 border-b border-success/30 bg-success-soft px-4 py-[9px] text-xs font-bold text-success">
+          <span className="h-2 w-2 rounded-full bg-success" />
           {tc("statusOk")}
         </Link>
       )}
@@ -65,8 +65,8 @@ export default async function HomePage({ params, searchParams }: { params: Promi
           <Link href="/order" className="relative self-start keep-white rounded-xl bg-white px-[18px] py-3 text-[15px] font-bold text-[#0F172A]">{th("heroCta")}</Link>
         </section>
 
-        <Link href="/trial" className="flex items-center gap-3 rounded-2xl border-2 border-dashed border-[#F59E0B] bg-surface p-3.5 text-text">
-          <span className="grid h-11 w-11 flex-none place-items-center rounded-xl bg-[#FEF3C7] text-[#B45309]">
+        <Link href="/trial" className="flex items-center gap-3 rounded-2xl border-2 border-dashed border-warning bg-surface p-3.5 text-text">
+          <span className="grid h-11 w-11 flex-none place-items-center rounded-xl bg-warning-soft text-warning">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><rect x="3" y="8" width="18" height="13" rx="2" /><path d="M12 8v13M3 12h18M12 8c-2-4-6-4-6-1.5S9 8 12 8c3 0 6-1 6-3.5S14 4 12 8z" /></svg>
           </span>
           <span className="flex flex-1 flex-col gap-0.5">
@@ -102,7 +102,7 @@ export default async function HomePage({ params, searchParams }: { params: Promi
               <h2 className="text-base font-bold">{th("packsTitle")}</h2>
               {(() => {
                 const v = packs[0].variants[0];
-                return v?.salePriceHtg ? <span className="text-xs font-bold text-[#B45309]">-{Math.round((1 - v.salePriceHtg / v.priceHtg) * 100)}%</span> : null;
+                return v?.salePriceHtg ? <span className="text-xs font-bold text-warning">-{Math.round((1 - v.salePriceHtg / v.priceHtg) * 100)}%</span> : null;
               })()}
             </div>
             <div className="flex gap-2.5">
@@ -119,7 +119,7 @@ export default async function HomePage({ params, searchParams }: { params: Promi
                     {v && (
                       <span className="flex items-baseline gap-1.5">
                         <span className="text-base font-extrabold">{formatMoney(v.salePriceHtg ?? v.priceHtg, "HTG", locale)}</span>
-                        {v.salePriceHtg && <span className="text-xs text-[#64748B] line-through">{formatMoney(v.priceHtg, "HTG", locale)}</span>}
+                        {v.salePriceHtg && <span className="text-xs text-muted line-through">{formatMoney(v.priceHtg, "HTG", locale)}</span>}
                       </span>
                     )}
                   </Link>
